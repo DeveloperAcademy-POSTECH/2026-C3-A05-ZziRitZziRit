@@ -43,28 +43,24 @@
 		A4AD5EB92FCC7AA100736E6D /* Exceptions for "Mayoty" folder in "Mayoty" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Core/.gitkeep,
 				Domain/Entities/.gitkeep,
+				Domain/Roles/.gitkeep,
+				Domain/Services/.gitkeep,
+				Domain/States/.gitkeep,
+				Infrastructure/Bluetooth/.gitkeep,
+				Infrastructure/HomeKit/.gitkeep,
+				Shared/Sound/.gitkeep,
 			);
 			target = A4AD5E962FCC792F00736E6D /* Mayoty */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		A4AD5EBA2FCC7AA100736E6D /* Exceptions for "Mayoty" folder in "Compile Sources" phase from "Mayoty" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = A4AD5E932FCC792F00736E6D /* Sources */;
-			membershipExceptions = (
-				Domain/Entities/.gitkeep,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		A4AD5E992FCC792F00736E6D /* Mayoty */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A4AD5EB92FCC7AA100736E6D /* Exceptions for "Mayoty" folder in "Mayoty" target */,
-				A4AD5EBA2FCC7AA100736E6D /* Exceptions for "Mayoty" folder in "Compile Sources" phase from "Mayoty" target */,
 			);
 			path = Mayoty;
 			sourceTree = "<group>";
@@ -368,6 +364,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6B47X24XTW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -404,6 +401,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6B47X24XTW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
