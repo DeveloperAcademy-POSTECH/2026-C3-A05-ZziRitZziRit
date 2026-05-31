@@ -1,13 +1,6 @@
-<div>
-  <img src="https://capsule-render.vercel.app/api?type=soft&color=0:111111,100:333333&height=100&text=%20MAYOTY&fontColor=FFFFFF&fontSize=42" />
-</div>
+# Mayoty
 
-
-
-> 사회자가 없이 마피아 게임을 하는 상황에서 HomeKit의 Homepod, 조명 제어 기술을 활용하여 
-다양한 감각으로 몰입하도록 도와주는 서비스 🦹‍♂️
-
-
+> 사회자가 없이 마피아 게임을 하는 상황에서 HomeKit의 Homepod, 조명 제어 기술을 활용하여 다양한 감각으로 몰입하도록 도와주는 서비스 🦹‍♂️
 
 ###  Developer
 |    💵 남궁   |    ☀️ 주니   |   🎀 케일린   |    🍟 민    |  🤍 흰    |
