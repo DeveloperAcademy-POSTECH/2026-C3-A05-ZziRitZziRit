@@ -18,6 +18,7 @@ enum GameAction {
     case voteCompleted
 
     case finalDefenseEnded
+    case executionVoteSubmitted(voter: Player, isAgree: Bool)
     case executionCompleted
     case gameEnded
 }
