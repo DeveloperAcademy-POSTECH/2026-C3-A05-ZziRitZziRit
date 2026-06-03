@@ -10,6 +10,10 @@ final class MafiaGame {
 
     private(set) var currentState: any GameState
 
+    private(set) var mafiaTarget: Player?
+    private(set) var policeTarget: Player?
+    private(set) var doctorTarget: Player?
+
     init(
         players: [Player],
         initialState: any GameState
@@ -30,6 +34,24 @@ final class MafiaGame {
         currentState.exit(game: self)
         currentState = state
         currentState.enter(game: self)
+    }
+
+    func selectMafiaTarget(_ player: Player) {
+        mafiaTarget = player
+    }
+
+    func investigateTarget(_ player: Player) {
+        policeTarget = player
+    }
+
+    func selectDoctorTarget(_ player: Player) {
+        doctorTarget = player
+    }
+
+    func resetNightTargets() {
+        mafiaTarget = nil
+        policeTarget = nil
+        doctorTarget = nil
     }
 
     func endGame() {
