@@ -9,19 +9,15 @@ struct PoliceState: GameState {
     func enter(game: MafiaGame) {
         // 경찰 선택 요청
     }
-    
+
     func handleAction(game: MafiaGame, action: GameAction) {
-        switch action {
-        case .policeSelected(let target):
-            game.investigateTarget(target)
-            game.changeState(to: DoctorState())
-            
-        default:
-            break
-        }
+        guard case .policeSelected(let target) = action else { return }
+
+        game.selectInvestigateTarget(target)
+        game.changeState(to: DoctorState())
     }
-    
+
     func exit(game: MafiaGame) {
-        
+
     }
 }

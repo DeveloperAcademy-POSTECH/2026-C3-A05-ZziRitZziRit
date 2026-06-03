@@ -48,11 +48,11 @@ final class MafiaGame {
         mafiaTarget = player
     }
 
-    func investigateTarget(_ player: Player) {
+    func selectInvestigateTarget(_ player: Player) {
         policeTarget = player
     }
 
-    func selectDoctorTarget(_ player: Player) {
+    func selectHealTarget(_ player: Player) {
         doctorTarget = player
     }
 

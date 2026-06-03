@@ -11,13 +11,9 @@ struct ExecutionVoteState: GameState {
     }
 
     func handleAction(game: MafiaGame, action: GameAction) {
-        switch action {
-        case .executionVoteCompleted:
-            game.changeState(to: ExecutionResultState())
+        guard case .executionVoteCompleted = action else { return }
 
-        default:
-            break
-        }
+        game.changeState(to: ExecutionResultState())
     }
 
     func exit(game: MafiaGame) {
