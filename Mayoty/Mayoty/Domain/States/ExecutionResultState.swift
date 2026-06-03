@@ -1,26 +1,26 @@
 //
-//  FinalDefenseState.swift
+//  ExecutionResultState.swift
 //  Mayoty
 //
 //  Created by sun on 6/3/26.
 //
 
-struct FinalDefenseState: GameState {
+struct ExecutionResultState: GameState {
     func enter(game: MafiaGame) {
-        // 최후 변론 시작
+        // 처형 결과 발표 시작
     }
-    
+
     func handleAction(game: MafiaGame, action: GameAction) {
         switch action {
-        case .finalDefenseEnded:
-            game.changeState(to: ExecutionVoteState())
-            
+        case .executionCompleted:
+            game.changeState(to: ResultState())
+
         default:
             break
         }
     }
-    
+
     func exit(game: MafiaGame) {
-        // 최후 변론 종료 처리
+        // 처형 결과 발표 종료
     }
 }
