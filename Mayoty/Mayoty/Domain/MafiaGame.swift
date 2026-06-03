@@ -13,6 +13,9 @@ final class MafiaGame {
     private(set) var mafiaTarget: Player?
     private(set) var policeTarget: Player?
     private(set) var doctorTarget: Player?
+    
+    private(set) var finalDefensePlayer: Player?
+    let voteManager = VoteManager()
 
     init(
         players: [Player],
@@ -52,6 +55,14 @@ final class MafiaGame {
         mafiaTarget = nil
         policeTarget = nil
         doctorTarget = nil
+    }
+    
+    func selectFinalDefensePlayer(_ player: Player) {
+        finalDefensePlayer = player
+    }
+    
+    func resetFinalDefensePlayer() {
+        finalDefensePlayer = nil
     }
 
     func endGame() {
