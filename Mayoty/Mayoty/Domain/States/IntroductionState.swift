@@ -8,7 +8,7 @@
 struct IntroductionState: GameState {
     func enter(game: MafiaGame) {
         game.timerManager.startTimer(
-            seconds: GameTime.discussion,
+            seconds: GameTime.introduction,
             onTimeout: {
                 game.changeState(to: NightState())
             }
