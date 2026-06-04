@@ -8,6 +8,7 @@
 enum GameAction {
     case startGame
     case rolesAssigned
+    case introductionEnded
 
     case mafiaSelected(target: Player)
     case policeSelected(target: Player)
