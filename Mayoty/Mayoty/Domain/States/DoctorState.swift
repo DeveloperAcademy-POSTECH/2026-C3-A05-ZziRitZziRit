@@ -10,7 +10,7 @@ struct DoctorState: GameState {
         game.timerManager.startTimer(
             seconds: GameTime.doctor,
             onTimeout: {
-                game.changeState(to: DiscussionState())
+                game.proceedAfterNight()
             }
         )
     }
@@ -19,10 +19,10 @@ struct DoctorState: GameState {
         guard case .doctorSelected(let target) = action else { return }
 
         game.selectHealTarget(target)
-        game.changeState(to: DiscussionState())
+        game.proceedAfterNight()
     }
 
     func exit(game: MafiaGame) {
-
+        game.timerManager.stopTimer()
     }
 }
