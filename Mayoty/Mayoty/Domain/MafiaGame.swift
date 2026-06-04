@@ -65,7 +65,8 @@ final class MafiaGame {
     func selectFinalDefensePlayer(_ player: Player) {
         finalDefensePlayer = player
     }
-
+    
+    // TODO: FinalDefenseState 종료 시 finalDefensePlayer 초기화
     func resetFinalDefensePlayer() {
         finalDefensePlayer = nil
     }

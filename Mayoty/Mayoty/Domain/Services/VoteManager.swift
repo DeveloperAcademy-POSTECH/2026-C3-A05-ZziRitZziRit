@@ -65,14 +65,14 @@ final class VoteManager {
             isAgree: false
         )
     }
-    
+
     // MARK: - 찬반 투표 집계
 
-    func shouldExecute() -> Bool {
+    var shouldBeExecuted: Bool {
         let agreeCount = executionVotes.values.filter { $0 }.count
-        let disagreeCount = executionVotes.values.filter { !$0 }.count
+        let totalCount = executionVotes.values.count
 
-        return agreeCount > disagreeCount
+        return 2 * agreeCount > totalCount
     }
 
     func resetTargetVotes() {
