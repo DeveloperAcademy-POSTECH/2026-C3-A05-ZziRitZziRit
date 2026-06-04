@@ -42,7 +42,7 @@ final class TimerManager {
                 let remainingDuration = self.clock.now.duration(to: deadline)
                 let remainingSeconds = max(
                     0,
-                    Int(ceil(Double(remainingDuration.components.seconds)))
+                    Int(remainingDuration.components.seconds)
                 )
 
                 await MainActor.run {
