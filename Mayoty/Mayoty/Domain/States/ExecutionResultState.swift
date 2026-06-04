@@ -22,6 +22,6 @@ struct ExecutionResultState: GameState {
     }
     
     func exit(game: MafiaGame) {
-        // 처형 결과 발표 종료
+        game.timerManager.stopTimer()
     }
 }

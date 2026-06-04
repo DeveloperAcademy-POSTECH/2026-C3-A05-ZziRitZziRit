@@ -8,7 +8,9 @@
 import Foundation
 
 final class TimerManager {
-    private var timer: Timer?
+    private var timerTask: Task<Void, Never>?
+    private let clock = ContinuousClock()
+
     private(set) var remainingTime: Int = 0
 
     func startTimer(
@@ -18,29 +20,50 @@ final class TimerManager {
     ) {
         stopTimer()
 
+        let deadline = clock.now + .seconds(seconds)
+
         remainingTime = seconds
         onTick?(remainingTime)
 
-        timer = Timer.scheduledTimer(
-            withTimeInterval: 1.0,
-            repeats: true
-        ) { [weak self] timer in
+        timerTask = Task { [weak self] in
             guard let self else { return }
 
-            self.remainingTime -= 1
-            onTick?(self.remainingTime)
+            while !Task.isCancelled {
+                do {
+                    try await Task.sleep(
+                        for: .milliseconds(200),
+                        tolerance: .milliseconds(50),
+                        clock: self.clock
+                    )
+                } catch {
+                    return
+                }
 
-            if self.remainingTime <= 0 {
-                timer.invalidate()
-                self.timer = nil
-                onTimeout()
+                let remainingDuration = self.clock.now.duration(to: deadline)
+                let remainingSeconds = max(
+                    0,
+                    Int(ceil(Double(remainingDuration.components.seconds)))
+                )
+
+                await MainActor.run {
+                    self.remainingTime = remainingSeconds
+                    onTick?(remainingSeconds)
+                }
+
+                if remainingSeconds <= 0 {
+                    await MainActor.run {
+                        self.timerTask = nil
+                        onTimeout()
+                    }
+                    return
+                }
             }
         }
     }
 
     func stopTimer() {
-        timer?.invalidate()
-        timer = nil
+        timerTask?.cancel()
+        timerTask = nil
     }
 
     func resetTimer() {
