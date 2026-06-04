@@ -7,16 +7,35 @@
 
 struct ExecutionVoteState: GameState {
     func enter(game: MafiaGame) {
-        // 처형 찬반 투표 시작
+        game.timerManager.startTimer(
+            seconds: GameTime.executionVote,
+            onTimeout: {
+                game.changeState(to: ExecutionResultState())
+            }
+        )
     }
 
     func handleAction(game: MafiaGame, action: GameAction) {
-        guard case .executionVoteCompleted = action else { return }
+        switch action {
+        case .executionVoteSubmitted(let voter, let isAgree):
+            guard let finalDefensePlayer = game.finalDefensePlayer else { return }
 
-        game.changeState(to: ExecutionResultState())
+            game.voteManager.submitExecutionVote(
+                voter: voter,
+                finalDefensePlayer: finalDefensePlayer,
+                isAgree: isAgree
+            )
+
+        case .executionVoteCompleted:
+            game.changeState(to: ExecutionResultState())
+
+        default:
+            break
+        }
     }
 
     func exit(game: MafiaGame) {
-        // 처형 찬반 투표 종료
+        game.timerManager.stopTimer()
     }
 }
+
