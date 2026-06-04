@@ -11,8 +11,9 @@ import SwiftUI
 struct MayotyWatch_Watch_AppApp: App {
     var body: some Scene {
         WindowGroup {
+            DeadTest()
 //            HapticCatalogView()
-            ContentView()
+//            ContentView()
         }
     }
 }
