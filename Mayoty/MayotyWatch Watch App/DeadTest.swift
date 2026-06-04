@@ -11,13 +11,13 @@ struct DeadTest: View {
     var body: some View {
         VStack() {
             HStack {
-                Image("마피아 로고 1")
+                Image("MaifaLogo")
                     .resizable(capInsets: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
                     .frame(width: 40, height: 40)
                     //                    .aspectRatio(contentMode: .fit)
                 Spacer()
             }
-            Image("해골이미지2")
+            Image("skeleton")
 //                .frame(width: 20, height: 20)
                 .resizable()
                 .scaledToFit()
