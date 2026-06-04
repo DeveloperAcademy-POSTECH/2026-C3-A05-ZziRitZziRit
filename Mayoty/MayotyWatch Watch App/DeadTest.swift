@@ -1,0 +1,49 @@
+//
+//  DeadTest.swift
+//  MayotyWatch Watch App
+//
+//  Created by 이경민 on 6/2/26.
+//
+
+import SwiftUI
+
+struct DeadTest: View {
+    var body: some View {
+        VStack() {
+            HStack {
+                Image("마피아 로고 1")
+                    .resizable(capInsets: EdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0))
+                    .frame(width: 40, height: 40)
+                    //                    .aspectRatio(contentMode: .fit)
+                Spacer()
+            }
+            Image("해골이미지2")
+//                .frame(width: 20, height: 20)
+                .resizable()
+                .scaledToFit()
+            Text("사망하셨습니다")
+                .font(.headline)
+            Button("Dead") {
+                let device = WKInterfaceDevice.current()
+                
+                Task{
+                    for _ in 0..<3 {
+                        device.play(.stop)
+                        try? await Task.sleep(for: .milliseconds(1000))
+                    }
+                    device.play(.start)
+                    try? await Task.sleep(for: .milliseconds(600))
+                }
+            }
+        }
+        .ignoresSafeArea()
+        .task {
+            await HapticCatalog.dead.play()
+        }
+    }
+
+}
+
+#Preview {
+    DeadTest()
+}
