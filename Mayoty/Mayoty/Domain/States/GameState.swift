@@ -6,7 +6,12 @@
 //
 
 protocol GameState {
-    func enter()
-    func handleAction(_ action: GameAction)
-    func exit()
+    func enter(game: MafiaGame)
+
+    func handleAction(
+        game: MafiaGame,
+        action: GameAction
+    )
+
+    func exit(game: MafiaGame)
 }
