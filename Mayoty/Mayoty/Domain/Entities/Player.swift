@@ -7,25 +7,29 @@
 
 import Foundation
 
-struct Player: Identifiable, Codable {
+final class Player: Identifiable {
     let id: UUID
-    let color: PlayerColor
-    
+
+    var color: PlayerColor?
     var role: Role?
     var isAlive: Bool
-    
+
     let watchId: String?
     let lightId: String?
-    
+
     init(
         id: UUID = UUID(),
-        color: PlayerColor
+        color: PlayerColor? = nil,
+        role: Role? = nil,
+        isAlive: Bool = true,
+        watchId: String? = nil,
+        lightId: String? = nil
     ) {
         self.id = id
         self.color = color
-        self.role = nil
-        self.isAlive = true
-        self.watchId = nil
-        self.lightId = nil
+        self.role = role
+        self.isAlive = isAlive
+        self.watchId = watchId
+        self.lightId = lightId
     }
 }
