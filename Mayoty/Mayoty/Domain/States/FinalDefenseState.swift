@@ -7,19 +7,20 @@
 
 struct FinalDefenseState: GameState {
     func enter(game: MafiaGame) {
-        // 최후 변론 시작
+        game.timerManager.startTimer(
+            seconds: GameTime.finalDefense,
+            onTimeout: {
+                game.changeState(to: ExecutionVoteState())
+            }
+        )
     }
-    
+
     func handleAction(game: MafiaGame, action: GameAction) {
-        switch action {
-        case .finalDefenseEnded:
-            game.changeState(to: ExecutionState())
-            
-        default:
-            break
-        }
+        guard case .finalDefenseEnded = action else { return }
+
+        game.changeState(to: ExecutionVoteState())
     }
-    
+
     func exit(game: MafiaGame) {
         // 최후 변론 종료 처리
     }
