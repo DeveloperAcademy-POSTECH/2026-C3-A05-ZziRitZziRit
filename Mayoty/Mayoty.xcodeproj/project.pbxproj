@@ -54,12 +54,27 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		559880362FD16FD100C82E02 /* Exceptions for "Mayoty" folder in "MayotyWatch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Infrastructure/Bluetooth/BLEAnswer.swift,
+				Infrastructure/Bluetooth/BLEUUID.swift,
+			);
+			target = A4AD5ECA2FCC7B9700736E6D /* MayotyWatch Watch App */;
+		};
+		559880652FD170BC00C82E02 /* Exceptions for "MayotyWatch Watch App" folder in "MayotyWatch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"MayotyWatch-Watch-App-Info.plist",
+			);
+			target = A4AD5ECA2FCC7B9700736E6D /* MayotyWatch Watch App */;
+		};
 		A4AD5EB92FCC7AA100736E6D /* Exceptions for "Mayoty" folder in "Mayoty" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Core/.gitkeep,
 				Domain/Services/.gitkeep,
-				Infrastructure/Bluetooth/.gitkeep,
+				Info.plist,
 				Infrastructure/HomeKit/.gitkeep,
 				Shared/Sound/.gitkeep,
 			);
@@ -72,12 +87,16 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				A4AD5EB92FCC7AA100736E6D /* Exceptions for "Mayoty" folder in "Mayoty" target */,
+				559880362FD16FD100C82E02 /* Exceptions for "Mayoty" folder in "MayotyWatch Watch App" target */,
 			);
 			path = Mayoty;
 			sourceTree = "<group>";
 		};
 		A4AD5ECC2FCC7B9700736E6D /* MayotyWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				559880652FD170BC00C82E02 /* Exceptions for "MayotyWatch Watch App" folder in "MayotyWatch Watch App" target */,
+			);
 			path = "MayotyWatch Watch App";
 			sourceTree = "<group>";
 		};
@@ -381,6 +400,11 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 6B47X24XTW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Mayoty/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "이 앱은 주변 BLE 기기와 통신하기 위해 Bluetooth를 사용합니다.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "이 앱은 주변 BLE 기기와 통신하기 위해 Bluetooth를 사용합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -422,6 +446,11 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 6B47X24XTW;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Mayoty/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "이 앱은 주변 BLE 기기와 통신하기 위해 Bluetooth를 사용합니다.";
+				INFOPLIST_KEY_NSBluetoothPeripheralUsageDescription = "이 앱은 주변 BLE 기기와 통신하기 위해 Bluetooth를 사용합니다.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -459,10 +488,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4MKG9D7KY5;
+				DEVELOPMENT_TEAM = CKPNMTR7K5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "MayotyWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MayotyWatch;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "이 앱은 주변 BLE 기기와 통신하기 위해 Bluetooth를 사용합니다.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = app.zziritzzirit.mayoty;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -494,10 +525,12 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 4MKG9D7KY5;
+				DEVELOPMENT_TEAM = CKPNMTR7K5;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "MayotyWatch-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = MayotyWatch;
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "이 앱은 주변 BLE 기기와 통신하기 위해 Bluetooth를 사용합니다.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = app.zziritzzirit.mayoty;
 				LD_RUNPATH_SEARCH_PATHS = (
