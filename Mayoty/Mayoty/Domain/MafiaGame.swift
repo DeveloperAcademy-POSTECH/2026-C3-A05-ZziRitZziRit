@@ -22,7 +22,9 @@ final class MafiaGame {
     private(set) var doctorTarget: Player?
 
     private(set) var finalDefensePlayer: Player?
+    
     let voteManager = VoteManager()
+    let timerManager = TimerManager()
 
     init(
         players: [Player],

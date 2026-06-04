@@ -7,7 +7,12 @@
 
 struct DiscussionState: GameState {
     func enter(game: MafiaGame) {
-        // 토론 시작
+        game.timerManager.startTimer(
+            seconds: GameTime.discussion,
+            onTimeout: {
+                game.changeState(to: VoteState())
+            }
+        )
     }
 
     func handleAction(game: MafiaGame, action: GameAction) {

@@ -7,7 +7,12 @@
 
 struct MafiaState: GameState {
     func enter(game: MafiaGame) {
-        // 마피아 선택 요청
+        game.timerManager.startTimer(
+            seconds: GameTime.mafia,
+            onTimeout: {
+                game.changeState(to: PoliceState())
+            }
+        )
     }
 
     func handleAction(game: MafiaGame, action: GameAction) {

@@ -7,7 +7,12 @@
 
 struct FinalDefenseState: GameState {
     func enter(game: MafiaGame) {
-        // 최후 변론 시작
+        game.timerManager.startTimer(
+            seconds: GameTime.finalDefense,
+            onTimeout: {
+                game.changeState(to: ExecutionVoteState())
+            }
+        )
     }
 
     func handleAction(game: MafiaGame, action: GameAction) {

@@ -7,7 +7,12 @@
 
 struct DoctorState: GameState {
     func enter(game: MafiaGame) {
-        // 의사 선택 요청
+        game.timerManager.startTimer(
+            seconds: GameTime.doctor,
+            onTimeout: {
+                game.changeState(to: DiscussionState())
+            }
+        )
     }
 
     func handleAction(game: MafiaGame, action: GameAction) {
