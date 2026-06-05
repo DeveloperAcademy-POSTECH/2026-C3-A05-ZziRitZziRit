@@ -8,62 +8,44 @@ import Foundation
 import CoreBluetooth
 
 final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate{
-
+    
+    var onConnectionStateChanged: ((WatchConnectionState) -> Void)?
+    
     private var centralManager: CBCentralManager?
     private var targetPeripheral: CBPeripheral?
     private var answerCharacteristic: CBCharacteristic?
     
-    private let model: WatchViewModel
-    private var pendingAnswer: BLEMessage?
+    private var pendingAnswer: BLEAnswer?  //보류중인 응답
     
-    init(model: WatchViewModel){
-        self.model = model
+    override init(){
         super.init()
-        
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
     }
 
 
-    
+//Central manager 업데이트 알림
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        switch central.state{
-        case.poweredOn:
-            model.status = "Powered On"
-            model.addLog("블루투스 활성화")
-        case.poweredOff:
-            model.status = "Powered Off"
-            model.addLog("블루투스 비활성화")
-        case.unauthorized:
-            model.status = "Unauthorized"
-            model.addLog("블루투스 비활성화")
-        case.unsupported:
-            model.status = "Unsupported"
-            model.addLog("이 기기는 블루투스를 지원하지 않습니다")
-        case .unknown:
-            model.status = "Unknown"
-        case .resetting:
-            model.status = "Resetting"
-        default:
-            model.status = "Bluetooth not ready"
-        }
-    }
-    
-    
-
-    func scan(){
-        guard centralManager?.state == .poweredOn else {
-            model.addLog("블루투스 상태가 올바르지 않음")
+        guard central.state == .poweredOn else {
             return
         }
-        model.addLog("Start scan...")
         
-        centralManager?.scanForPeripherals(
-            withServices: [BLEUUID.service],
-            options: nil)
+        onConnectionStateChanged?(.idle)
     }
     
     
-
+//peripheral을 찾고 난 다음 Service 탐색
+    func scan(){
+        guard centralManager?.state == .poweredOn else {
+            return
+        }
+        
+        onConnectionStateChanged?(.scanning)
+        
+        centralManager?.scanForPeripherals(withServices: [BLEUUID.service], options: nil)
+    }
+    
+    
+//Central에서 연결 끊을 경우
     func disconnect(){
         if let peripheral = targetPeripheral{
             centralManager?.cancelPeripheralConnection(peripheral)
@@ -71,88 +53,82 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         
         targetPeripheral = nil
         answerCharacteristic = nil
-        model.status = "Disconnected"
-        model.addLog("Disconnected")
+        onConnectionStateChanged?(.disconnected)
     }
     
     
-
+//BLEAnswer 보내기
     func sendSaveOrKill(_ answer: BLEsaveOrKill){
-        send(BLEMessage(kind: .saveOrKill, value: answer.rawValue))
+        send(BLEAnswer(kind: .saveOrKill, value: answer.rawValue))
     }
     
     func sendSelectPlayer(_ playerNumber: UInt8){
-        send(BLEMessage(kind:.selectPlayer, value: playerNumber))
+        send(BLEAnswer(kind:.selectPlayer, value: playerNumber))
     }
     
     
     
-    private func send(_ message: BLEMessage) {
+    private func send(_ answer: BLEAnswer) {
         guard let peripheral = targetPeripheral,
               let characteristic = answerCharacteristic
         else {
-            pendingAnswer = message
-            model.addLog("다시 검색합니다")
+            pendingAnswer = answer
             scan()
             return
         }
         
-        peripheral.writeValue(message.data, for: characteristic, type: .withResponse)
-        
-//      여기 어떻게 수정하지
-//      model.status = "Sent \(answer == .kill ? "죽이기" : "살리기")"
-//      model.addLog("Sent \(answer == .kill ? "죽이기" : "살리기")"
-        
+        peripheral.writeValue(answer.data, for: characteristic, type: .withResponse)
     }
     
-
     
+    
+
+//central이 peripheral을 발견했음을 알림
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        model.status = "iPhone 발견"
-        model.addLog("Found: \(peripheral.name ?? "Unknown")")
         
         targetPeripheral = peripheral
         targetPeripheral?.delegate = self
+        
+        onConnectionStateChanged?(.connecting)
         
         centralManager?.stopScan()
         centralManager?.connect(peripheral, options: nil)
     }
     
 
-    
+//central이 peripheral과 연결했음을 delegate에 알림
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        model.status = "Connected"
-        model.addLog("iPhone과 연결됨")
+        onConnectionStateChanged?(.connected)
         peripheral.discoverServices([BLEUUID.service])
     }
     
     
-
+//central가 peripheral과 연결을 생성하지 못했음을 delegate에 알림
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: (any Error)?) {
-        model.status = "Connect Failed"
-        model.addLog("Connect Failed: \(error?.localizedDescription ?? "Unknown Error")")
-    }
-    
-    
-
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
-        model.status = "Disconnected"
-        model.addLog("Disconnected")
-        
         targetPeripheral = nil
         answerCharacteristic = nil
+        onConnectionStateChanged?(.failed)
+    }
+    
+    
+//central가 peripheral과 연결이 끊어진 것을 delegate에 알림
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: (any Error)?) {
+        targetPeripheral = nil
+        answerCharacteristic = nil
+        onConnectionStateChanged?(.disconnected)
     }
     
 
 
-    
+//central에서 peripheral의 service 검색이 성공했음을 알림
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: (any Error)?) {
-        if let error{
-            model.addLog("Discover services error: \(error.localizedDescription)")
+        
+        guard error == nil,
+              let services = peripheral.services
+        else {
+            onConnectionStateChanged?(.failed)
             return
         }
-        
-        guard let services = peripheral.services else { return }
         
         for service in services where service.uuid == BLEUUID.service {
             peripheral.discoverCharacteristics([BLEUUID.answer], for: service)
@@ -161,19 +137,18 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
     
 
 
-    
+//PeripheralDelegate에게 지정된 특성의 값을 검색하는데 성공했음을 알려주거나 특성의 값이 변경된 것을 알림
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: (any Error)?) {
-        if let error{
-            model.addLog("Discover characteristics error: \(error.localizedDescription)")
+        
+        guard error == nil,
+              let characteristics = service.characteristics
+        else {
+            onConnectionStateChanged?(.failed)
             return
         }
         
-        guard let characteristics = service.characteristics else { return }
-        
         for characteristic in characteristics where characteristic.uuid == BLEUUID.answer {
             answerCharacteristic = characteristic
-            model.status = "Ready"
-            model.addLog("Ready to send")
             
             if let pendingAnswer{
                 self.pendingAnswer = nil
@@ -184,16 +159,12 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
     
 
 
-    
-    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: (any Error)?) {
-        if let error{
-            model.status = "Write failed"
-            model.addLog("Write failed: \(error.localizedDescription)")
-        }else{
-            model.status = "Write success"
-            model.addLog("쓰기 성공")
+//Peripheral의 characteristic에 대한 값 쓰기
+    func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: (any Error)?
+    ) {
+        if error != nil {
+            onConnectionStateChanged?(.failed)
         }
     }
     
 }
-
