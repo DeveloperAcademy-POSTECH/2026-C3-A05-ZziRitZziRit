@@ -1,9 +1,9 @@
-//
-//  DeadTest.swift
-//  MayotyWatch Watch App
-//
-//  Created by 이경민 on 6/2/26.
-//
+    //
+    //  DeadTest.swift
+    //  MayotyWatch Watch App
+    //
+    //  Created by 이경민 on 6/2/26.
+    //
 
 import SwiftUI
 
@@ -31,17 +31,14 @@ struct DeadTest: View {
                         device.play(.stop)
                         try? await Task.sleep(for: .milliseconds(1000))
                     }
-                    device.play(.start)
-                    try? await Task.sleep(for: .milliseconds(600))
                 }
-            }
+                .task {
+                    await HapticCatalog.dead.play()
+                }
+//            }
         }
-        .ignoresSafeArea()
-        .task {
-            await HapticCatalog.dead.play()
-        }
+        .safeAreaPadding(.top, 0)
     }
-
 }
 
 #Preview {
