@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct GameStart: View {
+struct GameStartView: View {
     var body: some View {
         MafiaLogoView {
                 Text("마피아 게임을 시작합니다")
@@ -18,5 +18,5 @@ struct GameStart: View {
 }
 
 #Preview {
-    GameStart()
+    GameStartView()
 }

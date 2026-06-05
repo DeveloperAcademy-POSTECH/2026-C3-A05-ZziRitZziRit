@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct WelcomeMafia: View {
+struct WelcomeMafiaView: View {
     var body: some View {
         MafiaLogoView{
                 Text("마피아 세계에 \n오신걸 \n환영합니다.")
@@ -18,5 +18,5 @@ struct WelcomeMafia: View {
 }
 
 #Preview {
-        WelcomeMafia()
+    WelcomeMafiaView()
 }
