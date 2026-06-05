@@ -1,9 +1,9 @@
-    //
-    //  DeadTest.swift
-    //  MayotyWatch Watch App
-    //
-    //  Created by 이경민 on 6/2/26.
-    //
+//
+//  DeadTest.swift
+//  MayotyWatch Watch App
+//
+//  Created by 이경민 on 6/2/26.
+//
 
 import SwiftUI
 
