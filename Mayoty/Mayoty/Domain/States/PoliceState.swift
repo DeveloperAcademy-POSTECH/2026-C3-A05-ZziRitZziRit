@@ -19,6 +19,11 @@ struct PoliceState: GameState {
         guard case .policeSelected(let target) = action else { return }
 
         game.selectInvestigateTarget(target)
+        
+        let isMafia = target.role?.team == .mafia
+
+        // TODO: 경찰 워치에 수사 결과 전송
+        // game.watchBluetoothManager.sendInvestigationResult(isMafia)
         game.changeState(to: DoctorState())
     }
 

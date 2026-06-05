@@ -22,9 +22,12 @@ final class MafiaGame {
     private(set) var doctorTarget: Player?
 
     private(set) var finalDefensePlayer: Player?
-    
+    private(set) var winner: Team?
+
     let voteManager = VoteManager()
     let timerManager = TimerManager()
+    let gameRuleManager = GameRuleManager()
+    let resultManager = ResultManager()
 
     init(
         players: [Player],
@@ -67,10 +70,33 @@ final class MafiaGame {
     func selectFinalDefensePlayer(_ player: Player) {
         finalDefensePlayer = player
     }
-    
-    // TODO: FinalDefenseState 종료 시 finalDefensePlayer 초기화
+
     func resetFinalDefensePlayer() {
         finalDefensePlayer = nil
+    }
+
+    func proceedAfterNight() {
+        gameRuleManager.applyNightResult(game: self)
+
+        if let winner = resultManager.checkWinner(players: players) {
+            self.winner = winner
+            changeState(to: ResultState())
+            return
+        }
+
+        changeState(to: DiscussionState())
+    }
+
+    func proceedAfterExecution() {
+        gameRuleManager.applyExecutionResult(game: self)
+
+        if let winner = resultManager.checkWinner(players: players) {
+            self.winner = winner
+            changeState(to: ResultState())
+            return
+        }
+
+        changeState(to: NightState())
     }
 
     func endGame() {

@@ -10,17 +10,15 @@ struct ExecutionResultState: GameState {
         game.timerManager.startTimer(
             seconds: GameTime.executionResult,
             onTimeout: {
-                game.changeState(to: ResultState())
+                game.proceedAfterExecution()
             }
         )
     }
-    
+
     func handleAction(game: MafiaGame, action: GameAction) {
-        guard case .executionVoteCompleted = action else { return }
-        
-        game.changeState(to: ResultState())
+        // 투표는 이미 끝났고, 현재는 결과를 보여주는 상태이므로 별도 액션을 처리하지 않음
     }
-    
+
     func exit(game: MafiaGame) {
         game.timerManager.stopTimer()
     }
