@@ -7,6 +7,8 @@
 
 struct NightState: GameState {
     func enter(game: MafiaGame) {
+        // TODO: BLE payload/configuration 처리 완료 이벤트 이후 MafiaState로
+        
         game.changeState(to: MafiaState())
     }
     

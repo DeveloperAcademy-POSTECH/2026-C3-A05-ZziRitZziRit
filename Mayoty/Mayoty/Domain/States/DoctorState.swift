@@ -7,21 +7,22 @@
 
 struct DoctorState: GameState {
     func enter(game: MafiaGame) {
-        // 의사 선택 요청
+        game.timerManager.startTimer(
+            seconds: GameTime.doctor,
+            onTimeout: {
+                game.changeState(to: DiscussionState())
+            }
+        )
     }
-    
+
     func handleAction(game: MafiaGame, action: GameAction) {
-        switch action {
-        case .doctorSelected(let target):
-            game.selectMafiaTarget(target)
-            game.changeState(to: DiscussionState())
-            
-        default:
-            break
-        }
+        guard case .doctorSelected(let target) = action else { return }
+
+        game.selectHealTarget(target)
+        game.changeState(to: DiscussionState())
     }
-    
+
     func exit(game: MafiaGame) {
-        
+
     }
 }
