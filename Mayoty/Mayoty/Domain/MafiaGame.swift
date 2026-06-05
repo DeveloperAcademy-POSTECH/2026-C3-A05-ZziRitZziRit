@@ -28,6 +28,9 @@ final class MafiaGame {
     let timerManager = TimerManager()
     let gameRuleManager = GameRuleManager()
     let resultManager = ResultManager()
+    
+    let roleManager = RoleManager()
+    let colorManager = ColorManager()
 
     init(
         players: [Player],
