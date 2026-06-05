@@ -8,17 +8,27 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var model: WatchViewModel?
+    @State private var manager: WatchCentralManager?
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        VStack{
+            Button("Reconnect"){
+                manager?.scan()
+            }
+            
+            HStack{
+                Button("죽이기"){
+                    manager?.sendSaveOrKill(.kill)
+                }
+                Button("살리기"){
+                    manager?.sendSaveOrKill(.save)
+                }
+            }
         }
-        .padding()
     }
 }
 
-#Preview {
-    ContentView()
-}
+//#Preview {
+//    ContentView()
+//}
