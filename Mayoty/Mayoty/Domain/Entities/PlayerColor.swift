@@ -7,7 +7,7 @@
 
 enum PlayerColor: String, Codable, CaseIterable {
     case pink
-    case skyblue
+    case purple
     case yellow
     case mint
     case orange
