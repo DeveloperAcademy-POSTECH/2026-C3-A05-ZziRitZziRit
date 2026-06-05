@@ -77,24 +77,24 @@ struct HapticCatalogView: View {
                     }
                     
                     Button("Start Game") {
-                        Task { await HapticCatalog.startGame.play() }
+                        Task { await HapticPattern.startGame.play() }
                     }
                     .buttonStyle(.bordered)
 
                     Button("Reveal Role") {
-                        Task { await HapticCatalog.revealRole.play() }
+                        Task { await HapticPattern.revealRole.play() }
                     }
 
                     Button("Role Time to Action") {
-                        Task { await HapticCatalog.roleTimeToAction.play() }
+                        Task { await HapticPattern.roleTimeToAction.play() }
                     }
 
                     Button("Choose Player") {
-                        Task { await HapticCatalog.choosePlayer.play() }
+                        Task { await HapticPattern.choosePlayer.play() }
                     }
 
                     Button("Confirm Choose Player") {
-                        Task { await HapticCatalog.confirmChoosPlayer.play() }
+                        Task { await HapticPattern.confirmChoosPlayer.play() }
                     }
 
                     VStack {
@@ -106,41 +106,41 @@ struct HapticCatalogView: View {
                     }
 
                     Button("Time Remaining 5seconds") {
-                        Task { await HapticCatalog.timeRemaining.play() }
+                        Task { await HapticPattern.timeRemaining.play() }
                     }
 
                     Button("Dead") {
-                        Task { await HapticCatalog.dead.play() }
+                        Task { await HapticPattern.dead.play() }
                     }
 
                     Button("시민 승리") {
-                        Task { await HapticCatalog.citizenWin.play() }
+                        Task { await HapticPattern.citizenWin.play() }
                     }
 
                     Button("마피아 승리") {
-                        Task { await HapticCatalog.mafiaWin.play() }
+                        Task { await HapticPattern.mafiaWin.play() }
                     }
 
                     ProgressView()
 
                     Button("대기중") {
-                        Task { await HapticCatalog.circularProgress.play() }
+                        Task { await HapticPattern.circularProgress.play() }
                     }
 
                     Button("연결완료") {
-                        Task { await HapticCatalog.connectionOk.play() }
+                        Task { await HapticPattern.connectionOk.play() }
                     }
 
                     Button("연결실패") {
-                        Task { await HapticCatalog.connectionFail.play() }
+                        Task { await HapticPattern.connectionFail.play() }
                     }
 
                     Button("경찰이 마피아 찾음") {
-                        Task { await HapticCatalog.policeFoundMafia.play() }
+                        Task { await HapticPattern.policeFoundMafia.play() }
                     }
 
                     Button("경찰 마피아 못찾음") {
-                        Task { await HapticCatalog.policeNotFoundMafia.play() }
+                        Task { await HapticPattern.policeNotFoundMafia.play() }
                     }
                 }
             }

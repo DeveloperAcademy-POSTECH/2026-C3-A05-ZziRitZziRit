@@ -32,7 +32,7 @@ struct DeadTest: View {
                     }
                 }
                 .task {
-                    await HapticCatalog.dead.play()
+                    await HapticPattern.dead.play()
                 }
 //            }
         }

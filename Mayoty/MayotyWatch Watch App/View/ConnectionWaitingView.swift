@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ConnectionWaiting: View {
+struct ConnectionWaitingView: View {
     var body: some View {
         MafiaLogoView{
             VStack {
@@ -22,5 +22,5 @@ struct ConnectionWaiting: View {
 }
 
 #Preview {
-        ConnectionWaiting()
+    ConnectionWaitingView()
 }

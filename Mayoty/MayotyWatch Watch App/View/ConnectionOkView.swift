@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ConnectionOk: View {
+struct ConnectionOkView: View {
     var body: some View {
         MafiaLogoView {
             VStack(spacing: 5) {
@@ -21,5 +21,5 @@ struct ConnectionOk: View {
 }
 
 #Preview {
-    ConnectionOk()
+    ConnectionOkView()
 }
