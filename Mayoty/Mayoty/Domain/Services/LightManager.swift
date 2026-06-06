@@ -12,8 +12,7 @@ final class LightManager {
         self.homeKitLightManager = homeKitLightManager
     }
     
-    // MARK: - 낮 조명
-    
+    /// 낮 조명
     func setPlayerColorScene(players: [Player]) {
         for (player, light) in zip(players, homeKitLightManager.lights) {
             guard let color = player.color else { continue }
@@ -28,8 +27,7 @@ final class LightManager {
         }
     }
     
-    // MARK: - 밤 조명
-    
+    /// 밤 조명
     func setNightScene() {
         homeKitLightManager.lights.forEach {
             HomeKitLightService.setColor(
@@ -41,8 +39,7 @@ final class LightManager {
         }
     }
     
-    // MARK: - 최후 변론 조명
-
+    /// 최후 변론 조명
     func setFinalDefenseScene(player: Player, players: [Player]) {
         for (currentPlayer, light) in zip(players, homeKitLightManager.lights) {
             guard currentPlayer.id == player.id else {
@@ -62,8 +59,7 @@ final class LightManager {
         }
     }
     
-    // MARK: - 결과 조명
-    
+    /// 결과 조명
     func setResultScene(winner: Team) {
         let hue: Double
         
@@ -84,8 +80,7 @@ final class LightManager {
         }
     }
     
-    // MARK: - 종료 조명
-    
+    /// 종료 조명
     func turnOffAllLights() {
         homeKitLightManager.lights.forEach {
             HomeKitLightService.setPower($0, isOn: false)
