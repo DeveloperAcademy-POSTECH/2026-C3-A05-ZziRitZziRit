@@ -1,9 +1,9 @@
-    //
-    //  MafiaTitle.swift
-    //  MayotyWatch Watch App
-    //
-    //  Created by 이경민 on 6/2/26.
-    //
+//
+//  MafiaTitle.swift
+//  MayotyWatch Watch App
+//
+//  Created by 이경민 on 6/2/26.
+//
 
 import SwiftUI
 
@@ -17,20 +17,19 @@ struct MafiaLogoView<Content:View>: View {
     var body: some View {
         ZStack{
             LinearGradient(
-                colors:[.bgMain, .black],
+                colors: [.bgMain, .black],
                 startPoint: .top,
                 endPoint: .bottom
             )
             .ignoresSafeArea()
             
             content
-                .clipped()
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Image("마피아 로고 1")
+                Image("MaifaLogo")
                     .resizable()
-                    .frame(width: 47, height: 47)
+                    .frame(width: 60, height: 25)
                     .offset(y: -10)
             }
         }
