@@ -16,13 +16,11 @@ final class LightManager {
     func setPlayerColorScene(players: [Player]) {
         for (player, light) in zip(players, homeKitLightManager.lights) {
             guard let color = player.color else { continue }
-            
+
             HomeKitLightService.setPower(light, isOn: true)
             HomeKitLightService.setColor(
-                light,
-                hue: color.hue,
-                saturation: color.saturation,
-                brightness: 100
+                color.homeKitColor,
+                accessory: light
             )
         }
     }
@@ -31,10 +29,8 @@ final class LightManager {
     func setNightScene() {
         homeKitLightManager.lights.forEach {
             HomeKitLightService.setColor(
-                $0,
-                hue: 240,
-                saturation: 100,
-                brightness: 50
+                .night,
+                accessory: $0
             )
         }
     }
@@ -47,35 +43,29 @@ final class LightManager {
                 continue
             }
 
-            let color = player.color
-
             HomeKitLightService.setPower(light, isOn: true)
             HomeKitLightService.setColor(
-                light,
-                hue: color?.hue ?? 45,
-                saturation: color?.saturation ?? 100,
-                brightness: 100
+                player.color?.homeKitColor ?? .finalDefenseFallback,
+                accessory: light
             )
         }
     }
     
     /// 결과 조명
     func setResultScene(winner: Team) {
-        let hue: Double
-        
+        let color: HomeKitLightColor
+
         switch winner {
         case .mafia:
-            hue = 0
+            color = .mafiaWin
         case .citizens:
-            hue = 120
+            color = .citizenWin
         }
-        
+
         homeKitLightManager.lights.forEach {
             HomeKitLightService.setColor(
-                $0,
-                hue: hue,
-                saturation: 100,
-                brightness: 100
+                color,
+                accessory: $0
             )
         }
     }
