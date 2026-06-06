@@ -7,6 +7,8 @@
 
 struct ExecutionResultState: GameState {
     func enter(game: MafiaGame) {
+        GameLogger.event("🫠 처형 결과 발표 시작")
+
         guard let finalDefensePlayer = game.finalDefensePlayer else {
             return
         }
@@ -19,6 +21,7 @@ struct ExecutionResultState: GameState {
         game.timerManager.startTimer(
             seconds: GameTime.executionResult,
             onTimeout: {
+                GameLogger.timer("처형 결과 발표 시간 종료")
                 game.proceedAfterExecution()
             }
         )
@@ -29,6 +32,7 @@ struct ExecutionResultState: GameState {
     }
 
     func exit(game: MafiaGame) {
+        GameLogger.event("🫠 처형 결과 발표 상태 종료")
         game.timerManager.stopTimer()
     }
 }

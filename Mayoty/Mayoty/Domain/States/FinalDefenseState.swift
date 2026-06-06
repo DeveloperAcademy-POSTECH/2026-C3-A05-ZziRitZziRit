@@ -7,6 +7,8 @@
 
 struct FinalDefenseState: GameState {
     func enter(game: MafiaGame) {
+        GameLogger.event("🎤 최후 변론 시작")
+        
         guard let finalDefensePlayer = game.finalDefensePlayer else {
             return
         }
@@ -16,9 +18,14 @@ struct FinalDefenseState: GameState {
             players: game.players
         )
         
+        GameLogger.event(
+            "🎤 최후 변론 대상자: \(finalDefensePlayer.color?.rawValue ?? "Unknown")"
+        )
+        
         game.timerManager.startTimer(
             seconds: GameTime.finalDefense,
             onTimeout: {
+                GameLogger.timer("최후 변론 시간 종료")
                 game.changeState(to: ExecutionVoteState())
             }
         )
@@ -27,10 +34,13 @@ struct FinalDefenseState: GameState {
     func handleAction(game: MafiaGame, action: GameAction) {
         guard case .finalDefenseEnded = action else { return }
         
+        GameLogger.event("🎤 최후 변론 종료")
+        
         game.changeState(to: ExecutionVoteState())
     }
     
     func exit(game: MafiaGame) {
-        // 최후 변론 종료 처리
+        GameLogger.event("🎤 최후 변론 상태 종료")
+        game.timerManager.stopTimer()
     }
 }
