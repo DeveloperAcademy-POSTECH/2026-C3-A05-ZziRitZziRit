@@ -9,21 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var model: WatchViewModel?
-    @State private var manager: WatchCentralManager?
+    @State private var manager: WatchBLEManager?
     
     var body: some View {
         VStack{
             Button("Reconnect"){
                 manager?.scan()
-            }
-            
-            HStack{
-                Button("죽이기"){
-                    manager?.sendSaveOrKill(.kill)
-                }
-                Button("살리기"){
-                    manager?.sendSaveOrKill(.save)
-                }
             }
         }
     }
