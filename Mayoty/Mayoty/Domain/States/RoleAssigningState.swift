@@ -9,6 +9,8 @@ struct RoleAssigningState: GameState {
     func enter(game: MafiaGame) {
         game.roleManager.assignRoles(to: game.players)
         game.colorManager.assignColors(to: game.players)
+        
+        game.lightManager.setNightScene()
 
         game.timerManager.startTimer(
             seconds: GameTime.roleAssigning,

@@ -7,6 +7,7 @@
 
 struct VoteState: GameState {
     func enter(game: MafiaGame) {
+        game.lightManager.setNightScene()
         game.timerManager.startTimer(
             seconds: GameTime.vote,
             onTimeout: {

@@ -7,7 +7,11 @@
 
 struct ResultState: GameState {
     func enter(game: MafiaGame) {
-        // 결과 확인
+        guard let winner = game.winner else { return }
+        
+        game.lightManager.setResultScene(
+            winner: winner
+        )
     }
     
     func handleAction(game: MafiaGame, action: GameAction) {

@@ -7,6 +7,15 @@
 
 struct ExecutionResultState: GameState {
     func enter(game: MafiaGame) {
+        guard let finalDefensePlayer = game.finalDefensePlayer else {
+            return
+        }
+        
+        game.lightManager.setFinalDefenseScene(
+            player: finalDefensePlayer,
+            players: game.players
+        )
+        
         game.timerManager.startTimer(
             seconds: GameTime.executionResult,
             onTimeout: {
