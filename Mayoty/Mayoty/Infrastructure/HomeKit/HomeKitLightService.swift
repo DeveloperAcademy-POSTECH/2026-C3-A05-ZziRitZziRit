@@ -30,10 +30,8 @@ enum HomeKitLightService {
     }
 
     static func setColor(
-        _ accessory: HMAccessory,
-        hue: Double,
-        saturation: Double = 100,
-        brightness: Double = 100,
+        _ color: HomeKitLightColor,
+        accessory: HMAccessory,
         completion: ((Error?) -> Void)? = nil
     ) {
         guard let service = lightService(for: accessory),
@@ -53,9 +51,9 @@ enum HomeKitLightService {
             return
         }
 
-        hueCharacteristic.writeValue(hue) { _ in }
-        saturationCharacteristic.writeValue(saturation) { _ in }
-        brightnessCharacteristic.writeValue(brightness) { error in
+        hueCharacteristic.writeValue(color.hue) { _ in }
+        saturationCharacteristic.writeValue(color.saturation) { _ in }
+        brightnessCharacteristic.writeValue(color.brightness) { error in
             completion?(error)
         }
     }

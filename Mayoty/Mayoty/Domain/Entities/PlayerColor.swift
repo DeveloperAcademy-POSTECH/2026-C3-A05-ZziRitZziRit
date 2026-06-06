@@ -14,15 +14,18 @@ enum PlayerColor: String, Codable, CaseIterable {
 }
 
 extension PlayerColor {
-    var hue: Double {
+    var homeKitColor: HomeKitLightColor {
         switch self {
-        case .pink: return 330
-        case .purple: return 270
-        case .yellow: return 60
-        case .mint: return 150
-        case .orange: return 30
+        case .pink:
+            return .playerPink
+        case .purple:
+            return .playerPurple
+        case .yellow:
+            return .playerYellow
+        case .mint:
+            return .playerMint
+        case .orange:
+            return .playerOrange
         }
     }
-    
-    var saturation: Double { 100 }
 }
