@@ -31,17 +31,25 @@ final class MafiaGame {
     
     let roleManager = RoleManager()
     let colorManager = ColorManager()
+    let lightManager: LightManager
 
     init(
         players: [Player],
-        initialState: any GameState
+        initialState: any GameState,
+        homeKitLightManager: HomeKitLightManager
     ) {
         self.players = players
         self.currentState = initialState
+        self.lightManager = LightManager(
+            homeKitLightManager: homeKitLightManager
+        )
+
         self.currentState.enter(game: self)
     }
 
     func handleAction(_ action: GameAction) {
+        GameLogger.action(action)
+
         currentState.handleAction(
             game: self,
             action: action
@@ -49,6 +57,11 @@ final class MafiaGame {
     }
 
     func changeState(to state: any GameState) {
+        GameLogger.stateChanged(
+            from: currentState,
+            to: state
+        )
+
         currentState = state
     }
 
@@ -80,29 +93,17 @@ final class MafiaGame {
 
     func proceedAfterNight() {
         gameRuleManager.applyNightResult(game: self)
-
-        if let winner = resultManager.checkWinner(players: players) {
-            self.winner = winner
-            changeState(to: ResultState())
-            return
-        }
-
-        changeState(to: DiscussionState())
+        currentState.proceedAfterNight(game: self)
     }
 
     func proceedAfterExecution() {
         gameRuleManager.applyExecutionResult(game: self)
-
-        if let winner = resultManager.checkWinner(players: players) {
-            self.winner = winner
-            changeState(to: ResultState())
-            return
-        }
-
-        changeState(to: NightState())
+        currentState.proceedAfterExecution(game: self)
     }
 
     func endGame() {
         handleAction(.gameEnded)
     }
 }
+
+
