@@ -136,9 +136,7 @@ final class WatchBLEManager: NSObject, CBCentralManagerDelegate, CBPeripheralDel
             // 2. SendAnswerManager 생성
             sendAnswerManager = SendAnswerManager(peripheral: peripheral, characteristic: characteristic)
             
-            // 3. register 메시지 전송
-            let answer = BLEAnswer(type: .register(PlayerID: PlayerID.shared.id))
-            sendAnswerManager?.send(answer)
+
             
             // 4. 상태 업데이트
             connectionStateMessage = .connected
