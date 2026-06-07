@@ -31,16 +31,16 @@ final class WatchViewModel {
         centralManager.disconnect()
     }
 
-    func selectDoctorTarget(playerID: UInt8) {
-        send(.doctorSelected(playerID: playerID))
-    }
-
     func selectMafiaTarget(playerID: UInt8) {
         send(.mafiaSelected(playerID: playerID))
     }
 
     func selectPoliceTarget(playerID: UInt8) {
         send(.policeSelected(playerID: playerID))
+    }
+    
+    func selectDoctorTarget(playerID: UInt8) {
+        send(.doctorSelected(playerID: playerID))
     }
 
     func submitVote(targetID: UInt8) {
