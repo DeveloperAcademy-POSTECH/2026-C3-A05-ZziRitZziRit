@@ -14,4 +14,15 @@ protocol GameState {
     )
 
     func exit(game: MafiaGame)
+
+    func proceedAfterNight(game: MafiaGame)
+
+    func proceedAfterExecution(game: MafiaGame)
 }
+
+extension GameState {
+    func proceedAfterNight(game: MafiaGame) { }
+
+    func proceedAfterExecution(game: MafiaGame) { }
+}
+
