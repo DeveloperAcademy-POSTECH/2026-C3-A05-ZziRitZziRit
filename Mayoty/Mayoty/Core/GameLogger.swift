@@ -11,13 +11,13 @@ enum GameLogger {
     }
 
     static func stateChanged(
-        from oldState: any GameState,
-        to newState: any GameState
+        from oldState: Any,
+        to newState: Any
     ) {
         log("상태 변경: \(type(of: oldState)) → \(type(of: newState))")
     }
 
-    static func action(_ action: GameAction) {
+    static func action(_ action: Any) {
         log("액션 발생: \(action)")
     }
 
