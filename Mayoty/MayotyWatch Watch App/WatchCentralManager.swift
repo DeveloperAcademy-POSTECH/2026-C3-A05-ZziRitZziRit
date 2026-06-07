@@ -49,7 +49,7 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
 
         case .unauthorized:
             GameLogger.bluetooth("블루투스 권한 없음")
-            continuation.yield(.unautorized)
+            continuation.yield(.unauthorized)
 
         case .unsupported:
             GameLogger.bluetooth("이 기기는 블루투스를 지원하지 않음")
