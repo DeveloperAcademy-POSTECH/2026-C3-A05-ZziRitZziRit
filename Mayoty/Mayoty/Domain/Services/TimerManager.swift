@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import SwiftUI
 
+@Observable
 final class TimerManager {
     private var timerTask: Task<Void, Never>?
     private let clock = ContinuousClock()
