@@ -1,14 +1,13 @@
 //
-//  WatchConnectionError.swift
+//  WatchBLEConnectionState.swift
 //  Mayoty
 //
 //  Created by jeegarden on 6/5/26.
 //
+
 import Foundation
 
-
-enum WatchConnectionState{
-    
+enum WatchConnectionState {
     case idle
     case bluetoothUnavailable
     case scanning
@@ -16,13 +15,12 @@ enum WatchConnectionState{
     case connected
     case disconnected
     case failed
-    case unautorized
-    
+    case unauthorized
+
     case sendAnswerSuccess
     case sendAnswerFailed
-    
-    
-    var stateDescription: String? {
+
+    var stateDescription: String {
         switch self {
         case .idle:
             return "Idle"
@@ -38,12 +36,11 @@ enum WatchConnectionState{
             return "연결 해제"
         case .failed:
             return "연결 실패"
-        case.unautorized:
-            return " 권한 없음"
-            
-        case.sendAnswerSuccess:
+        case .unauthorized:
+            return "권한 없음"
+        case .sendAnswerSuccess:
             return "응답 보내기 성공"
-        case.sendAnswerFailed:
+        case .sendAnswerFailed:
             return "응답 보내기 실패"
         }
     }

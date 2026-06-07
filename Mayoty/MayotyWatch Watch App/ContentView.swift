@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @State private var model: WatchViewModel?
-    @State private var manager: WatchBLEManager?
+    @State private var manager: WatchCentralManager?
     
     var body: some View {
         VStack{
