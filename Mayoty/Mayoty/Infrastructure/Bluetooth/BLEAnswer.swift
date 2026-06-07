@@ -6,19 +6,16 @@
 //
 
 import Foundation
-import CoreBluetooth
 
-enum BLEAnswerKind: UInt8{
+enum BLEAnswerKind: UInt8 {
     case saveOrKill = 0
     case selectPlayer = 1
 }
 
-enum BLEsaveOrKill: UInt8{
+enum BLESaveOrKill: UInt8 {
     case save = 0
     case kill = 1
 }
-
-
 
 struct BLEAnswer {
     let kind: BLEAnswerKind
@@ -28,16 +25,13 @@ struct BLEAnswer {
         Data([kind.rawValue, value])
     }
     
-    
     init(kind: BLEAnswerKind, value: UInt8) {
         self.kind = kind
         self.value = value
     }
-
     
-    
-    init?(data:Data){
-        guard data.count>=2,
+    init?(data: Data) {
+        guard data.count >= 2,
               let kind = BLEAnswerKind(rawValue: data[0])
         else { return nil }
         
