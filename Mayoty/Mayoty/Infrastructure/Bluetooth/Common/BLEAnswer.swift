@@ -8,9 +8,9 @@
 import Foundation
 
 enum BLEAnswerKind: UInt8 {
-    case doctorSelected = 0
-    case mafiaSelected = 1
-    case policeSelected = 2
+    case mafiaSelected = 0
+    case policeSelected = 1
+    case doctorSelected = 2
     case voteSubmitted = 3
     case executionVoteSubmitted = 4
 }
