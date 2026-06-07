@@ -93,30 +93,17 @@ final class MafiaGame {
 
     func proceedAfterNight() {
         gameRuleManager.applyNightResult(game: self)
-
-        if let winner = resultManager.checkWinner(players: players) {
-            self.winner = winner
-            changeState(to: ResultState())
-            return
-        }
-
-        changeState(to: DiscussionState())
+        currentState.proceedAfterNight(game: self)
     }
 
     func proceedAfterExecution() {
         gameRuleManager.applyExecutionResult(game: self)
-
-        if let winner = resultManager.checkWinner(players: players) {
-            self.winner = winner
-            changeState(to: ResultState())
-            return
-        }
-
-        changeState(to: NightState())
+        currentState.proceedAfterExecution(game: self)
     }
 
     func endGame() {
         handleAction(.gameEnded)
     }
 }
+
 
