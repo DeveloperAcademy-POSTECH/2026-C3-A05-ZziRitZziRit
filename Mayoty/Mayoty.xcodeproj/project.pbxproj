@@ -57,6 +57,7 @@
 		559880362FD16FD100C82E02 /* Exceptions for "Mayoty" folder in "MayotyWatch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Core/GameLogger.swift,
 				Infrastructure/Bluetooth/BLEAnswer.swift,
 				Infrastructure/Bluetooth/BLEUUID.swift,
 			);
