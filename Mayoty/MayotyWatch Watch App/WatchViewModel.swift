@@ -31,7 +31,27 @@ final class WatchViewModel {
         centralManager.disconnect()
     }
 
-    func send(_ answer: BLEAnswer) {
+    func selectDoctorTarget(playerID: UInt8) {
+        send(.doctorSelected(playerID: playerID))
+    }
+
+    func selectMafiaTarget(playerID: UInt8) {
+        send(.mafiaSelected(playerID: playerID))
+    }
+
+    func selectPoliceTarget(playerID: UInt8) {
+        send(.policeSelected(playerID: playerID))
+    }
+
+    func submitVote(targetID: UInt8) {
+        send(.voteSubmitted(targetID: targetID))
+    }
+
+    func submitExecutionVote(isAgree: Bool) {
+        send(.executionVoteSubmitted(isAgree: isAgree))
+    }
+
+    private func send(_ answer: BLEAnswer) {
         centralManager.send(answer)
     }
 
