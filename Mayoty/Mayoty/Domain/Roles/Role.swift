@@ -19,4 +19,17 @@ enum Role: Codable {
             return .citizens
         }
     }
+    
+    var displayName: String {
+            switch self {
+            case .citizen:
+                return "시민"
+            case .mafia:
+                return "마피아"
+            case .police:
+                return "경찰"
+            case .doctor:
+                return "의사"
+            }
+        }
 }
