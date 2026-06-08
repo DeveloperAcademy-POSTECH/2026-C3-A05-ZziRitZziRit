@@ -64,9 +64,8 @@
 				Domain/Roles/Role.swift,
 =======
 				Core/GameLogger.swift,
->>>>>>> origin/develop
-				Infrastructure/Bluetooth/BLEAnswer.swift,
-				Infrastructure/Bluetooth/BLEUUID.swift,
+				Infrastructure/Bluetooth/Common/BLEAnswer.swift,
+				Infrastructure/Bluetooth/Common/BLEUUID.swift,
 			);
 			target = A4AD5ECA2FCC7B9700736E6D /* MayotyWatch Watch App */;
 		};
