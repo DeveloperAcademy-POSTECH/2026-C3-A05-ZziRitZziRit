@@ -7,21 +7,33 @@
 
 struct DiscussionState: GameState {
     func enter(game: MafiaGame) {
+        GameLogger.event("☀️ 토론 시작")
+
+        game.lightManager.setPlayerColorScene(
+            players: game.players
+        )
+
         game.timerManager.startTimer(
             seconds: GameTime.discussion,
             onTimeout: {
+                GameLogger.timer("토론 시간 종료")
                 game.changeState(to: VoteState())
             }
         )
     }
 
     func handleAction(game: MafiaGame, action: GameAction) {
-        guard case .discussionEnded = action else { return }
+        guard case .discussionEnded = action else {
+            return
+        }
+
+        GameLogger.event("☀️ 토론 종료")
 
         game.changeState(to: VoteState())
     }
 
     func exit(game: MafiaGame) {
-        // 토론 종료 처리
+        GameLogger.event("☀️ 토론 상태 종료")
+        game.timerManager.stopTimer()
     }
 }

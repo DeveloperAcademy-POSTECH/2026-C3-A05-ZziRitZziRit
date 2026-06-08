@@ -14,9 +14,7 @@ final class ResultManager {
             $0.role?.team == .mafia
         }.count
 
-        let citizenCount = alivePlayers.filter {
-            $0.role?.team == .citizens
-        }.count
+        let citizenCount = alivePlayers.count - mafiaCount
 
         if mafiaCount == 0 {
             return .citizens

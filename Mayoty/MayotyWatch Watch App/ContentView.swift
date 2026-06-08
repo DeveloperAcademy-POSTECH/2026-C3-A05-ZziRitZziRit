@@ -16,15 +16,6 @@ struct ContentView: View {
             Button("Reconnect"){
                 manager?.scan()
             }
-            
-            HStack{
-                Button("죽이기"){
-                    manager?.sendSaveOrKill(.kill)
-                }
-                Button("살리기"){
-                    manager?.sendSaveOrKill(.save)
-                }
-            }
         }
     }
 }
