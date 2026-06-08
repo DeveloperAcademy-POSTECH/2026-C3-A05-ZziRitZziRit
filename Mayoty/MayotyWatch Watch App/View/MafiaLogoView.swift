@@ -9,15 +9,18 @@ import SwiftUI
 
 struct MafiaLogoView<Content:View>: View {
     let content: Content
+    let baseColor: Color
     
-    init(@ViewBuilder content: () -> Content) {
+    init(baseColor:Color = .bgMain, @ViewBuilder content: () -> Content) {
+        self.baseColor = baseColor
         self.content = content()
     }
+    
     
     var body: some View {
         ZStack{
             LinearGradient(
-                colors: [.bgMain, .black],
+                colors:[baseColor, .black],
                 startPoint: .top,
                 endPoint: .bottom
             )

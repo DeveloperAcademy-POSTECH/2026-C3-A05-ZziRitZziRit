@@ -8,7 +8,7 @@
 import SwiftUI
 
 
-struct RoleResult: View {
+struct RoleResultView: View {
     let role: Role
     var body: some View {
         MafiaLogoView {
@@ -25,5 +25,5 @@ struct RoleResult: View {
 }
 
 #Preview {
-    RoleResult(role: .doctor)
+    RoleResultView(role: .doctor)
 }
