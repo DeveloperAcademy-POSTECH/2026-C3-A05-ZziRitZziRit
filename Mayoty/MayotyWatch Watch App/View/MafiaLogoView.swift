@@ -20,7 +20,7 @@ struct MafiaLogoView<Content:View>: View {
     var body: some View {
         ZStack{
             LinearGradient(
-                colors: [.bgMain, .black],
+                colors:[baseColor, .black],
                 startPoint: .top,
                 endPoint: .bottom
             )
