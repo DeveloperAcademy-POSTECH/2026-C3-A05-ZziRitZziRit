@@ -1,5 +1,5 @@
 //
-//  RoleSelecting.swift
+//  connectionWaiting.swift
 //  MayotyWatch Watch App
 //
 //  Created by 이경민 on 6/5/26.
@@ -7,15 +7,13 @@
 
 import SwiftUI
 
-struct RoleSelecting: View {
-    let role: Role
-    
+struct ConnectionWaitingView: View {
     var body: some View {
         MafiaLogoView{
             VStack {
                 ProgressView{}
                     .frame(width: 30, height: 30)
-                Text("\(role.displayName) 지목중")
+                Text("연결 대기중")
                     .font(.system(size:25))
                 
             }
@@ -24,5 +22,5 @@ struct RoleSelecting: View {
 }
 
 #Preview {
-    RoleSelecting(role: .doctor)
+    ConnectionWaitingView()
 }

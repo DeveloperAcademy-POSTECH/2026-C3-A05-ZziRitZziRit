@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RoleAssigning: View {
+struct RoleAssigningView: View {
     var body: some View {
         MafiaLogoView {
             VStack(spacing: 5) {
@@ -21,5 +21,5 @@ struct RoleAssigning: View {
 }
 
 #Preview {
-    RoleAssigning()
+    RoleAssigningView()
 }
