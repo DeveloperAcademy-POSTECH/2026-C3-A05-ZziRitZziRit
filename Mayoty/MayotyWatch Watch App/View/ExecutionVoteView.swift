@@ -9,7 +9,6 @@ import SwiftUI
 
 struct ExecutionVoteView: View {
     @State private var model: WatchViewModel?
-    @State private var manager: WatchCentralManager?
     @State private var kill: Bool = false
     
     var body: some View {
@@ -21,7 +20,6 @@ struct ExecutionVoteView: View {
 //                    .foregroundStyle(.white) //최다 지목된 플레이어 색깔
                 HStack{
                     Button(action: {
-                        manager?.sendSaveOrKill(.save)
                         kill = false
                     }) {
                         Text("살리기")
@@ -31,7 +29,6 @@ struct ExecutionVoteView: View {
                     .foregroundStyle(kill ? .gray : .btGreen)
                     
                     Button(action: {
-                        manager?.sendSaveOrKill(.kill)
                         kill = true
                     }) {
                         Text("죽이기")
