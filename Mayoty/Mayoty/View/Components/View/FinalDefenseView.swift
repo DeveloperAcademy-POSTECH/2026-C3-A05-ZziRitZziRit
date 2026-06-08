@@ -11,6 +11,7 @@ struct FinalDefenseView: View {
     let players: [Player]
     let finalDefender: Player?
     let remainingTime: Int
+    let stateTitle: String
 
     var body: some View {
         ListView(
@@ -19,7 +20,7 @@ struct FinalDefenseView: View {
             items: players
         ) {
             StateView(
-                state: "FinalDefenseState",
+                state: stateTitle,
                 remainingTime: remainingTime
             )
         } cell: { player in
