@@ -1,5 +1,5 @@
 //
-//  PoliceArrestResult.swift
+//  PoliceArrestResultView.swift
 //  MayotyWatch Watch App
 //
 //  Created by 이경민 on 6/5/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct PoliceArrestResult: View {
+struct PoliceArrestResultView: View {
     let result: PoliceArrest
     
     var body: some View {
@@ -24,6 +24,7 @@ struct PoliceArrestResult: View {
         }
     }
 }
+
 #Preview {
-    PoliceArrestResult(result: .success)
+    PoliceArrestResultView(result: .success)
 }
