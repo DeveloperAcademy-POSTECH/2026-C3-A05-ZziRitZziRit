@@ -57,9 +57,15 @@
 		559880362FD16FD100C82E02 /* Exceptions for "Mayoty" folder in "MayotyWatch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+<<<<<<< HEAD
+				Domain/Entities/Player.swift,
+				Domain/Entities/PlayerColor.swift,
+				Domain/Entities/Team.swift,
+				Domain/Roles/Role.swift,
+=======
 				Core/GameLogger.swift,
-				Infrastructure/Bluetooth/BLEAnswer.swift,
-				Infrastructure/Bluetooth/BLEUUID.swift,
+				Infrastructure/Bluetooth/Common/BLEAnswer.swift,
+				Infrastructure/Bluetooth/Common/BLEUUID.swift,
 			);
 			target = A4AD5ECA2FCC7B9700736E6D /* MayotyWatch Watch App */;
 		};
@@ -380,11 +386,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+<<<<<<< HEAD
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5H662NL8K9;
+=======
 				CODE_SIGN_ENTITLEMENTS = Mayoty/Mayoty.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6B47X24XTW;
+>>>>>>> origin/develop
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mayoty/Info.plist;
@@ -426,11 +439,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+<<<<<<< HEAD
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5H662NL8K9;
+=======
 				CODE_SIGN_ENTITLEMENTS = Mayoty/Mayoty.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 6B47X24XTW;
+>>>>>>> origin/develop
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Mayoty/Info.plist;
@@ -475,7 +495,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+<<<<<<< HEAD
+				DEVELOPMENT_TEAM = 5H662NL8K9;
+=======
 				DEVELOPMENT_TEAM = 6B47X24XTW;
+>>>>>>> origin/develop
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MayotyWatch-Watch-App-Info.plist";
@@ -512,7 +536,11 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+<<<<<<< HEAD
+				DEVELOPMENT_TEAM = 5H662NL8K9;
+=======
 				DEVELOPMENT_TEAM = 6B47X24XTW;
+>>>>>>> origin/develop
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "MayotyWatch-Watch-App-Info.plist";
