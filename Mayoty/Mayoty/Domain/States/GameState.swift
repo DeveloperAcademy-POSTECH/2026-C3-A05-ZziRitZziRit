@@ -21,8 +21,21 @@ protocol GameState {
 }
 
 extension GameState {
-    func proceedAfterNight(game: MafiaGame) { }
+    func proceedAfterNight(game: MafiaGame) {
+        if let winner = game.resultManager.checkWinner(players: game.players) {
+            game.setWinner(winner)
+            game.changeState(to: ResultState())
+        } else {
+            game.changeState(to: DiscussionState())
+        }
+    }
 
-    func proceedAfterExecution(game: MafiaGame) { }
+    func proceedAfterExecution(game: MafiaGame) {
+        if let winner = game.resultManager.checkWinner(players: game.players) {
+            game.setWinner(winner)
+            game.changeState(to: ResultState())
+        } else {
+            game.changeState(to: MafiaState())
+        }
+    }
 }
-

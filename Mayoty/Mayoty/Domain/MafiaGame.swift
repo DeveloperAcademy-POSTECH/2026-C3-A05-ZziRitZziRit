@@ -5,6 +5,9 @@
 //  Created by sun on 6/2/26.
 //
 
+import Observation
+
+@Observable
 final class MafiaGame {
     private(set) var players: [Player]
 
@@ -99,6 +102,10 @@ final class MafiaGame {
     func proceedAfterExecution() {
         gameRuleManager.applyExecutionResult(game: self)
         currentState.proceedAfterExecution(game: self)
+    }
+    
+    func setWinner(_ winner: Team) {
+        self.winner = winner
     }
 
     func endGame() {
