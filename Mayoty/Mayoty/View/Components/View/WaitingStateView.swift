@@ -4,37 +4,31 @@
 //
 //  Created by jeegarden on 6/7/26.
 //
+
 import SwiftUI
 
 struct WaitingStateView: View {
-    let devices: [Device] = [
-        Device(name: "블루투스 식별자 1"),
-        Device(name: "블루투스 식별자 2"),
-        Device(name: "블루투스 식별자 3"),
-    ]
-    let state: String = "WaitingState"
-    let remainingTime: Int = 0
+    let players: [Player]
+    let remainingTime: Int
 
     var body: some View {
         ListView(
-            leadingTitle: "연결된 기기",
-            trailingTitle: "\(devices.count)/5",
-            items: devices
+            leadingTitle: "연결된 플레이어",
+            trailingTitle: "\(players.count)/5",
+            items: players
         ) {
-            StateView(state: state, remainingTime: remainingTime)
-        } cell: { device in
+            StateView(
+                state: "WaitingState",
+                remainingTime: remainingTime
+            )
+        } cell: { player in
             ListCell {
                 HStack {
-                    Text(device.name)
-                        .font(.default)
+                    Text("Player \(String(player.id.uuidString.prefix(4)))")
                     Spacer()
                 }
             }
         }
     }
-}
-
-#Preview {
-    WaitingStateView()
 }
 

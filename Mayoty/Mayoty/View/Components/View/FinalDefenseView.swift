@@ -4,39 +4,34 @@
 //
 //  Created by jeegarden on 6/7/26.
 //
+
 import SwiftUI
 
 struct FinalDefenseView: View {
-    let device: [Device] = [
-        Device(name: "핑크",isFinalDefender: true, isAlive: true),   // 최후 변론자
-        Device(name: "보라", isFinalDefender: false,isAlive: true),
-        Device(name: "오렌지", isFinalDefender: false,isAlive: true),
-        Device(name: "노랑", isFinalDefender: false,isAlive: true),
-        Device(name: "민트", isFinalDefender: false,isAlive: false),
-    ]
-    
-    let state: String = "FinalDefenseState"
-    
-    let remainingTime: Int = 0
+    let players: [Player]
+    let finalDefender: Player?
+    let remainingTime: Int
 
-
-    
     var body: some View {
         ListView(
-            leadingTitle: "연결된 기기",
-            trailingTitle: "\(device.count)/5",
-            items: device
+            leadingTitle: "플레이어",
+            trailingTitle: "\(players.count)/5",
+            items: players
         ) {
-            StateView(state: state, remainingTime: remainingTime)
-        } cell: { device in
+            StateView(
+                state: "FinalDefenseState",
+                remainingTime: remainingTime
+            )
+        } cell: { player in
             ListCell {
                 HStack(spacing: 30) {
-                    Text("\(device.name)")
-                        .font(.default)
-                    Text(device.isAlive ? "생존" : "사망")
-                        .font(.default)
+                    Text(player.color?.rawValue ?? "색상 없음")
+
+                    Text(player.isAlive ? "생존" : "사망")
+
                     Spacer()
-                    if device.isFinalDefender {
+
+                    if player === finalDefender {
                         Text("최후 변론자")
                     }
                 }
@@ -44,6 +39,4 @@ struct FinalDefenseView: View {
         }
     }
 }
-#Preview {
-    FinalDefenseView()
-}
+

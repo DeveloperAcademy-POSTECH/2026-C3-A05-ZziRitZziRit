@@ -4,42 +4,35 @@
 //
 //  Created by jeegarden on 6/7/26.
 //
+
 import SwiftUI
 
 struct RoleAssignView: View {
-    
-    let devices: [Device] = [
-        Device(name: "블루투스 식별자 1"),
-        Device(name: "블루투스 식별자 2"),
-        Device(name: "블루투스 식별자 3"),
-    ]
-    let state: String = "RoleAssignState"
-    
-    let remainingTime: Int = 0
+    let players: [Player]
+    let remainingTime: Int
 
     var body: some View {
         ListView(
             leadingTitle: "연결된 기기",
-            trailingTitle: "\(devices.count)/5",
-            items: devices
+            trailingTitle: "\(players.count)/5",
+            items: players
         ) {
-            StateView(state: state, remainingTime: remainingTime)
-        } cell: { device in
+            StateView(state: "RoleAssignState", remainingTime: remainingTime)
+        } cell: { player in
             ListCell {
                 HStack {
-                    Text(device.name)
-                        .font(.default)
+                    Text("Player \(player.id.uuidString.prefix(4))")
+
                     Spacer()
-                    Text("색깔")
-                        .font(.default)
+
+                    Text(player.color?.rawValue ?? "색상 없음")
+
+                    Text(player.role?.displayName ?? "역할 없음")
                 }
             }
         }
     }
 }
 
-#Preview {
-    RoleAssignView()
-}
 
 
