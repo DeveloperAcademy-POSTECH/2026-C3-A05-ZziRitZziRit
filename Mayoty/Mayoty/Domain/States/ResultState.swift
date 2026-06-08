@@ -7,12 +7,26 @@
 
 struct ResultState: GameState {
     func enter(game: MafiaGame) {
-        // 결과 확인
+        guard let winner = game.winner else {
+            GameLogger.result("🔴🟢 승자 정보 없음")
+            return
+        }
+        
+        GameLogger.result(
+            winner == .mafia
+            ? "🔴 마피아 승리"
+            : "🟢 시민 승리"
+        )
+        
+        game.lightManager.setResultScene(
+            winner: winner
+        )
     }
     
     func handleAction(game: MafiaGame, action: GameAction) {
         switch action {
         case .gameEnded:
+            GameLogger.event("🔴🟢 게임 종료")
             game.endGame()
             
         default:
@@ -21,6 +35,6 @@ struct ResultState: GameState {
     }
     
     func exit(game: MafiaGame) {
-        // 결과 상태 종료 처리
+        GameLogger.event("🔴🟢 결과 상태 종료")
     }
 }
