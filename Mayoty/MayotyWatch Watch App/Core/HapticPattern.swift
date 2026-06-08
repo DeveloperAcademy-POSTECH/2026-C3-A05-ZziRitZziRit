@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-enum HapticCatalog {
+enum HapticPattern {
     case startGame
     case revealRole
     case roleTimeToAction

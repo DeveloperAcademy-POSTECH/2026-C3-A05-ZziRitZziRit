@@ -8,12 +8,14 @@
 import SwiftUI
 
 struct RoleSelecting: View {
+    let role: Role
+    
     var body: some View {
         MafiaLogoView{
             VStack {
                 ProgressView{}
                     .frame(width: 30, height: 30)
-                Text("000 지목중")
+                Text("\(role.displayName) 지목중")
                     .font(.system(size:25))
                 
             }
@@ -22,5 +24,5 @@ struct RoleSelecting: View {
 }
 
 #Preview {
-    RoleSelecting()
+    RoleSelecting(role: .doctor)
 }
