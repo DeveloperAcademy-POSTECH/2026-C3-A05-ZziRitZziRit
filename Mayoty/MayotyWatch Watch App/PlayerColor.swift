@@ -1,0 +1,14 @@
+//
+//  PlayerColor.swift
+//  Mayoty
+//
+//  Created by sun on 6/8/26.
+//
+
+enum PlayerColor: String, Codable, CaseIterable {
+    case pink
+    case purple
+    case yellow
+    case mint
+    case orange
+}
