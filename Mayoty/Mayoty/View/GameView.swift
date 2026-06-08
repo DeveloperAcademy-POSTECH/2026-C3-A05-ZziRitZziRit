@@ -19,9 +19,9 @@ struct GameView: View {
             Player()
         ],
         initialState: WaitingState(),
-        homeKitLightManager:  HomeKitLightManager()
+        homeKitLightManager: HomeKitLightManager()
     )
-
+    
     var body: some View {
         switch game.currentState {
         case is WaitingState:
@@ -30,7 +30,7 @@ struct GameView: View {
                     players: game.players,
                     remainingTime: game.timerManager.remainingTime
                 )
-
+                
                 Button("게임 시작") {
                     game.handleAction(.startGame)
                 }
@@ -58,9 +58,9 @@ struct GameView: View {
                 remainingTime: game.timerManager.remainingTime,
                 selectedPlayer: game.mafiaTarget
             ) { player in
-                game.selectMafiaTarget(player)
+                game.handleAction(.mafiaSelected(target: player))
             }
-
+            
         case is PoliceState:
             NightActionStateView(
                 players: game.players,
@@ -68,9 +68,9 @@ struct GameView: View {
                 remainingTime: game.timerManager.remainingTime,
                 selectedPlayer: game.policeTarget
             ) { player in
-                game.selectInvestigateTarget(player)
+                game.handleAction(.policeSelected(target: player))
             }
-
+            
         case is DoctorState:
             NightActionStateView(
                 players: game.players,
@@ -78,7 +78,7 @@ struct GameView: View {
                 remainingTime: game.timerManager.remainingTime,
                 selectedPlayer: game.doctorTarget
             ) { player in
-                game.selectHealTarget(player)
+                game.handleAction(.doctorSelected(target: player))
             }
             
         case is DiscussionState:
@@ -92,13 +92,19 @@ struct GameView: View {
             VoteStateView(
                 players: game.players,
                 remainingTime: game.timerManager.remainingTime
-            )
+            ) { voter, target in
+                game.handleAction(
+                    .voteSubmitted(
+                        voter: voter,
+                        target: target))
+            }
             
         case is FinalDefenseState:
             FinalDefenseView(
                 players: game.players,
                 finalDefender: nil,
-                remainingTime: game.timerManager.remainingTime
+                remainingTime: game.timerManager.remainingTime,
+                stateTitle: "FinalDefenseState"
             )
             
         case is ExecutionVoteState:
@@ -106,11 +112,27 @@ struct GameView: View {
                 players: game.players,
                 finalDefender: nil,
                 remainingTime: game.timerManager.remainingTime
+            ) { voter, isAgree in
+                game.handleAction(
+                    .executionVoteSubmitted(
+                        voter: voter,
+                        isAgree: isAgree))
+            }
+            
+        case is ExecutionResultState:
+            FinalDefenseView(
+                players: game.players,
+                finalDefender: nil,
+                remainingTime: game.timerManager.remainingTime,
+                stateTitle: "ExecutionResultState"
             )
             
+        case is ResultState:
+            if let winner = game.winner {
+                GameResultView(winner: winner)
+            }
         default:
-            Text("TODO: \(String(describing: type(of: game.currentState)))")
+            Text("알 수 없는 상태")
         }
     }
 }
-
