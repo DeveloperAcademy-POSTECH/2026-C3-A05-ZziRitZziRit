@@ -18,19 +18,19 @@ struct ExecutionVoteView: View {
                     .resizable()
                     .frame(width: 80, height: 80)
 //                    .foregroundStyle(.white) //최다 지목된 플레이어 색깔
-                HStack{
-                    Button(action: {
+                HStack {
+                    Button {
                         kill = false
-                    }) {
+                    } label: {
                         Text("살리기")
                             .foregroundStyle(.white)
                             .font(.title3)
                     }
                     .foregroundStyle(kill ? .gray : .btGreen)
                     
-                    Button(action: {
+                    Button {
                         kill = true
-                    }) {
+                    } label: {
                         Text("죽이기")
                             .foregroundStyle(.white)
                             .font(.title3)

@@ -1,5 +1,5 @@
 //
-//  RoleSelecting.swift
+//  RoleSelectingView.swift
 //  MayotyWatch Watch App
 //
 //  Created by 이경민 on 6/5/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct RoleSelecting: View {
+struct RoleSelectingView: View {
     let role: Role
     
     var body: some View {
@@ -24,5 +24,5 @@ struct RoleSelecting: View {
 }
 
 #Preview {
-    RoleSelecting(role: .doctor)
+    RoleSelectingView(role: .doctor)
 }

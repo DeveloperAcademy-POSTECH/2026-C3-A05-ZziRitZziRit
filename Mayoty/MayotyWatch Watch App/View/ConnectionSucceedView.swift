@@ -1,5 +1,5 @@
 //
-//  ConnectionOk.swift
+//  ConnectionSucceedView.swift
 //  MayotyWatch Watch App
 //
 //  Created by 이경민 on 6/5/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ConnectionOkView: View {
+struct ConnectionSucceedView: View {
     var body: some View {
         MafiaLogoView {
             VStack(spacing: 5) {
@@ -21,5 +21,5 @@ struct ConnectionOkView: View {
 }
 
 #Preview {
-    ConnectionOkView()
+    ConnectionSucceedView()
 }
