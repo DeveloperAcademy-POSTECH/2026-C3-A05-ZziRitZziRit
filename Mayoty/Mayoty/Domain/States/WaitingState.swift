@@ -13,7 +13,10 @@ struct WaitingState: GameState {
     func handleAction(game: MafiaGame, action: GameAction) {
         guard case .startGame = action else { return }
 
-        game.changeState(to: RoleAssigningState())
+        Task {
+            await GameAudioManager.shared.playNarrationAndWait(named: "startGame")
+            game.changeState(to: RoleAssigningState())
+        }
     }
 
     func exit(game: MafiaGame) {

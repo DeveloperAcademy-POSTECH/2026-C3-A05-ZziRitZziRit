@@ -12,12 +12,14 @@ struct ExecutionResultState: GameState {
         guard let finalDefensePlayer = game.finalDefensePlayer else {
             return
         }
-        
+
+        game.soundManager.playExecutionResultSound(game: game)
+
         game.lightManager.setFinalDefenseScene(
             player: finalDefensePlayer,
             players: game.players
         )
-        
+
         game.timerManager.startTimer(
             seconds: GameTime.executionResult,
             onTimeout: {
