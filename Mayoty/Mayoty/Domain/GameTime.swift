@@ -6,11 +6,11 @@
 //
 
 enum GameTime {
-    static let roleAssigning = 15
+    static let roleAssigning = 35
     
     static let introduction = 30
     
-    static let mafia = 10
+    static let mafia = 15
     static let police = 10
     static let doctor = 10
     
