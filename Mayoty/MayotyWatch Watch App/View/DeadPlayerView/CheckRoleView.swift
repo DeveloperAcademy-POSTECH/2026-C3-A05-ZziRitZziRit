@@ -10,8 +10,8 @@ import SwiftUI
 struct CheckRoleView: View {
     @Environment(\.dismiss) private var dismiss
     
-    @State private var selectedPlayerID: UUID? = nil
     
+    // TODO: 게임 상태(Store/ViewModel)에서 플레이어 목록 주입받도록 변경
     @State private var players: [Player] = [
         Player(color: PlayerColor.pink),
         Player(color: PlayerColor.purple),
