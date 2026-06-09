@@ -8,6 +8,7 @@
 struct DoctorState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("👨‍⚕️ 의사 치료 시작")
+        GameAudioManager.shared.playNarration(named: "doctorSelected")
 
         game.timerManager.startTimer(
             seconds: GameTime.doctor,
@@ -19,9 +20,7 @@ struct DoctorState: GameState {
     }
 
     func handleAction(game: MafiaGame, action: GameAction) {
-        guard case .doctorSelected(let target) = action else {
-            return
-        }
+        guard case .doctorSelected(let target) = action else { return }
 
         game.selectHealTarget(target)
 
@@ -32,6 +31,7 @@ struct DoctorState: GameState {
 
     func exit(game: MafiaGame) {
         GameLogger.event("👨‍⚕️ 의사 치료 종료")
+        GameAudioManager.shared.stopAll()
         game.timerManager.stopTimer()
     }
 }

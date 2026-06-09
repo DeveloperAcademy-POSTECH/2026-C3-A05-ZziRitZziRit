@@ -35,6 +35,7 @@ final class MafiaGame {
     let roleManager = RoleManager()
     let colorManager = ColorManager()
     let lightManager: LightManager
+    let soundManager = SoundManager()
 
     init(
         players: [Player],
