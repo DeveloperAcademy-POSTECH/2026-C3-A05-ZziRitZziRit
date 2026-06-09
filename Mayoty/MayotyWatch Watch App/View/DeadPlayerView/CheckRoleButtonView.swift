@@ -10,13 +10,12 @@ import SwiftUI
 struct CheckRoleButtonView: View {
     var body: some View {
         MafiaLogoView {
-            VStack{
+            VStack(spacing: -30){
                 
                 Text("플레이어들의\n직업을\n확인해보세요")
                     .multilineTextAlignment(.center)
                     .font(Font.system(size: 30).bold())
                     .frame(maxWidth: 300, maxHeight: 200)
-                    .padding(.bottom, -35)
                 
                 NavigationLink{
                     CheckRoleView()

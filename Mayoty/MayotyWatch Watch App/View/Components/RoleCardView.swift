@@ -1,5 +1,5 @@
 //
-//  JobCardView.swift
+//  RoleCardView.swift
 //  Mayoty
 //
 //  Created by JaewhanNamkoong on 6/8/26.
