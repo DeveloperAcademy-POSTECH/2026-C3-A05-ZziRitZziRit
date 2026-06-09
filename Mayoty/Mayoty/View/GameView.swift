@@ -18,13 +18,23 @@ struct GameView: View {
         homeKitLightManager: HomeKitLightManager()
     )
 
+//    private var connectedPlayers: [Player] {
+//        bleModel.connectedWatchIDs.map { id in
+//            Player(
+//                id: id,
+//                watchId: id.uuidString
+//            )
+//        }
+//    }
+    
     private var connectedPlayers: [Player] {
-        bleModel.connectedWatchIDs.map { id in
-            Player(
-                id: id,
-                watchId: id.uuidString
-            )
-        }
+        [
+            Player(id: UUID(), watchId: "mock-watch-1"),
+            Player(id: UUID(), watchId: "mock-watch-2"),
+            Player(id: UUID(), watchId: "mock-watch-3"),
+            Player(id: UUID(), watchId: "mock-watch-4"),
+            Player(id: UUID(), watchId: "mock-watch-5")
+        ]
     }
     
     // TODO: 5명 차도록 인원 수정할 예정
