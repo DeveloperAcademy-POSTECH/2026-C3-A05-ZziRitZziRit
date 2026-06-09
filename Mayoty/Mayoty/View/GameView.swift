@@ -10,6 +10,7 @@ import SwiftUI
 struct GameView: View {
 
     @State private var bleModel = BLEViewModel()
+    @State private var didAutoStartGame = false
 
     @State private var game = MafiaGame(
         players: [],
@@ -25,43 +26,47 @@ struct GameView: View {
             )
         }
     }
-
+    
+    // TODO: 5명 차도록 인원 수정할 예정
     private var canStartGame: Bool {
-        connectedPlayers.count >= 2
-    }
+            connectedPlayers.count >= 3
+        }
+
+        private func startGameIfNeeded() {
+            guard canStartGame else { return }
+            guard game.currentState is WaitingState else { return }
+            guard !didAutoStartGame else { return }
+
+            didAutoStartGame = true
+
+            game = MafiaGame(
+                players: connectedPlayers,
+                initialState: WaitingState(),
+                homeKitLightManager: HomeKitLightManager()
+            )
+
+            game.handleAction(.startGame)
+        }
 
     var body: some View {
         switch game.currentState {
-
+            
         case is WaitingState:
             VStack {
                 WaitingStateView(
                     players: connectedPlayers,
                     remainingTime: game.timerManager.remainingTime
                 )
-
-                Button("게임 시작") {
-                    guard canStartGame else { return }
-
-                    game = MafiaGame(
-                        players: connectedPlayers,
-                        initialState: WaitingState(),
-                        homeKitLightManager: HomeKitLightManager()
-                    )
-
-                    game.handleAction(.startGame)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(!canStartGame)
-                .padding(.bottom)
-
-                if !canStartGame {
-                    
-                    // TODO: 기기 5대 이상 연결해야 넘어갈 수 있도록 수정 예정
-                    Text("최소 2명 이상의 플레이어가 연결되어야 시작할 수 있습니다.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                
+                Text("플레이어를 기다리는 중...")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+            .onAppear {
+                startGameIfNeeded()
+            }
+            .onChange(of: connectedPlayers.count) {
+                startGameIfNeeded()
             }
 
         case is RoleAssigningState:

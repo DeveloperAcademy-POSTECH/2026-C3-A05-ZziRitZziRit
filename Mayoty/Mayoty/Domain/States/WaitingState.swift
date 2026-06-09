@@ -12,6 +12,8 @@ struct WaitingState: GameState {
 
     func handleAction(game: MafiaGame, action: GameAction) {
         guard case .startGame = action else { return }
+        // TODO: 5명 찼을 때만 startGame 호출도록 수정할 예정
+        guard game.players.count == 3 else { return }
 
         Task {
             await GameAudioManager.shared.playNarrationAndWait(named: "startGame")
