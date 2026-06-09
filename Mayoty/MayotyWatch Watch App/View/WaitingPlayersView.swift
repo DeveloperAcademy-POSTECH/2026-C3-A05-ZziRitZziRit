@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct WaitingPlayers: View {
+struct WaitingPlayersView: View {
     var body: some View {
         MafiaLogoView {
             VStack(spacing: 20) {
@@ -23,5 +23,5 @@ struct WaitingPlayers: View {
 }
 
 #Preview {
-    WaitingPlayers()
+    WaitingPlayersView()
 }
