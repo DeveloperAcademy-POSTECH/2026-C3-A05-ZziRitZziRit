@@ -18,7 +18,7 @@ enum HapticPattern {
     case citizenWin
     case mafiaWin
     case circularProgress
-    case connectionOk
+    case connectionSucceed
     case connectionFail
     case policeFoundMafia
     case policeNotFoundMafia
@@ -157,8 +157,8 @@ enum HapticPattern {
                 
             case .circularProgress:
                 device.play(.directionUp)
-                device.play(.start)
-            case .connectionOk:
+                device.play(.start) // 연결완료시까지 무한반복
+            case .connectionSucceed:
                 device.play(.directionUp)
             case .connectionFail:
                 device.play(.failure)

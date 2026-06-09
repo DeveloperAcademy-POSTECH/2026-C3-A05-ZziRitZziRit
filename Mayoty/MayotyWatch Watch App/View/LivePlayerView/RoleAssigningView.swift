@@ -17,6 +17,9 @@ struct RoleAssigningView: View {
                     .font(.system(size:30))
             }
         }
+        .task {
+            await HapticPattern.circularProgress.play()
+        }
     }
 }
 

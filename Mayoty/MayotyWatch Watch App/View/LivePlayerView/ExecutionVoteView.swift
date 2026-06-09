@@ -27,6 +27,10 @@ struct ExecutionVoteView: View {
                             .font(.title3)
                     }
                     .foregroundStyle(kill ? .gray : .btGreen)
+                    .task {
+                        await HapticPattern.choosePlayer.play()
+                        print("살리기")
+                    }
                     
                     Button {
                         kill = true
@@ -36,6 +40,10 @@ struct ExecutionVoteView: View {
                             .font(.title3)
                     }
                     .foregroundStyle(kill ? .btRed : .gray)
+                    .task {
+                        await HapticPattern.choosePlayer.play()
+                        print("죽이기")
+                    }
                 }
             }
         }

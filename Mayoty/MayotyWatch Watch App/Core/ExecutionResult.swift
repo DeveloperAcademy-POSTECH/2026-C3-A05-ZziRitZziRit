@@ -15,14 +15,14 @@ enum ExecutionResult {
 extension ExecutionResult {
     var textColor: Color {
         switch self {
-            case .survive: return .green
-            case .dead: return .red
+            case .survive: .green
+            case .dead: .red
         }
     }
     var textResult: String {
         switch self {
-            case .survive: return "생존"
-            case .dead: return "사망"
+            case .survive: "생존"
+            case .dead: "사망"
         }
     }
 }
