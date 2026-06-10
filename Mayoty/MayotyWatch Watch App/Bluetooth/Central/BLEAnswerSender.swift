@@ -18,12 +18,21 @@ final class BLEAnswerSender {
         self.peripheral = peripheral
         self.characteristic = characteristic
     }
+    
+    func sendJoin() {
+        send(.join())
+    }
 
     func send(_ answer: BLEAnswer) {
+        let writeType: CBCharacteristicWriteType =
+            characteristic.properties.contains(.write)
+            ? .withResponse
+            : .withoutResponse
+
         peripheral.writeValue(
             answer.data,
             for: characteristic,
-            type: .withResponse
+            type: writeType
         )
     }
 }

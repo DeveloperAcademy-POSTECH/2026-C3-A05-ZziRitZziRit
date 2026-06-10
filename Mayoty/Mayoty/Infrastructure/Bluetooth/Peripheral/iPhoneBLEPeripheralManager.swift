@@ -11,6 +11,7 @@ import CoreBluetooth
 enum BLEPeripheralEvent {
     case bluetoothStateChanged(String, log: String?)
     case advertisingChanged(Bool, log: String)
+    case watchConnected(id: UUID)
     case answerReceived(id: UUID, answer: BLEAnswer)
     case log(String)
 }
@@ -115,7 +116,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         continuation.yield(.log("Service added"))
     }
 
-    private func startAdvertising() {
+    func startAdvertising() {
         guard let peripheralManager else { return }
 
         peripheralManager.startAdvertising([
@@ -165,14 +166,16 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
                 continue
             }
 
+            let centralID = request.central.identifier
+
+            continuation.yield(.watchConnected(id: centralID))
+
             guard let data = request.value,
                   let answer = BLEAnswer(data: data)
             else {
                 peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
                 continue
             }
-
-            let centralID = request.central.identifier
 
             continuation.yield(
                 .answerReceived(
