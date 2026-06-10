@@ -51,14 +51,14 @@ struct RoleNightView: View {
             return .purple3
         }
     }
-
+    
     var body: some View {
         MafiaLogoView {
             VStack{
                 Text(role.selectingText)
                     .font(Font.system(size: 22))
                     .fontWeight(.bold)
-
+                
                 VStack {
                     ProgressView(value: downloadAmount, total: 100)
                         .frame(width: 200)
@@ -147,7 +147,7 @@ struct RoleNightView: View {
             await runCountdown()
         }
     }
-
+}
 
 
 #Preview {

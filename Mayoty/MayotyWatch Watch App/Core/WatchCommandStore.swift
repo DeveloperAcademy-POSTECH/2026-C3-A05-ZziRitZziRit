@@ -27,16 +27,6 @@ final class WatchCommandStore {
 
     func handle(_ command: BLECommand) {
         switch command.kind {
-
-        case .connectionSucceeded:
-            currentScreen = .waitingPlayers
-
-        case .waitingPlayers:
-            currentScreen = .waitingPlayers
-
-        case .gameStart:
-            currentScreen = .gameStart
-
         case .playerColor:
             updatePlayerColor(
                 targetID: command.targetID,

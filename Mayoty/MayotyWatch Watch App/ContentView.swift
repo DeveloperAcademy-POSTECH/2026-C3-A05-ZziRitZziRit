@@ -9,7 +9,7 @@ import SwiftUI
 
 struct ContentView: View {
     @Bindable var viewModel: WatchViewModel
-
+    
     var body: some View {
         switch viewModel.commandStore.currentScreen {
         case .join:
@@ -27,16 +27,13 @@ struct ContentView: View {
             DayTimeView()
             
         case .mafiaTurn:
-            MafNightView(
-                players: viewModel.commandStore.players,
-                viewModel: viewModel
-            )
+            RoleNightView(role: .mafia)
             
         case .policeTurn:
-            PolNightView()
+            RoleNightView(role: .police)
             
         case .doctorTurn:
-            DocNightView()
+            RoleNightView(role: .doctor)
             
         case .nightTime:
             RoleSelectingView(role: viewModel.commandStore.role)
@@ -49,10 +46,10 @@ struct ContentView: View {
             )
             
         case .vote:
-            PolNightView()
+            RoleNightView(role: .citizen)
             
         case .finalDefense:
-            FinalDefensementView()
+            FinalDefenseView()
             
         case .executionVote:
             ExecutionVoteView()
@@ -63,11 +60,11 @@ struct ContentView: View {
             )
             
         case .gameEnded:
-            if viewModel.commandStore.winner == .mafia {
-                MafiaVictoryView()
-            } else {
-                CitizenVictoryView()
-            }
+            VictoryView(
+                victory: viewModel.commandStore.winner == .mafia
+                    ? .mafia
+                    : .citizen
+            )
         }
     }
 }
