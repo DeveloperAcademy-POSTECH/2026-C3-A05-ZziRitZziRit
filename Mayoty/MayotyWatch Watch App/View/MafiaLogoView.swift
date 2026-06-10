@@ -30,7 +30,7 @@ struct MafiaLogoView<Content:View>: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Image("MaifaLogo")
+                Image("MafiaLogo")
                     .resizable()
                     .frame(width: 60, height: 25)
                     .offset(y: -10)

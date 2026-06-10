@@ -10,18 +10,19 @@ import SwiftUI
 struct MafiaVictoryView: View {
     var body: some View {
         MafiaLogoView {
-            VStack {
-                Text("마피아 승리")
-                    .foregroundStyle(.red)
-                    .font(.title)
-                Button {
-                    Task { await HapticPattern.choosePlayer.play() }
-                    //TODO: go to 1st step
-                } label: {
-                    Text("처음으로")
-                        .foregroundStyle(.white)
+            BloodAnimationView {
+                VStack {
+                    Text("마피아 승리")
+                        .foregroundStyle(.red)
+                        .font(.title)
+                    Button {
+                        Task { await HapticPattern.choosePlayer.play() }
+                    } label: {
+                        Text("처음으로")
+                            .foregroundStyle(.white)
+                    }
+                    .foregroundStyle(.btMain)
                 }
-                .foregroundStyle(.btMain)
             }
         }
         .task {
