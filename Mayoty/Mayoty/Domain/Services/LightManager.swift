@@ -62,11 +62,11 @@ final class LightManager {
                     return
                 }
 
-                HomeKitLightService.setBrightness(30, accessory: light) { brightnessError in
+                HomeKitLightService.setBrightness(20, accessory: light) { brightnessError in
                     if let brightnessError {
-                        GameLogger.light("\(light.name) 밝기 30% 실패: \(brightnessError.localizedDescription)")
+                        GameLogger.light("\(light.name) 밝기 20% 실패: \(brightnessError.localizedDescription)")
                     } else {
-                        GameLogger.light("\(light.name) 밝기 30% 적용 성공")
+                        GameLogger.light("\(light.name) 밝기 20% 적용 성공")
                     }
                 }
             }

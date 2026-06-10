@@ -21,7 +21,7 @@ enum HomeKitLightColor {
         switch self {
         case .playerPink: return 330
         case .playerPurple: return 270
-        case .playerYellow: return 60
+        case .playerYellow: return 70
         case .playerMint: return 150
         case .playerOrange: return 30
         case .finalDefenseFallback: return 45

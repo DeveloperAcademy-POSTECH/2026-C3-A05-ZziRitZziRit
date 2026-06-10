@@ -26,10 +26,10 @@ extension Role {
     
     var iconName: String {
         switch self {
-            case .mafia: "hat.widebrim"
-            case .police: "shield.pattern.checkered"
-            case .doctor: "stethoscope"
-            case .citizen: "person.crop.circle"
+            case .mafia: "mafia"
+            case .police: "police"
+            case .doctor: "doctor"
+            case .citizen: "citizen"
         }
     }
 }

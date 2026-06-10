@@ -15,8 +15,10 @@ struct RoleResultView: View {
             VStack(spacing: 5) {
                 Text("당신의 직업은")
                     .font(.system(size:30))
-                Image(systemName: role.iconName)
-                    .font(.system(size:60))
+                Image(role.iconName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120, height: 120)
                 Text(role.displayName)
                     .font(.system(size:30))
             }
@@ -28,5 +30,5 @@ struct RoleResultView: View {
 }
 
 #Preview {
-    RoleResultView(role: .doctor)
+    RoleResultView(role: .police)
 }
