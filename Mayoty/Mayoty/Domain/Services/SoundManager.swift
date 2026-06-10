@@ -25,6 +25,8 @@ final class SoundManager {
             "rolesAssigned-doctor",
             "rolesAssigned-completed"
         ])
+        
+        GameAudioManager.shared.playBGM(named: "nightBgm")
     }
 
     // MARK: - Introduction
@@ -35,11 +37,17 @@ final class SoundManager {
             delay: seconds
         )
     }
+    
+    func playIntroductionStartBgm(){
+        GameAudioManager.shared.playBGM(named: "discussionBgm")
+    }
 
     // MARK: - Mafia
 
     func playMafiaStartSound() {
         GameAudioManager.shared.playNarration(named: "mafiaSelected")
+        
+//        GameAudioManager.shared.playBGM(named: "nightBgm")
     }
 
     // MARK: - Police
@@ -68,6 +76,8 @@ final class SoundManager {
         GameAudioManager.shared.playNarration(
             named: "discussion-\(color.rawValue)Dead"
         )
+        
+        GameAudioManager.shared.playBGM(named: "discussionBgm")
     }
 
     // MARK: - Vote
@@ -126,18 +136,25 @@ final class SoundManager {
     // MARK: - Result
 
     func playResultSound(winner: Team) {
-        let fileName: String
+        let narrationFileName: String
+        let bgmFileName: String
 
         switch winner {
         case .citizens:
-            fileName = "gameEnded-citizenVictory"
+            narrationFileName = "gameEnded-citizenVictory"
+            bgmFileName = "citizenVictoryBgm"
 
         case .mafia:
-            fileName = "gameEnded-mafiaVictory"
+            narrationFileName = "gameEnded-mafiaVictory"
+            bgmFileName = "mafiaVictoryBgm"
         }
 
         GameAudioManager.shared.playNarration(
-            named: fileName
+            named: narrationFileName
+        )
+        
+        GameAudioManager.shared.playBGM(
+            named: bgmFileName
         )
     }
 

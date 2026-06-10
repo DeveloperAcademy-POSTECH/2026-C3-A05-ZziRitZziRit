@@ -18,6 +18,8 @@ struct IntroductionState: GameState {
         game.soundManager.playIntroductionEndingSound(
             after: max(0.0, Double(GameTime.introduction) - 30.0)
         )
+        
+        game.soundManager.playIntroductionStartBgm()
 
         game.timerManager.startTimer(
             seconds: GameTime.introduction,
