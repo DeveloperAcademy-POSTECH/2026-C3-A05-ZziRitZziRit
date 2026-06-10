@@ -22,6 +22,9 @@ struct PoliceArrestResultView: View {
                     .font(.system(size:35))
             }
         }
+        .task {
+            await result.resultHaptic.play()
+        }
     }
 }
 

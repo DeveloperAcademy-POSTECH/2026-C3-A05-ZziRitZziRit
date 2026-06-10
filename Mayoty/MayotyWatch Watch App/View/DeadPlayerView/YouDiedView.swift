@@ -39,6 +39,9 @@ struct YouDiedView: View {
                 .ignoresSafeArea()
             }
         }
+        .task {
+            await HapticPattern.dead.play()
+        }
     }
 }
 

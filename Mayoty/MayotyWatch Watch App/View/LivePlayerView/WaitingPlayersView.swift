@@ -19,6 +19,9 @@ struct WaitingPlayersView: View {
                     .font(.system(size:25))
             }
         }
+        .task {
+            await HapticPattern.circularProgress.play()
+        }
     }
 }
 

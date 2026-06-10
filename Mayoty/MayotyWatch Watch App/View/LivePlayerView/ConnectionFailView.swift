@@ -24,6 +24,9 @@ struct ConnectionFailView: View {
                 .foregroundStyle(.btMain)
             }
         }
+        .task {
+            await HapticPattern.connectionFail.play()
+        }
     }
 }
 

@@ -21,6 +21,9 @@ struct RoleResultView: View {
                     .font(.system(size:30))
             }
         }
+        .task {
+            await HapticPattern.revealRole.play()
+        }
     }
 }
 
