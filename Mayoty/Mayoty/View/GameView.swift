@@ -12,16 +12,34 @@ struct GameView: View {
     @State private var game: MafiaGame
     @State private var bleViewModel: BLEViewModel
     @State private var didAutoStartGame = false
+
+    private let peripheralManager: iPhoneBLEPeripheralManager
+    private let watchCommandManager: WatchCommandManager
     
     init() {
+        let peripheralManager = iPhoneBLEPeripheralManager()
+
+        let watchCommandManager = WatchCommandManager(
+            peripheralManager: peripheralManager
+        )
+
         let initialGame = MafiaGame(
             players: [],
             initialState: WaitingState(),
-            homeKitLightManager: HomeKitLightManager()
+            homeKitLightManager: HomeKitLightManager(),
+            watchCommandManager: watchCommandManager
         )
         
+        self.peripheralManager = peripheralManager
+        self.watchCommandManager = watchCommandManager
+
         _game = State(initialValue: initialGame)
-        _bleViewModel = State(initialValue: BLEViewModel(game: initialGame))
+        _bleViewModel = State(
+            initialValue: BLEViewModel(
+                game: initialGame,
+                peripheralManager: peripheralManager
+            )
+        )
     }
     
         private var connectedPlayers: [Player] {
@@ -38,13 +56,13 @@ struct GameView: View {
 //            Player(id: UUID(), watchId: "mock-watch-1"),
 //            Player(id: UUID(), watchId: "mock-watch-2"),
 //            Player(id: UUID(), watchId: "mock-watch-3"),
-//            Player(id: UUID(), watchId: "mock-watch-4"),
+//            Player(id: UUID(), watchId: "mock-watch-4")
 //            Player(id: UUID(), watchId: "mock-watch-5")
 //        ]
 //    }
     
     private var canStartGame: Bool {
-        connectedPlayers.count >= 5
+        connectedPlayers.count >= 3
     }
     
     private func startGameIfNeeded() {
@@ -57,7 +75,8 @@ struct GameView: View {
         game = MafiaGame(
             players: connectedPlayers,
             initialState: WaitingState(),
-            homeKitLightManager: HomeKitLightManager()
+            homeKitLightManager: HomeKitLightManager(),
+            watchCommandManager: watchCommandManager
         )
         
         game.handleAction(.startGame)

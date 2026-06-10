@@ -9,6 +9,8 @@ struct ExecutionVoteState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("👍 처형 찬반 투표 시작")
 
+        game.watchCommandManager.sendExecutionVote()
+
         game.soundManager.playExecutionVoteStartSound(game: game)
 
         game.lightManager.setNightScene()

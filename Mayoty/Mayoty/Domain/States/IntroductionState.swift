@@ -8,6 +8,8 @@
 struct IntroductionState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("👋 자기소개 시작")
+        
+        game.watchCommandManager.sendDayTime()
 
         game.lightManager.setPlayerColorScene(
             players: game.players

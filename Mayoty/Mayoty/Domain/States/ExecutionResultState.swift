@@ -13,6 +13,8 @@ struct ExecutionResultState: GameState {
             return
         }
 
+        game.watchCommandManager.sendExecutionResult()
+
         game.soundManager.playExecutionResultSound(game: game)
 
         game.lightManager.setFinalDefenseScene(

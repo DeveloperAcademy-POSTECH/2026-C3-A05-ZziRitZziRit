@@ -9,10 +9,12 @@ struct DiscussionState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("☀️ 토론 시작")
 
+        game.watchCommandManager.sendDayTime()
+
         game.lightManager.setPlayerColorScene(
             players: game.players
         )
-        
+
         game.soundManager.playDiscussionStartSound(game: game)
 
         game.timerManager.startTimer(
