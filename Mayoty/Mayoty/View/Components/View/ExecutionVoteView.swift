@@ -57,7 +57,7 @@ struct ExecutionVoteView: View {
             if let voter = selectedVoter {
                 HStack {
                     Text("\(voter.color?.rawValue ?? "색상 없음") 투표")
-
+                    
                     Button("찬성") {
                         submitVote(voter: voter, isAgree: true)
                     }

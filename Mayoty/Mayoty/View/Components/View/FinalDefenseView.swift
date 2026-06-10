@@ -25,11 +25,11 @@ struct FinalDefenseView: View {
             )
         } cell: { player in
             ListCell {
-                HStack(spacing: 30) {
+                HStack(spacing: 8) {
                     Text(player.color?.rawValue ?? "색상 없음")
-
+                        .frame(width: 70, alignment: .leading)
                     Text(player.isAlive ? "생존" : "사망")
-
+                        .frame(width: 40, alignment: .leading)
                     Spacer()
 
                     if player === finalDefender {
