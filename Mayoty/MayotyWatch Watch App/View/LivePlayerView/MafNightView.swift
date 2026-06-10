@@ -1,13 +1,17 @@
 //
-//  DocNightView.swift
+//  MafNightView.swift
 //  Mayoty
 //
 //  Created by JaewhanNamkoong on 6/5/26.
 //
 
+
 import SwiftUI
 
-struct DocNightView: View {
+
+
+
+struct MafNightView: View {
     
     @State private var selectedPlayerID: UUID? = nil
     
@@ -35,7 +39,7 @@ struct DocNightView: View {
     var body: some View {
         MafiaLogoView {
             VStack{
-                Text("살릴 사람을 지목하세요")
+                Text("죽일 사람을 지목하세요")
                     .font(Font.system(size: 22))
                     .fontWeight(.bold)
                 VStack {
@@ -57,6 +61,9 @@ struct DocNightView: View {
                                                 selectedPlayerID = player.id
                                             }
                                         }
+                                        .task {
+                                            await HapticPattern.choosePlayer.play()
+                                        }
                                     
                                 }
                             }
@@ -71,8 +78,11 @@ struct DocNightView: View {
     }
 }
 
+
+
 #Preview {
-    NavigationView{
-        DocNightView()
+    NavigationStack {
+        MafNightView()
     }
 }
+

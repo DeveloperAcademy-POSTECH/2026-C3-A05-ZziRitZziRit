@@ -57,7 +57,9 @@ struct PolNightView: View {
                                                 selectedPlayerID = player.id
                                             }
                                         }
-                                    
+                                        .task {
+                                            await HapticPattern.choosePlayer.play()
+                                        }
                                 }
                             }
                         }

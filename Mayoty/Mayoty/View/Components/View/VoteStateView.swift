@@ -30,7 +30,11 @@ struct VoteStateView: View {
             } cell: { player in
                 ListCell {
                     HStack {
-                        Text(player.color?.rawValue ?? "색상 없음")
+                        Text(player.color?.rawValue ?? "-")
+                            .frame(width: 70, alignment: .leading)
+                        Text(player.isAlive ? "생존" : "사망")
+                            .frame(width: 40, alignment: .leading)
+                        Text(player.role?.displayName ?? "역할 없음")
 
                         Spacer()
 
