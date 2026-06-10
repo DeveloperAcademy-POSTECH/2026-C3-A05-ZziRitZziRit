@@ -23,6 +23,9 @@ struct CitizenVictoryView: View {
                 .foregroundStyle(.btMain)
             }
         }
+        .task {
+            await HapticPattern.citizenWin.play()
+        }
     }
 }
 
