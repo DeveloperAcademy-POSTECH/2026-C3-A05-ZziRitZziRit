@@ -22,12 +22,16 @@ struct RoleAssignView: View {
             ListCell {
                 HStack {
                     Text("Player \(player.id.uuidString.prefix(4))")
-
-                    Spacer()
+                        .frame(width: 100,alignment: .leading )
 
                     Text(player.color?.rawValue ?? "색상 없음")
-
+                        .frame(width: 70, alignment: .leading)
+                    
+                    Spacer()
+                    
                     Text(player.role?.displayName ?? "역할 없음")
+                    
+                    
                 }
             }
         }

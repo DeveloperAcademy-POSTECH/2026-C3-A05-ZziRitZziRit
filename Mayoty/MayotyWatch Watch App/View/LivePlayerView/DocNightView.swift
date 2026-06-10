@@ -10,6 +10,9 @@ import SwiftUI
 struct DocNightView: View {
     
     @State private var selectedPlayerID: UUID? = nil
+    @GestureState private var isPressing = false
+    @State private var pressProgress: Double = 0
+    @State private var confirmedPlayerID: UUID? = nil
     
     @State private var players: [Player] = [
         Player(color: PlayerColor.pink),
@@ -49,18 +52,76 @@ struct DocNightView: View {
                         VStack{
                             ForEach(players) { player in
                                 if player.id == selectedPlayerID {
-                                    MainButtonView(player: player)
+                                    let longPress = LongPressGesture(minimumDuration: 3)
+                                        .updating($isPressing) { current, state, _ in
+                                            state = current
+                                        }
+                                        .onEnded { success in
+                                            if success {
+                                                confirmedPlayerID = player.id
+                                            }
+                                        }
+
+                                    ZStack {
+                                        MainButtonView(player: player, isConfirmed: confirmedPlayerID == player.id)
+                                            .overlay(
+                                                Group {
+                                                    if confirmedPlayerID == player.id {
+                                                        Image(systemName: "checkmark.circle.fill")
+                                                            .font(.system(size: 28))
+                                                            .foregroundStyle(.green)
+                                                            .offset(x: 70, y: -28)
+                                                            .transition(.scale)
+                                                    }
+                                                }
+                                            )
+
+                                        GeometryReader { geo in
+                                            let w = geo.size.width
+                                            let h = geo.size.height
+                                            ZStack(alignment: .leading) {
+                                                Rectangle().fill(Color.clear)
+                                                Rectangle()
+                                                    .fill(Color.black.opacity(0.35))
+                                                    .frame(width: (confirmedPlayerID == player.id) ? 0 : w * pressProgress, height: h)
+                                            }
+                                        }
+                                        .clipShape(RoundedRectangle(cornerRadius: 16))
+                                        .allowsHitTesting(false)
+                                    }
+                                    .onChange(of: isPressing) { _, newValue in
+                                        if newValue {
+                                            withAnimation(.linear(duration: 3)) {
+                                                pressProgress = 1
+                                            }
+                                        } else {
+                                            if confirmedPlayerID != player.id {
+                                                pressProgress = 0
+                                            }
+                                        }
+                                    }
+                                    .simultaneousGesture(longPress)
+                                    .onChange(of: confirmedPlayerID) { _, newValue in
+                                        if newValue == player.id {
+                                            pressProgress = 0
+                                        }
+                                    }
                                 } else {
                                     SubButtonView(player: player)
                                         .onTapGesture {
                                             withAnimation(.easeInOut(duration:0.15)) {
                                                 selectedPlayerID = player.id
+                                                confirmedPlayerID = nil
+                                                pressProgress = 0
                                             }
                                         }
+<<<<<<< HEAD:Mayoty/MayotyWatch Watch App/View/LivePlayerView/DocNightView.swift
                                         .task {
                                             await HapticPattern.choosePlayer.play()
                                         }
                                     
+=======
+>>>>>>> origin/develop:Mayoty/MayotyWatch Watch App/View/DocNightView.swift
                                 }
                             }
                         }
@@ -79,3 +140,4 @@ struct DocNightView: View {
         DocNightView()
     }
 }
+
