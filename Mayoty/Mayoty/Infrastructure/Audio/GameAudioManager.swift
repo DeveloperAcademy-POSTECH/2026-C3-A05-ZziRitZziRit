@@ -81,7 +81,7 @@ final class GameAudioManager {
 
         narrationTask = Task { [weak self] in
             do {
-                try await Task.sleep(for: .seconds(seconds))
+                try? await Task.sleep(for: .seconds(seconds))
                 guard !Task.isCancelled else { return }
 
                 await self?.playOneNarrationAndWait(named: fileName)
@@ -166,7 +166,7 @@ final class GameAudioManager {
         let duration = UInt64(player.duration * 1_000_000_000)
 
         do {
-            try await Task.sleep(nanoseconds: duration)
+            try? await Task.sleep(nanoseconds: duration)
         } catch {
             player.stop()
         }
