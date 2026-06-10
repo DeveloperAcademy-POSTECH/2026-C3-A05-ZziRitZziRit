@@ -28,7 +28,7 @@ enum HomeKitLightService {
             completion?(error)
         }
     }
-
+    
     static func setColor(
         _ color: HomeKitLightColor,
         accessory: HMAccessory,
@@ -48,12 +48,56 @@ enum HomeKitLightService {
                 type: HMCharacteristicTypeBrightness
               )
         else {
+            GameLogger.light("\(accessory.name) 색상 characteristic 찾기 실패")
+            completion?(nil)
             return
         }
 
-        hueCharacteristic.writeValue(color.hue) { _ in }
-        saturationCharacteristic.writeValue(color.saturation) { _ in }
-        brightnessCharacteristic.writeValue(color.brightness) { error in
+        GameLogger.light("\(accessory.name) 색상 변경 시작: \(color)")
+
+        hueCharacteristic.writeValue(color.hue) { hueError in
+            if let hueError {
+                GameLogger.light("Hue 변경 실패: \(hueError.localizedDescription)")
+                completion?(hueError)
+                return
+            }
+
+            saturationCharacteristic.writeValue(color.saturation) { saturationError in
+                if let saturationError {
+                    GameLogger.light("Saturation 변경 실패: \(saturationError.localizedDescription)")
+                    completion?(saturationError)
+                    return
+                }
+
+                brightnessCharacteristic.writeValue(color.brightness) { brightnessError in
+                    if let brightnessError {
+                        GameLogger.light("Brightness 변경 실패: \(brightnessError.localizedDescription)")
+                    } else {
+                        GameLogger.light("\(accessory.name) 색상 변경 완료")
+                    }
+
+                    completion?(brightnessError)
+                }
+            }
+        }
+    }
+    
+    static func setBrightness(
+        _ brightness: Double,
+        accessory: HMAccessory,
+        completion: ((Error?) -> Void)? = nil
+    ) {
+        guard let service = lightService(for: accessory),
+              let brightnessCharacteristic = characteristic(
+                in: service,
+                type: HMCharacteristicTypeBrightness
+              )
+        else {
+            completion?(nil)
+            return
+        }
+
+        brightnessCharacteristic.writeValue(brightness) { error in
             completion?(error)
         }
     }
@@ -84,3 +128,4 @@ enum HomeKitLightService {
         }
     }
 }
+

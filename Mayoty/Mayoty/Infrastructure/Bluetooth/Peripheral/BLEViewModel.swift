@@ -12,6 +12,7 @@ import Observation
 final class BLEViewModel {
     var isAdvertising: Bool = false
     var bluetoothStateText: String = "Unknown"
+    var connectedWatchIDs: Set<UUID> = []
     var answers: [UUID: BLEAnswer] = [:]
     var logs: [String] = []
 
@@ -24,6 +25,10 @@ final class BLEViewModel {
 
     deinit {
         eventTask?.cancel()
+    }
+
+    func startAdvertising() {
+        peripheralManager.startAdvertising()
     }
 
     func stopAdvertising() {
@@ -53,6 +58,10 @@ final class BLEViewModel {
             self.isAdvertising = isAdvertising
             addLog(log)
 
+        case let .watchConnected(id):
+            connectedWatchIDs.insert(id)
+            addLog("Watch connected: \(id.uuidString.prefix(8))")
+
         case let .answerReceived(id, answer):
             receiveAnswer(from: id, answer: answer)
 
@@ -62,7 +71,9 @@ final class BLEViewModel {
     }
 
     func receiveAnswer(from id: UUID, answer: BLEAnswer) {
+        connectedWatchIDs.insert(id)
         answers[id] = answer
+
         logs.insert(
             "\(id.uuidString.prefix(8)) → \(answer.kind), value: \(answer.value)",
             at: 0

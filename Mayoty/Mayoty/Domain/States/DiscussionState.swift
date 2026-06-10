@@ -12,6 +12,8 @@ struct DiscussionState: GameState {
         game.lightManager.setPlayerColorScene(
             players: game.players
         )
+        
+        game.soundManager.playDiscussionStartSound(game: game)
 
         game.timerManager.startTimer(
             seconds: GameTime.discussion,

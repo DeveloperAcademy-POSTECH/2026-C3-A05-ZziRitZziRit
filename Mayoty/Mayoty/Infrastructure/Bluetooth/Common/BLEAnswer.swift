@@ -8,11 +8,14 @@
 import Foundation
 
 enum BLEAnswerKind: UInt8 {
-    case mafiaSelected = 0
-    case policeSelected = 1
-    case doctorSelected = 2
-    case voteSubmitted = 3
-    case executionVoteSubmitted = 4
+    case join = 0
+    
+    case mafiaSelected = 1
+    case policeSelected = 2
+    case doctorSelected = 3
+    
+    case voteSubmitted = 4
+    case executionVoteSubmitted = 5
 }
 
 struct BLEAnswer {
@@ -39,22 +42,26 @@ struct BLEAnswer {
 }
 
 extension BLEAnswer {
+    static func join() -> BLEAnswer {
+        BLEAnswer(kind: .join, value: 0)
+    }
+    
     static func doctorSelected(playerID: UInt8) -> BLEAnswer {
         BLEAnswer(kind: .doctorSelected, value: playerID)
     }
-
+    
     static func mafiaSelected(playerID: UInt8) -> BLEAnswer {
         BLEAnswer(kind: .mafiaSelected, value: playerID)
     }
-
+    
     static func policeSelected(playerID: UInt8) -> BLEAnswer {
         BLEAnswer(kind: .policeSelected, value: playerID)
     }
-
+    
     static func voteSubmitted(targetID: UInt8) -> BLEAnswer {
         BLEAnswer(kind: .voteSubmitted, value: targetID)
     }
-
+    
     static func executionVoteSubmitted(isAgree: Bool) -> BLEAnswer {
         BLEAnswer(
             kind: .executionVoteSubmitted,
@@ -66,6 +73,8 @@ extension BLEAnswer {
 extension BLEAnswer {
     var kindText: String {
         switch kind {
+        case .join:
+            return "연결"
         case .doctorSelected:
             return "의사 지목"
         case .mafiaSelected:
