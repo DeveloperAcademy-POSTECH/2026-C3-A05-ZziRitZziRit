@@ -33,12 +33,12 @@ extension Role {
         }
     }
     
-    var nightText: String {
+    var selectingText: String {
         switch self {
             case .mafia: "죽일 사람을 지목하세요"
             case .police: "조사할 사람을 지목하세요"
             case .doctor: "살릴 사람을 지목하세요"
-            case .citizen: ""
+            case .citizen: "죽일 사람을 지목하세요"
         }
     }
 }

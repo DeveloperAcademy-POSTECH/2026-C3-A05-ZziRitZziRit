@@ -40,7 +40,7 @@ struct YouDiedView: View {
             }
         }
         .task {
-            await HapticPattern.dead.play()
+            try? await HapticPattern.dead.play()
         }
     }
 }

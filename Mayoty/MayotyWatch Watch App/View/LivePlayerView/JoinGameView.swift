@@ -14,7 +14,7 @@ struct JoinGameView: View {
                 MafiaStackView()
 //                    .frame(width:120, height: 130)
                 Button {
-                    Task { await HapticPattern.choosePlayer.play() }
+                    Task { try? await HapticPattern.choosePlayer.play() }
                 } label: {
                     Text("참가하기")
                         .foregroundStyle(.white)
