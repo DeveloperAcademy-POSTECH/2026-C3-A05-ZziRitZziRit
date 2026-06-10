@@ -23,7 +23,7 @@ final class SoundManager {
             "rolesAssigned-mafia",
             "rolesAssigned-police",
             "rolesAssigned-doctor",
-            "roleAssigned-completed"
+            "rolesAssigned-completed"
         ])
     }
 

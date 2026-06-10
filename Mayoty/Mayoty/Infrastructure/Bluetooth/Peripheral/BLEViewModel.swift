@@ -16,10 +16,13 @@ final class BLEViewModel {
     var answers: [UUID: BLEAnswer] = [:]
     var logs: [String] = []
 
+    var game: MafiaGame
+
     private let peripheralManager = iPhoneBLEPeripheralManager()
     private var eventTask: Task<Void, Never>?
 
-    init() {
+    init(game: MafiaGame) {
+        self.game = game
         observePeripheralEvents()
     }
 
@@ -78,9 +81,62 @@ final class BLEViewModel {
             "\(id.uuidString.prefix(8)) → \(answer.kind), value: \(answer.value)",
             at: 0
         )
+
+        handleGameAnswer(from: id, answer: answer)
+    }
+
+    private func handleGameAnswer(from id: UUID, answer: BLEAnswer) {
+        switch answer.kind {
+        case .join:
+            break
+
+        case .mafiaSelected:
+            guard let target = player(for: answer.value) else { return }
+            game.handleAction(.mafiaSelected(target: target))
+
+        case .policeSelected:
+            guard let target = player(for: answer.value) else { return }
+            game.handleAction(.policeSelected(target: target))
+
+        case .doctorSelected:
+            guard let target = player(for: answer.value) else { return }
+            game.handleAction(.doctorSelected(target: target))
+
+        case .voteSubmitted:
+            guard let voter = player(for: id) else { return }
+            guard let target = player(for: answer.value) else { return }
+            game.handleAction(.voteSubmitted(voter: voter, target: target))
+
+        case .executionVoteSubmitted:
+            guard let voter = player(for: id) else { return }
+            game.handleAction(
+                .executionVoteSubmitted(
+                    voter: voter,
+                    isAgree: answer.value == 1
+                )
+            )
+        }
+    }
+
+    private func player(for number: UInt8) -> Player? {
+        let index = Int(number) - 1
+
+        guard game.players.indices.contains(index) else {
+            addLog("Invalid player number: \(number)")
+            return nil
+        }
+
+        return game.players[index]
+    }
+
+    private func player(for watchID: UUID) -> Player? {
+        game.players.first { player in
+            player.watchId == watchID.uuidString
+        }
     }
 
     private func addLog(_ text: String) {
         logs.insert(text, at: 0)
     }
 }
+
