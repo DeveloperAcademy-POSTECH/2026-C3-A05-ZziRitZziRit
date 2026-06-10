@@ -14,11 +14,13 @@ struct CitizenVictoryView: View {
                 Text("시민 승리")
                     .foregroundStyle(.green)
                     .font(.title)
+                    .fontWeight(.bold)
                 Button{
                     // TODO: go to 1st step
                 } label: {
                     Text("처음으로")
                         .foregroundStyle(.white)
+                        .fontWeight(.bold)
                 }
                 .foregroundStyle(.btMain)
             }

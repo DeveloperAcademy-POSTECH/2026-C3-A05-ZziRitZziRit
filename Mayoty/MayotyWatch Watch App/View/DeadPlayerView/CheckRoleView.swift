@@ -27,13 +27,15 @@ struct CheckRoleView: View {
             VStack{
                 
                 ScrollView{
-                    VStack(spacing: 10) {
+                    VStack(spacing:50) {
                         ForEach(players) { player in
                             RoleCardView(player: player)
                         }
                     }
-                    .padding(.horizontal, 16)
+                    .padding(.horizontal, 8)
                     .padding(.vertical, 8)
+                    Color.clear
+                        .frame(height: 40)
                 }
                 .padding(.top, 50)
                 .ignoresSafeArea()
