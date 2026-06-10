@@ -1,14 +1,16 @@
 //
-//  DocNightView.swift
-//  Mayoty
+//  RoleNightView.swift
+//  MayotyWatch Watch App
 //
-//  Created by JaewhanNamkoong on 6/5/26.
+//  Created by NamChoong
+//  fix by 이경민 on 6/11/26.
 //
 
 import SwiftUI
 
-struct DocNightView: View {
+struct RoleNightView: View {
     
+    let role:Role
     @State private var selectedPlayerID: UUID? = nil
     @GestureState private var isPressing = false
     @State private var pressProgress: Double = 0
@@ -38,7 +40,7 @@ struct DocNightView: View {
     var body: some View {
         MafiaLogoView {
             VStack{
-                Text("살릴 사람을 지목하세요")
+                Text(role.nightText)
                     .font(Font.system(size: 22))
                     .fontWeight(.bold)
                 VStack {
@@ -129,8 +131,5 @@ struct DocNightView: View {
 }
 
 #Preview {
-    NavigationView{
-        DocNightView()
-    }
+    RoleNightView(role: .doctor)
 }
-
