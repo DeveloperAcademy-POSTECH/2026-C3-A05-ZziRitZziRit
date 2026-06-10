@@ -11,7 +11,19 @@ struct RoleCardView: View {
     
     let player: Player
     
+    private var roleTint: Color {
+        guard let role = player.role else { return .primary }
+        switch role {
+        case .mafia:
+            return .red
+        case .police, .doctor, .citizen:
+            return .green
+        }
+    }
+    
     var body: some View {
+        
+        
         HStack {
             Image(systemName: "person.fill")
                 .resizable()
@@ -24,7 +36,7 @@ struct RoleCardView: View {
                     .fontWeight(.semibold)
                 Text("\(player.role?.displayName ?? "")")
                     .font(Font.system(size: 23))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(roleTint)
             }
             .padding(.leading, 10)
         }
@@ -40,11 +52,13 @@ struct RoleCardView: View {
     }
 }
 
+
+
 #Preview {
     let sample = Player(
         id: UUID(),
         color: .pink,
-        role: .mafia
+        role: .citizen
     )
     return RoleCardView(player: sample)
 }
