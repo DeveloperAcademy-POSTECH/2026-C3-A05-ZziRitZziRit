@@ -15,15 +15,13 @@ struct MafiaVictoryView: View {
                     .foregroundStyle(.red)
                     .font(.title)
                 Button {
+                    Task { await HapticPattern.choosePlayer.play() }
                     //TODO: go to 1st step
                 } label: {
                     Text("처음으로")
                         .foregroundStyle(.white)
                 }
                 .foregroundStyle(.btMain)
-                .task {
-                    await HapticPattern.choosePlayer.play()
-                }
             }
         }
         .task {
