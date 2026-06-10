@@ -8,6 +8,7 @@
 struct PoliceState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("👮‍♂️ 경찰 수사 시작")
+        GameAudioManager.shared.playNarration(named: "policeSelected")
         
         game.timerManager.startTimer(
             seconds: GameTime.police,
@@ -36,6 +37,7 @@ struct PoliceState: GameState {
     
     func exit(game: MafiaGame) {
         GameLogger.event("👮‍♂️ 경찰 수사 종료")
+        GameAudioManager.shared.stopAll()
         game.timerManager.stopTimer()
     }
 }

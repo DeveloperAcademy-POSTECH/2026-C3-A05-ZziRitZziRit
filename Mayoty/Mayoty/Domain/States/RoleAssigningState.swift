@@ -8,12 +8,15 @@
 struct RoleAssigningState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("✅ 역할 배정 시작")
+
+        game.soundManager.playRoleAssigningSounds()
+
         game.roleManager.assignRoles(to: game.players)
         GameLogger.event("✅ 역할 배정 성공")
-        
+
         game.colorManager.assignColors(to: game.players)
         GameLogger.event("✅ 색상 배정 성공")
-        
+
         game.lightManager.setNightScene()
 
         game.timerManager.startTimer(
@@ -34,5 +37,6 @@ struct RoleAssigningState: GameState {
 
     func exit(game: MafiaGame) {
         game.timerManager.stopTimer()
+        game.soundManager.stopAll()
     }
 }
