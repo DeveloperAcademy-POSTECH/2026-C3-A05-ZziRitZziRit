@@ -10,6 +10,7 @@ import Observation
 
 @Observable
 final class BLEViewModel {
+
     var isAdvertising: Bool = false
     var bluetoothStateText: String = "Unknown"
     var connectedWatchIDs: Set<UUID> = []
@@ -18,17 +19,24 @@ final class BLEViewModel {
 
     var game: MafiaGame
 
-    private let peripheralManager = iPhoneBLEPeripheralManager()
+    private let peripheralManager: iPhoneBLEPeripheralManager
     private var eventTask: Task<Void, Never>?
 
-    init(game: MafiaGame) {
+    init(
+        game: MafiaGame,
+        peripheralManager: iPhoneBLEPeripheralManager
+    ) {
         self.game = game
+        self.peripheralManager = peripheralManager
+
         observePeripheralEvents()
     }
 
     deinit {
         eventTask?.cancel()
     }
+
+    // MARK: - 광고 제어
 
     func startAdvertising() {
         peripheralManager.startAdvertising()
@@ -37,6 +45,8 @@ final class BLEViewModel {
     func stopAdvertising() {
         peripheralManager.stopAdvertising()
     }
+
+    // MARK: - 이벤트 관찰
 
     private func observePeripheralEvents() {
         eventTask = Task {
@@ -47,6 +57,8 @@ final class BLEViewModel {
             }
         }
     }
+
+    // MARK: - 이벤트 처리
 
     private func handle(_ event: BLEPeripheralEvent) {
         switch event {
@@ -73,17 +85,20 @@ final class BLEViewModel {
         }
     }
 
+    // MARK: - 응답 수신
+
     func receiveAnswer(from id: UUID, answer: BLEAnswer) {
         connectedWatchIDs.insert(id)
         answers[id] = answer
 
-        logs.insert(
-            "\(id.uuidString.prefix(8)) → \(answer.kind), value: \(answer.value)",
-            at: 0
+        addLog(
+            "\(id.uuidString.prefix(8)) → \(answer.kind), value: \(answer.value)"
         )
 
         handleGameAnswer(from: id, answer: answer)
     }
+
+    // MARK: - 게임 액션 변환
 
     private func handleGameAnswer(from id: UUID, answer: BLEAnswer) {
         switch answer.kind {
@@ -105,10 +120,17 @@ final class BLEViewModel {
         case .voteSubmitted:
             guard let voter = player(for: id) else { return }
             guard let target = player(for: answer.value) else { return }
-            game.handleAction(.voteSubmitted(voter: voter, target: target))
+
+            game.handleAction(
+                .voteSubmitted(
+                    voter: voter,
+                    target: target
+                )
+            )
 
         case .executionVoteSubmitted:
             guard let voter = player(for: id) else { return }
+
             game.handleAction(
                 .executionVoteSubmitted(
                     voter: voter,
@@ -117,6 +139,8 @@ final class BLEViewModel {
             )
         }
     }
+
+    // MARK: - 플레이어 찾기
 
     private func player(for number: UInt8) -> Player? {
         let index = Int(number) - 1
@@ -135,8 +159,9 @@ final class BLEViewModel {
         }
     }
 
+    // MARK: - 로그
+
     private func addLog(_ text: String) {
         logs.insert(text, at: 0)
     }
 }
-

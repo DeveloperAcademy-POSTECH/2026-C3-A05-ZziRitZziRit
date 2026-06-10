@@ -10,12 +10,19 @@ import Observation
 
 @Observable
 final class WatchViewModel {
+
     var connectionState: WatchConnectionState = .idle
-    
-    private let centralManager = WatchCentralManager()
+
+    let commandStore = WatchCommandStore()
+
+    private let centralManager: WatchCentralManager
     private var eventTask: Task<Void, Never>?
 
     init() {
+        self.centralManager = WatchCentralManager(
+            commandStore: commandStore
+        )
+
         observeEvents()
     }
 
@@ -23,13 +30,17 @@ final class WatchViewModel {
         eventTask?.cancel()
     }
 
+    // MARK: - 연결 관리
+
     func scan() {
         centralManager.scan()
     }
-    
+
     func disconnect() {
         centralManager.disconnect()
     }
+
+    // MARK: - 밤 행동
 
     func selectMafiaTarget(playerID: UInt8) {
         send(.mafiaSelected(playerID: playerID))
@@ -38,10 +49,12 @@ final class WatchViewModel {
     func selectPoliceTarget(playerID: UInt8) {
         send(.policeSelected(playerID: playerID))
     }
-    
+
     func selectDoctorTarget(playerID: UInt8) {
         send(.doctorSelected(playerID: playerID))
     }
+
+    // MARK: - 투표 행동
 
     func submitVote(targetID: UInt8) {
         send(.voteSubmitted(targetID: targetID))
@@ -51,9 +64,13 @@ final class WatchViewModel {
         send(.executionVoteSubmitted(isAgree: isAgree))
     }
 
+    // MARK: - 응답 전송
+
     private func send(_ answer: BLEAnswer) {
         centralManager.send(answer)
     }
+
+    // MARK: - 이벤트 관찰
 
     private func observeEvents() {
         eventTask = Task {

@@ -9,18 +9,26 @@ import Foundation
 import CoreBluetooth
 
 final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
-    
+
     private var centralManager: CBCentralManager?
     private var targetPeripheral: CBPeripheral?
+
+    /// Watch → iPhone 응답 전송용
     private var answerCharacteristic: CBCharacteristic?
+
+    /// iPhone → Watch 명령 수신용
+    private var commandCharacteristic: CBCharacteristic?
+
+    private let commandStore: WatchCommandStore
     private var answerSender: BLEAnswerSender?
 
     let events: AsyncStream<WatchConnectionState>
     private let continuation: AsyncStream<WatchConnectionState>.Continuation
-
-    override init() {
+    
+    init(commandStore: WatchCommandStore) {
         let stream = AsyncStream.makeStream(of: WatchConnectionState.self)
 
+        self.commandStore = commandStore
         self.events = stream.stream
         self.continuation = stream.continuation
 
@@ -32,6 +40,9 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         )
     }
 
+    // MARK: - Bluetooth State
+
+    /// Watch의 Bluetooth 상태 변경 처리
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
         case .poweredOn:
@@ -69,6 +80,9 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         }
     }
 
+    // MARK: - Scan
+
+    /// iPhone Peripheral 검색 시작
     func scan() {
         guard centralManager?.state == .poweredOn else {
             GameLogger.bluetooth("블루투스 상태가 올바르지 않음")
@@ -85,6 +99,9 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         )
     }
 
+    // MARK: - Disconnect
+
+    /// iPhone Peripheral 연결 해제
     func disconnect() {
         if let peripheral = targetPeripheral {
             centralManager?.cancelPeripheralConnection(peripheral)
@@ -92,12 +109,16 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
 
         targetPeripheral = nil
         answerCharacteristic = nil
+        commandCharacteristic = nil
         answerSender = nil
 
         GameLogger.bluetooth("Disconnected")
         continuation.yield(.disconnected)
     }
 
+    // MARK: - Send Answer
+
+    /// Watch에서 선택한 응답을 iPhone으로 전송
     func send(_ answer: BLEAnswer) {
         guard let answerSender else {
             GameLogger.bluetooth("전송 준비 안 됨. 다시 검색합니다")
@@ -106,10 +127,16 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
             return
         }
 
-        GameLogger.bluetooth("Send answer: kind=\(answer.kind), value=\(answer.value)")
+        GameLogger.bluetooth(
+            "Send answer: kind=\(answer.kind), value=\(answer.value)"
+        )
+
         answerSender.send(answer)
     }
 
+    // MARK: - Connect
+
+    /// iPhone Peripheral 발견 시 연결 시도
     func centralManager(
         _ central: CBCentralManager,
         didDiscover peripheral: CBPeripheral,
@@ -126,6 +153,7 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         central.connect(peripheral, options: nil)
     }
 
+    /// iPhone Peripheral 연결 완료 후 서비스 검색
     func centralManager(
         _ central: CBCentralManager,
         didConnect peripheral: CBPeripheral
@@ -136,15 +164,20 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         peripheral.discoverServices([BLEUUID.service])
     }
 
+    /// iPhone Peripheral 연결 실패 처리
     func centralManager(
         _ central: CBCentralManager,
         didFailToConnect peripheral: CBPeripheral,
         error: Error?
     ) {
-        GameLogger.bluetooth("Connect failed: \(error?.localizedDescription ?? "unknown")")
+        GameLogger.bluetooth(
+            "Connect failed: \(error?.localizedDescription ?? "unknown")"
+        )
+
         continuation.yield(.failed)
     }
 
+    /// iPhone Peripheral 연결 해제 처리
     func centralManager(
         _ central: CBCentralManager,
         didDisconnectPeripheral peripheral: CBPeripheral,
@@ -152,18 +185,24 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
     ) {
         targetPeripheral = nil
         answerCharacteristic = nil
+        commandCharacteristic = nil
         answerSender = nil
 
         GameLogger.bluetooth("Disconnected")
         continuation.yield(.disconnected)
     }
 
+    // MARK: - Discover Service
+
+    /// BLE Service 검색 결과 처리
     func peripheral(
         _ peripheral: CBPeripheral,
         didDiscoverServices error: Error?
     ) {
         if let error {
-            GameLogger.bluetooth("Discover services error: \(error.localizedDescription)")
+            GameLogger.bluetooth(
+                "Discover services error: \(error.localizedDescription)"
+            )
             continuation.yield(.failed)
             return
         }
@@ -172,34 +211,62 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
 
         for service in services where service.uuid == BLEUUID.service {
             peripheral.discoverCharacteristics(
-                [BLEUUID.answer],
+                [
+                    BLEUUID.answer,
+                    BLEUUID.command
+                ],
                 for: service
             )
         }
     }
 
+    // MARK: - Discover Characteristics
+
+    /// answer, command Characteristic 검색 결과 처리
     func peripheral(
         _ peripheral: CBPeripheral,
         didDiscoverCharacteristicsFor service: CBService,
         error: Error?
     ) {
         if let error {
-            GameLogger.bluetooth("Discover characteristics error: \(error.localizedDescription)")
+            GameLogger.bluetooth(
+                "Discover characteristics error: \(error.localizedDescription)"
+            )
             continuation.yield(.failed)
             return
         }
 
         guard let characteristics = service.characteristics else { return }
 
-        for characteristic in characteristics where characteristic.uuid == BLEUUID.answer {
-            answerCharacteristic = characteristic
+        for characteristic in characteristics {
+            switch characteristic.uuid {
+            case BLEUUID.answer:
+                answerCharacteristic = characteristic
 
-            answerSender = BLEAnswerSender(
-                peripheral: peripheral,
-                characteristic: characteristic
-            )
+                answerSender = BLEAnswerSender(
+                    peripheral: peripheral,
+                    characteristic: characteristic
+                )
 
-            GameLogger.bluetooth("전송 준비 완료")
+                GameLogger.bluetooth("응답 전송 준비 완료")
+
+            case BLEUUID.command:
+                commandCharacteristic = characteristic
+
+                peripheral.setNotifyValue(
+                    true,
+                    for: characteristic
+                )
+
+                GameLogger.bluetooth("명령 수신 준비 완료")
+
+            default:
+                break
+            }
+        }
+
+        if answerCharacteristic != nil,
+           commandCharacteristic != nil {
             continuation.yield(.connected)
 
             GameLogger.bluetooth("참가 신호 전송")
@@ -207,6 +274,36 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
         }
     }
 
+    // MARK: - Receive Command
+
+    /// iPhone에서 notify로 보낸 BLECommand 수신
+    func peripheral(
+        _ peripheral: CBPeripheral,
+        didUpdateValueFor characteristic: CBCharacteristic,
+        error: Error?
+    ) {
+        if let error {
+            GameLogger.bluetooth(
+                "Command receive failed: \(error.localizedDescription)"
+            )
+            return
+        }
+
+        guard characteristic.uuid == BLEUUID.command,
+              let data = characteristic.value,
+              let command = BLECommand(data: data)
+        else { return }
+
+        GameLogger.bluetooth(
+            "Command received: kind=\(command.kind), value=\(command.value)"
+        )
+
+        commandStore.handle(command)
+    }
+
+    // MARK: - Write Result
+
+    /// Watch → iPhone 응답 전송 결과 처리
     func peripheral(
         _ peripheral: CBPeripheral,
         didWriteValueFor characteristic: CBCharacteristic,
