@@ -8,49 +8,75 @@
 import SwiftUI
 
 struct GameView: View {
-    
-    // TODO: Bluetooth 연결 구현 후 목데이터 제거 예정
+
+    @State private var bleModel = BLEViewModel()
+
     @State private var game = MafiaGame(
-        players: [
-            Player(),
-            Player(),
-            Player(),
-            Player(),
-            Player()
-        ],
+        players: [],
         initialState: WaitingState(),
         homeKitLightManager: HomeKitLightManager()
     )
-    
+
+    private var connectedPlayers: [Player] {
+        bleModel.connectedWatchIDs.map { id in
+            Player(
+                id: id,
+                watchId: id.uuidString
+            )
+        }
+    }
+
+    private var canStartGame: Bool {
+        connectedPlayers.count >= 2
+    }
+
     var body: some View {
         switch game.currentState {
+
         case is WaitingState:
             VStack {
                 WaitingStateView(
-                    players: game.players,
+                    players: connectedPlayers,
                     remainingTime: game.timerManager.remainingTime
                 )
-                
+
                 Button("게임 시작") {
+                    guard canStartGame else { return }
+
+                    game = MafiaGame(
+                        players: connectedPlayers,
+                        initialState: WaitingState(),
+                        homeKitLightManager: HomeKitLightManager()
+                    )
+
                     game.handleAction(.startGame)
                 }
                 .buttonStyle(.borderedProminent)
+                .disabled(!canStartGame)
                 .padding(.bottom)
+
+                if !canStartGame {
+                    
+                    // TODO: 기기 5대 이상 연결해야 넘어갈 수 있도록 수정 예정
+                    Text("최소 2명 이상의 플레이어가 연결되어야 시작할 수 있습니다.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
-            
+
         case is RoleAssigningState:
             RoleAssignView(
                 players: game.players,
                 remainingTime: game.timerManager.remainingTime
             )
-            
+
         case is IntroductionState:
             DiscussionStateView(
                 players: game.players,
                 title: "IntroductionState",
                 remainingTime: game.timerManager.remainingTime
             )
-            
+
         case is MafiaState:
             NightActionStateView(
                 players: game.players,
@@ -60,7 +86,7 @@ struct GameView: View {
             ) { player in
                 game.handleAction(.mafiaSelected(target: player))
             }
-            
+
         case is PoliceState:
             NightActionStateView(
                 players: game.players,
@@ -70,7 +96,7 @@ struct GameView: View {
             ) { player in
                 game.handleAction(.policeSelected(target: player))
             }
-            
+
         case is DoctorState:
             NightActionStateView(
                 players: game.players,
@@ -80,14 +106,14 @@ struct GameView: View {
             ) { player in
                 game.handleAction(.doctorSelected(target: player))
             }
-            
+
         case is DiscussionState:
             DiscussionStateView(
                 players: game.players,
                 title: "DiscussionState",
                 remainingTime: game.timerManager.remainingTime
             )
-            
+
         case is VoteState:
             VoteStateView(
                 players: game.players,
@@ -96,9 +122,11 @@ struct GameView: View {
                 game.handleAction(
                     .voteSubmitted(
                         voter: voter,
-                        target: target))
+                        target: target
+                    )
+                )
             }
-            
+
         case is FinalDefenseState:
             FinalDefenseView(
                 players: game.players,
@@ -106,7 +134,7 @@ struct GameView: View {
                 remainingTime: game.timerManager.remainingTime,
                 stateTitle: "FinalDefenseState"
             )
-            
+
         case is ExecutionVoteState:
             ExecutionVoteView(
                 players: game.players,
@@ -116,9 +144,11 @@ struct GameView: View {
                 game.handleAction(
                     .executionVoteSubmitted(
                         voter: voter,
-                        isAgree: isAgree))
+                        isAgree: isAgree
+                    )
+                )
             }
-            
+
         case is ExecutionResultState:
             FinalDefenseView(
                 players: game.players,
@@ -126,11 +156,12 @@ struct GameView: View {
                 remainingTime: game.timerManager.remainingTime,
                 stateTitle: "ExecutionResultState"
             )
-            
+
         case is ResultState:
             if let winner = game.winner {
                 GameResultView(winner: winner)
             }
+
         default:
             Text("알 수 없는 상태")
         }
