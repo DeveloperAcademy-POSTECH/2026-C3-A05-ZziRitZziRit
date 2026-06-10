@@ -13,12 +13,14 @@ struct CheckRoleView: View {
     
     // TODO: 게임 상태(Store/ViewModel)에서 플레이어 목록 주입받도록 변경
     @State private var players: [Player] = [
-        Player(color: PlayerColor.pink),
-        Player(color: PlayerColor.purple),
-        Player(color: PlayerColor.yellow),
-        Player(color: PlayerColor.orange),
-        Player(color: PlayerColor.mint)
+        Player(color: PlayerColor.pink, role: Role.mafia),
+        Player(color: PlayerColor.purple, role: Role.citizen),
+        Player(color: PlayerColor.yellow, role: Role.citizen),
+        Player(color: PlayerColor.orange, role: Role.doctor),
+        Player(color: PlayerColor.mint, role: Role.police)
     ]
+    
+    
     
     var body: some View {
         MafiaLogoView {
