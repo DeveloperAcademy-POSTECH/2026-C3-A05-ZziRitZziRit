@@ -29,20 +29,20 @@ struct RoleNightView: View {
     private var progressColor : Color {
         if downloadAmount > 50 {
             return .purple1
-        } else if downloadAmount <= 50 && downloadAmount > 20 {
+        } else if downloadAmount > 20 {
             return .purple2
-        } else if downloadAmount <= 20 {
+        } else {
             return .purple3
         }
-        return .purple
     }
-    
+
     var body: some View {
         MafiaLogoView {
             VStack{
                 Text(role.nightText)
                     .font(Font.system(size: 22))
                     .fontWeight(.bold)
+
                 VStack {
                     ProgressView(value: downloadAmount, total: 100)
                         .frame(width: 200)
@@ -50,19 +50,6 @@ struct RoleNightView: View {
                         .progressViewStyle(
                             LinearProgressViewStyle(tint: progressColor)
                         )
-                    ScrollView{
-                        VStack{
-                            ForEach(players) { player in
-                                if player.id == selectedPlayerID {
-                                    let longPress = LongPressGesture(minimumDuration: 3)
-                                        .updating($isPressing) { current, state, _ in
-                                            state = current
-                                        }
-                                        .onEnded { success in
-                                            if success {
-                                                confirmedPlayerID = player.id
-                                            }
-                                        }
 
                                     ZStack {
                                         MainButtonView(player: player, isConfirmed: confirmedPlayerID == player.id)
@@ -128,7 +115,6 @@ struct RoleNightView: View {
             .ignoresSafeArea()
         }
     }
-}
 
 #Preview {
     RoleNightView(role: .doctor)

@@ -58,7 +58,9 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Core/GameLogger.swift,
+				Domain/Entities/Team.swift,
 				Infrastructure/Bluetooth/Common/BLEAnswer.swift,
+				Infrastructure/Bluetooth/Common/BLECommand.swift,
 				Infrastructure/Bluetooth/Common/BLEUUID.swift,
 			);
 			target = A4AD5ECA2FCC7B9700736E6D /* MayotyWatch Watch App */;

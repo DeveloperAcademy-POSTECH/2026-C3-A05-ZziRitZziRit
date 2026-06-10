@@ -8,18 +8,66 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var model: WatchViewModel?
-    @State private var manager: WatchCentralManager?
-    
+    @Bindable var viewModel: WatchViewModel
+
     var body: some View {
-        VStack{
-            Button("Reconnect"){
-                manager?.scan()
+        switch viewModel.commandStore.currentScreen {
+        case .join:
+            JoinGameView(viewModel: viewModel)
+            
+        case .roleAssigning:
+            RoleAssigningView()
+            
+        case .roleResult:
+            RoleSelectingView(
+                role: viewModel.commandStore.role
+            )
+            
+        case .dayTime:
+            DayTimeView()
+            
+        case .mafiaTurn:
+            MafNightView(
+                players: viewModel.commandStore.players,
+                viewModel: viewModel
+            )
+            
+        case .policeTurn:
+            PolNightView()
+            
+        case .doctorTurn:
+            DocNightView()
+            
+        case .nightTime:
+            RoleSelectingView(role: viewModel.commandStore.role)
+            
+        case .policeResult:
+            PoliceArrestResultView(
+                result: viewModel.commandStore.policeResultIsMafia
+                ? .success
+                : .fail
+            )
+            
+        case .vote:
+            PolNightView()
+            
+        case .finalDefense:
+            FinalDefensementView()
+            
+        case .executionVote:
+            ExecutionVoteView()
+            
+        case .executionResult:
+            ExecutionResultView(
+                excutionResult: .survive
+            )
+            
+        case .gameEnded:
+            if viewModel.commandStore.winner == .mafia {
+                MafiaVictoryView()
+            } else {
+                CitizenVictoryView()
             }
         }
     }
 }
-
-//#Preview {
-//    ContentView()
-//}

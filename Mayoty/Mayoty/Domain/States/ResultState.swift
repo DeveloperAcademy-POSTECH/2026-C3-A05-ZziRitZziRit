@@ -12,6 +12,8 @@ struct ResultState: GameState {
             return
         }
 
+        game.watchCommandManager.sendGameEnded(winner: winner)
+
         GameLogger.result(
             winner == .mafia
             ? "🔴 마피아 승리"

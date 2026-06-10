@@ -21,17 +21,20 @@ struct PoliceState: GameState {
     
     func handleAction(game: MafiaGame, action: GameAction) {
         guard case .policeSelected(let target) = action else { return }
-        
+
         game.selectInvestigateTarget(target)
-        
+
         let isMafia = target.role?.team == .mafia
-        
+
         GameLogger.event(
             "👮‍♂️ 경찰 수사 완료: \(isMafia ? "마피아" : "시민")"
         )
-        
-        // TODO: 경찰 워치에 수사 결과 전송
-        // game.watchBluetoothManager.sendInvestigationResult(isMafia)
+
+        game.watchCommandManager.sendPoliceResult(
+            isMafia: isMafia,
+            to: game.players
+        )
+
         game.changeState(to: DoctorState())
     }
     
