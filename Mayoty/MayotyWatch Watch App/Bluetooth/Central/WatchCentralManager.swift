@@ -199,8 +199,11 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
                 characteristic: characteristic
             )
 
-            GameLogger.bluetooth("Ready to send")
+            GameLogger.bluetooth("전송 준비 완료")
             continuation.yield(.connected)
+
+            GameLogger.bluetooth("참가 신호 전송")
+            answerSender?.sendJoin()
         }
     }
 
