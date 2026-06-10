@@ -12,6 +12,8 @@ struct NightState: GameState {
         // TODO: BLE payload/configuration 처리 완료 이벤트 이후 MafiaState로
         
         game.changeState(to: MafiaState())
+        
+        GameAudioManager.shared.playBGM(named: "nightBgm")
     }
     
     func handleAction(game: MafiaGame, action: GameAction) {
