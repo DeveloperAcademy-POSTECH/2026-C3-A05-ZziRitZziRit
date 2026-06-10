@@ -1,6 +1,7 @@
 {
   "images" : [
     {
+      "filename" : "Mayoty_AppLogo.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -25,6 +26,12 @@
       ],
       "idiom" : "universal",
       "platform" : "ios",
+      "size" : "1024x1024"
+    },
+    {
+      "filename" : "Mayoty_WatchAppLogo.png",
+      "idiom" : "universal",
+      "platform" : "watchos",
       "size" : "1024x1024"
     }
   ],
