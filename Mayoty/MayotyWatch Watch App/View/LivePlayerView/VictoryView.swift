@@ -1,19 +1,21 @@
 //
-//  CitizenVictoryView.swift
+//  VictoryView.swift
 //  MayotyWatch Watch App
 //
-//  Created by 이경민 on 6/5/26.
+//  Created by 이경민 on 6/11/26.
 //
 
 import SwiftUI
 
-struct CitizenVictoryView: View {
+struct VictoryView: View {
+    let victory: Victory
+    
     var body: some View {
-        MafiaLogoView(baseColor: .bgCitizen) {
-            ConfettiAnimationView {
+        MafiaLogoView(baseColor: victory.backGroundColor) {
+            victory.animation {
                 VStack {
-                    Text("시민 승리")
-                        .foregroundStyle(.green)
+                    Text(victory.text)
+                        .foregroundStyle(victory.textColor)
                         .font(.title)
                     Button{
                             // TODO: go to 1st step
@@ -26,11 +28,11 @@ struct CitizenVictoryView: View {
             }
         }
         .task {
-            await HapticPattern.citizenWin.play()
+            await victory.haptic.play()
         }
     }
 }
 
 #Preview {
-    CitizenVictoryView()
+    VictoryView(victory: .mafia)
 }
