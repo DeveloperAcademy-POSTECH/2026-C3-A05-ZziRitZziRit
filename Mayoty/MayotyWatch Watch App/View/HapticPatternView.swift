@@ -128,7 +128,7 @@ struct HapticPatternView: View {
                     }
 
                     Button("연결완료") {
-                        Task { await HapticPattern.connectionOk.play() }
+                        Task { await HapticPattern.connectionSucceed.play() }
                     }
 
                     Button("연결실패") {

@@ -14,6 +14,9 @@ struct GameStartView: View {
                     .font(.system(size:30))
                     .multilineTextAlignment(.center)
         }
+        .task {
+            await HapticPattern.startGame.play()
+        }
     }
 }
 

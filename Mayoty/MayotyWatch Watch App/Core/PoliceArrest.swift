@@ -16,15 +16,22 @@ enum PoliceArrest: Codable {
 extension PoliceArrest {
     var resultText: String {
         switch self {
-            case .success: return "성공"
-            case .fail: return "실패"
+            case .success: "성공"
+            case .fail: "실패"
         }
     }
 
     var resultColor: Color {
         switch self {
-        case .success: return .green
-        case .fail: return .red
+        case .success: .green
+        case .fail: .red
+        }
+    }
+    
+    var resultHaptic: HapticPattern {
+        switch self {
+            case .success: HapticPattern.policeFoundMafia
+            case .fail: HapticPattern.policeNotFoundMafia
         }
     }
 }

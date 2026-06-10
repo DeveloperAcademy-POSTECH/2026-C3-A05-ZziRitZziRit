@@ -17,6 +17,9 @@ struct ConnectionSucceedView: View {
                     .font(.system(size:30))
             }
         }
+        .task {
+            await HapticPattern.connectionSucceed.play()
+        }
     }
 }
 
