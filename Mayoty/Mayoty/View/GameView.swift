@@ -43,9 +43,8 @@ struct GameView: View {
 //        ]
 //    }
     
-    // TODO: 5명 차도록 인원 수정할 예정
     private var canStartGame: Bool {
-        connectedPlayers.count >= 3
+        connectedPlayers.count >= 5
     }
     
     private func startGameIfNeeded() {
