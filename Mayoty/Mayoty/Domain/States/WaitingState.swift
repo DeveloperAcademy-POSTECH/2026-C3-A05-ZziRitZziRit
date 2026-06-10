@@ -12,6 +12,7 @@ struct WaitingState: GameState {
 
     func handleAction(game: MafiaGame, action: GameAction) {
         guard case .startGame = action else { return }
+        guard game.players.count == 5 else { return }
 
         Task {
             await GameAudioManager.shared.playNarrationAndWait(named: "startGame")
