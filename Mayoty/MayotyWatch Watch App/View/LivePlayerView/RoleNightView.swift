@@ -1,14 +1,16 @@
-//
-//  DocNightView.swift
-//  Mayoty
-//
-//  Created by JaewhanNamkoong on 6/5/26.
-//
+    //
+    //  RoleNightView.swift
+    //  MayotyWatch Watch App
+    //
+    //  Created by NamChoong
+    //  fix by 이경민 on 6/11/26.
+    //
 
 import SwiftUI
 
-struct DocNightView: View {
+struct RoleNightView: View {
     
+    let role:Role
     @State private var selectedPlayerID: UUID? = nil
     @GestureState private var isPressing = false
     @State private var pressProgress: Double = 0
@@ -22,8 +24,24 @@ struct DocNightView: View {
         Player(color: PlayerColor.mint)
     ]
     
-    
     @State private var downloadAmount : Double = 100
+    
+    private func runCountdown() async {
+        while downloadAmount > 0 {
+            try? await Task.sleep(for: .milliseconds(100))
+            if Task.isCancelled { return }
+            
+            withAnimation(.linear(duration: 0.1)) {
+                downloadAmount -= 1
+            }
+            
+            let value = Int(downloadAmount)
+            if value <= 50, value > 0, value % 10 == 0 {
+                try? await HapticPattern.timeRemaining.play()
+            }
+        }
+    }
+    
     private var progressColor : Color {
         if downloadAmount > 50 {
             return .purple1
@@ -38,7 +56,7 @@ struct DocNightView: View {
     var body: some View {
         MafiaLogoView {
             VStack{
-                Text("살릴 사람을 지목하세요")
+                Text(role.selectingText)
                     .font(Font.system(size: 22))
                     .fontWeight(.bold)
                 VStack {
@@ -61,7 +79,7 @@ struct DocNightView: View {
                                                 confirmedPlayerID = player.id
                                             }
                                         }
-
+                                    
                                     ZStack {
                                         MainButtonView(player: player, isConfirmed: confirmedPlayerID == player.id)
                                             .overlay(
@@ -75,7 +93,7 @@ struct DocNightView: View {
                                                     }
                                                 }
                                             )
-
+                                        
                                         GeometryReader { geo in
                                             let w = geo.size.width
                                             let h = geo.size.height
@@ -125,12 +143,14 @@ struct DocNightView: View {
             .padding(.top, 50)
             .ignoresSafeArea()
         }
+        .task {
+            await runCountdown()
+        }
     }
 }
+
+
 
 #Preview {
-    NavigationView{
-        DocNightView()
-    }
+    RoleNightView(role: .mafia)
 }
-

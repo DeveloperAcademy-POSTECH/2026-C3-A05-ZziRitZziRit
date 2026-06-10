@@ -1,5 +1,5 @@
 //
-//  KillorNot.swift
+//  ExecutionVoteView.swift
 //  MayotyWatch Watch App
 //
 //  Created by 이경민 on 6/5/26.
@@ -28,7 +28,7 @@ struct ExecutionVoteView: View {
                     }
                     .foregroundStyle(kill ? .gray : .btGreen)
                     .task {
-                        await HapticPattern.choosePlayer.play()
+                        try? await HapticPattern.choosePlayer.play()
                         print("살리기")
                     }
                     
@@ -41,7 +41,7 @@ struct ExecutionVoteView: View {
                     }
                     .foregroundStyle(kill ? .btRed : .gray)
                     .task {
-                        await HapticPattern.choosePlayer.play()
+                        try? await HapticPattern.choosePlayer.play()
                         print("죽이기")
                     }
                 }

@@ -44,7 +44,7 @@ struct MainButtonView: View {
 
 #Preview {
     NavigationStack{
-        MafNightView()
+        MainButtonView(player: Player())
     }
 }
 

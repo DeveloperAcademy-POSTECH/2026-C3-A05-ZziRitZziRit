@@ -34,5 +34,5 @@ struct SubButtonView: View {
 }
 
 #Preview {
-    MafNightView()
+    SubButtonView(player: Player())
 }

@@ -1,5 +1,5 @@
 //
-//  FinalStatement.swift
+//  FinalDefenseView.swift
 //  MayotyWatch Watch App
 //
 //  Created by 이경민 on 6/5/26.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct FinalDefensementView: View {
+struct FinalDefenseView: View {
     var body: some View {
         MafiaLogoView{
             VStack {
@@ -17,12 +17,12 @@ struct FinalDefensementView: View {
                     .font(.system(size:25))
             }
             .task {
-                await HapticPattern.circularProgress.play()
+                try? await HapticPattern.circularProgress.play()
             }
         }
     }
 }
 
 #Preview {
-    FinalDefensementView()
+    FinalDefenseView()
 }

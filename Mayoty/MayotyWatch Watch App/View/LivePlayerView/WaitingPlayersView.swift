@@ -1,5 +1,5 @@
 //
-//  WaitingPlayers.swift
+//  WaitingPlayersView.swift
 //  MayotyWatch Watch App
 //
 //  Created by 이경민 on 6/5/26.
@@ -20,7 +20,7 @@ struct WaitingPlayersView: View {
             }
         }
         .task {
-            await HapticPattern.circularProgress.play()
+            try? await HapticPattern.circularProgress.play()
         }
     }
 }

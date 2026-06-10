@@ -1,5 +1,5 @@
 //
-//  GameStart.swift
+//  GameStartView.swift
 //  MayotyWatch Watch App
 //
 //  Created by 이경민 on 6/5/26.
@@ -15,7 +15,7 @@ struct GameStartView: View {
                     .multilineTextAlignment(.center)
         }
         .task {
-            await HapticPattern.startGame.play()
+            try? await HapticPattern.startGame.play()
         }
     }
 }
