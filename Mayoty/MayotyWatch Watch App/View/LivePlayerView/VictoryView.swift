@@ -28,7 +28,7 @@ struct VictoryView: View {
             }
         }
         .task {
-            await victory.haptic.play()
+            try? await victory.haptic.play()
         }
     }
 }

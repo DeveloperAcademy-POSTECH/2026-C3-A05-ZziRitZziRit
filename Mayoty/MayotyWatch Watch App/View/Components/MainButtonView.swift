@@ -44,7 +44,7 @@ struct MainButtonView: View {
 
 #Preview {
     NavigationStack{
-        RoleNightView(role: .mafia)
+        MainButtonView(player: Player())
     }
 }
 

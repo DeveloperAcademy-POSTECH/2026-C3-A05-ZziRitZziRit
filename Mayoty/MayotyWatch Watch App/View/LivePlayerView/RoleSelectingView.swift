@@ -20,7 +20,7 @@ struct RoleSelectingView: View {
             }
         }
         .task {
-            await HapticPattern.circularProgress.play()
+            try? await HapticPattern.circularProgress.play()
         }
     }
 }

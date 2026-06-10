@@ -18,7 +18,7 @@ struct RoleAssigningView: View {
             }
         }
         .task {
-            await HapticPattern.circularProgress.play()
+            try? await HapticPattern.circularProgress.play()
         }
     }
 }

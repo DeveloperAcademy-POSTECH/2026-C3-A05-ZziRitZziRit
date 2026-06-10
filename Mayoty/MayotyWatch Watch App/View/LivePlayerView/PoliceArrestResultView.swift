@@ -23,7 +23,7 @@ struct PoliceArrestResultView: View {
             }
         }
         .task {
-            await result.resultHaptic.play()
+            try? await result.resultHaptic.play()
         }
     }
 }
