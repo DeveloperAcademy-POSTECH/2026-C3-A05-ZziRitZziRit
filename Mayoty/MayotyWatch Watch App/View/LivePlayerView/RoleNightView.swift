@@ -1,10 +1,10 @@
-//
-//  RoleNightView.swift
-//  MayotyWatch Watch App
-//
-//  Created by NamChoong
-//  fix by 이경민 on 6/11/26.
-//
+    //
+    //  RoleNightView.swift
+    //  MayotyWatch Watch App
+    //
+    //  Created by NamChoong
+    //  fix by 이경민 on 6/11/26.
+    //
 
 import SwiftUI
 
@@ -24,8 +24,24 @@ struct RoleNightView: View {
         Player(color: PlayerColor.mint)
     ]
     
-    
     @State private var downloadAmount : Double = 100
+    
+    private func runCountdown() async {
+        while downloadAmount > 0 {
+            try? await Task.sleep(for: .milliseconds(100))
+            if Task.isCancelled { return }
+            
+            withAnimation(.linear(duration: 0.1)) {
+                downloadAmount -= 1
+            }
+            
+            let value = Int(downloadAmount)
+            if value <= 50, value > 0, value % 10 == 0 {
+                try? await HapticPattern.timeRemaining.play()
+            }
+        }
+    }
+    
     private var progressColor : Color {
         if downloadAmount > 50 {
             return .purple1
@@ -39,7 +55,7 @@ struct RoleNightView: View {
     var body: some View {
         MafiaLogoView {
             VStack{
-                Text(role.nightText)
+                Text(role.selectingText)
                     .font(Font.system(size: 22))
                     .fontWeight(.bold)
 
@@ -50,7 +66,20 @@ struct RoleNightView: View {
                         .progressViewStyle(
                             LinearProgressViewStyle(tint: progressColor)
                         )
-
+                    ScrollView{
+                        VStack{
+                            ForEach(players) { player in
+                                if player.id == selectedPlayerID {
+                                    let longPress = LongPressGesture(minimumDuration: 3)
+                                        .updating($isPressing) { current, state, _ in
+                                            state = current
+                                        }
+                                        .onEnded { success in
+                                            if success {
+                                                confirmedPlayerID = player.id
+                                            }
+                                        }
+                                    
                                     ZStack {
                                         MainButtonView(player: player, isConfirmed: confirmedPlayerID == player.id)
                                             .overlay(
@@ -64,7 +93,7 @@ struct RoleNightView: View {
                                                     }
                                                 }
                                             )
-
+                                        
                                         GeometryReader { geo in
                                             let w = geo.size.width
                                             let h = geo.size.height
@@ -114,8 +143,13 @@ struct RoleNightView: View {
             .padding(.top, 50)
             .ignoresSafeArea()
         }
+        .task {
+            await runCountdown()
+        }
     }
 
+
+
 #Preview {
-    RoleNightView(role: .doctor)
+    RoleNightView(role: .mafia)
 }

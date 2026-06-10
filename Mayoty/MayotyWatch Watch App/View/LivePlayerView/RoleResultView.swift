@@ -24,7 +24,7 @@ struct RoleResultView: View {
             }
         }
         .task {
-            await HapticPattern.revealRole.play()
+            try? await HapticPattern.revealRole.play()
         }
     }
 }

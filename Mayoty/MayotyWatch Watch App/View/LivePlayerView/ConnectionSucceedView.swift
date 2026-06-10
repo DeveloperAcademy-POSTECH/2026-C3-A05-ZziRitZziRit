@@ -18,7 +18,7 @@ struct ConnectionSucceedView: View {
             }
         }
         .task {
-            await HapticPattern.connectionSucceed.play()
+            try? await HapticPattern.connectionSucceed.play()
         }
     }
 }

@@ -17,7 +17,7 @@ struct FinalDefenseView: View {
                     .font(.system(size:25))
             }
             .task {
-                await HapticPattern.circularProgress.play()
+                try? await HapticPattern.circularProgress.play()
             }
         }
     }

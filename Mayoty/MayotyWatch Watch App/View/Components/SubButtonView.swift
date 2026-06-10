@@ -34,5 +34,5 @@ struct SubButtonView: View {
 }
 
 #Preview {
-    RoleNightView(role: .mafia)
+    SubButtonView(player: Player())
 }

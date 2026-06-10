@@ -25,7 +25,7 @@ struct ConnectionFailView: View {
             }
         }
         .task {
-            await HapticPattern.connectionFail.play()
+            try? await HapticPattern.connectionFail.play()
         }
     }
 }
