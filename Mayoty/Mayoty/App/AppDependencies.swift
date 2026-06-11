@@ -37,4 +37,11 @@ final class AppDependencies {
             watchCommandManager: watchCommandManager
         )
     }
+
+    /// 첫 화면 표시 시점에 BLE/HomeKit 시스템 연결을 시작 (호출 전까지는 객체만 준비)
+    /// @main 부트스트랩(App init) 중에 CoreBluetooth/HomeKit 데몬 연결을 만들지 않기 위함
+    func activate() {
+        peripheralManager.activate()
+        homeKitLightManager.activate()
+    }
 }

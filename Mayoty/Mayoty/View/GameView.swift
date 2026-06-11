@@ -83,6 +83,8 @@ struct GameView: View {
                     .foregroundStyle(.secondary)
             }
             .onAppear {
+                // BLE/HomeKit 시스템 연결은 기존 코드처럼 첫 렌더 시점에 시작
+                dependencies.activate()
                 startGameIfNeeded()
             }
             .onChange(of: connectedPlayers.count) {

@@ -16,11 +16,19 @@ final class HomeKitLightManager: NSObject, HMHomeManagerDelegate {
     override init() {
         super.init()
 
+        GameLogger.light("HomeKitLightManager 초기화")
+    }
+
+    /// HMHomeManager 생성 — 첫 화면 표시 시점에 호출
+    /// (@main 부트스트랩 중 생성하면 시스템 데몬 연결 시점이 너무 일러질 수 있음)
+    func activate() {
+        guard homeManager == nil else { return }
+
         let manager = HMHomeManager()
         manager.delegate = self
         self.homeManager = manager
 
-        GameLogger.light("HomeKitLightManager 초기화")
+        GameLogger.light("HomeKit 활성화")
     }
 
     func homeManagerDidUpdateHomes(_ manager: HMHomeManager) {

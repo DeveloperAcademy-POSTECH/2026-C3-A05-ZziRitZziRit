@@ -19,9 +19,6 @@ enum BLEPeripheralEvent {
 
 final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
 
-    /// 최대 동시 구독 Watch 수 — iOS Peripheral 한계 보호용
-    private let maxSubscribers: Int = 5
-
     private var peripheralManager: CBPeripheralManager?
 
     /// Watch → iPhone
@@ -34,7 +31,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
     /// 특정 Watch에만 notify를 보내려면 CBCentral 인스턴스가 필요함
     private var subscribedCentrals: [UUID: CBCentral] = [:]
 
-    /// 서비스가 이미 등록되어 중복 등록 방지
+    /// 서비스가 이미 등록되어 중복 등록 방지 (전원 사이클 시 리셋)
     private var isServiceAdded: Bool = false
 
     /// updateValue 내부 큐가 가득 찼을 때 재전송 대기 중인 명령
@@ -51,8 +48,16 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         self.continuation = stream.continuation
 
         super.init()
+    }
 
-        self.peripheralManager = CBPeripheralManager(
+    /// CBPeripheralManager 생성 — 첫 화면 표시 시점에 호출
+    /// (@main 부트스트랩 중 생성하면 시스템 데몬 연결 시점이 너무 일러질 수 있음)
+    func activate() {
+        guard peripheralManager == nil else { return }
+
+        GameLogger.bluetooth("PeripheralManager 활성화")
+
+        peripheralManager = CBPeripheralManager(
             delegate: self,
             queue: nil
         )
@@ -63,6 +68,8 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
     func peripheralManagerDidUpdateState(
         _ peripheral: CBPeripheralManager
     ) {
+        GameLogger.bluetooth("PeripheralManager 상태: \(peripheral.state.rawValue)")
+
         switch peripheral.state {
         case .poweredOn:
             continuation.yield(
@@ -76,6 +83,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
             startAdvertising()
 
         case .poweredOff:
+            GameLogger.bluetooth("블루투스 비활성화")
             resetSessionState()
 
             continuation.yield(
@@ -86,6 +94,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
             )
 
         case .unauthorized:
+            GameLogger.bluetooth("블루투스 권한 없음")
             resetSessionState()
 
             continuation.yield(
@@ -96,6 +105,8 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
             )
 
         case .unsupported:
+            GameLogger.bluetooth("이 기기는 블루투스를 지원하지 않음")
+
             continuation.yield(
                 .bluetoothStateChanged(
                     "Unsupported",
@@ -104,6 +115,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
             )
 
         case .resetting:
+            GameLogger.bluetooth("블루투스 재설정 중")
             resetSessionState()
 
             continuation.yield(
@@ -149,6 +161,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
     private func setupService() {
         guard let peripheralManager else { return }
         guard !isServiceAdded else {
+            GameLogger.bluetooth("Service already added — skip")
             continuation.yield(.log("Service already added — skip"))
             return
         }
@@ -180,34 +193,45 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
             commandCharacteristic
         ]
 
+        // 이전 세션의 잔여 등록을 정리한 뒤 등록 (검증된 기존 동작)
+        peripheralManager.removeAllServices()
         peripheralManager.add(service)
         isServiceAdded = true
 
+        GameLogger.bluetooth("Service 등록 요청")
         continuation.yield(
             .log("Service added")
         )
     }
 
+    /// Service 등록 결과 — 실패 시 원인 파악용
+    func peripheralManager(
+        _ peripheral: CBPeripheralManager,
+        didAdd service: CBService,
+        error: Error?
+    ) {
+        if let error {
+            GameLogger.bluetooth("Service 등록 실패: \(error.localizedDescription)")
+            continuation.yield(.log("Service add error: \(error.localizedDescription)"))
+        } else {
+            GameLogger.bluetooth("Service 등록 완료")
+        }
+    }
+
     // MARK: - Advertising
 
     /// Watch가 검색할 수 있도록 Advertising 시작
+    /// 항상 광고를 유지 — 구독 수로 광고를 막으면 stale 구독이 남았을 때
+    /// 새 Watch가 iPhone을 발견하지 못하게 됨
     func startAdvertising() {
         guard let peripheralManager else { return }
-
-        guard subscribedCentrals.count < maxSubscribers else {
-            continuation.yield(.log("Slot full — skip advertising"))
-            return
-        }
-
-        if peripheralManager.isAdvertising {
-            return
-        }
 
         peripheralManager.startAdvertising([
             CBAdvertisementDataServiceUUIDsKey: [BLEUUID.service],
             CBAdvertisementDataLocalNameKey: "Answer-iPhone"
         ])
 
+        GameLogger.bluetooth("Advertising 시작 요청")
         continuation.yield(
             .advertisingChanged(
                 true,
@@ -220,6 +244,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
     func stopAdvertising() {
         peripheralManager?.stopAdvertising()
 
+        GameLogger.bluetooth("Advertising 중지")
         continuation.yield(
             .advertisingChanged(
                 false,
@@ -233,12 +258,14 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         error: Error?
     ) {
         if let error {
+            GameLogger.bluetooth("Advertising 실패: \(error.localizedDescription)")
             continuation.yield(
                 .log(
                     "Advertising error: \(error.localizedDescription)"
                 )
             )
         } else {
+            GameLogger.bluetooth("Advertising 성공")
             continuation.yield(
                 .log("Advertising success")
             )
@@ -260,6 +287,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
 
         if !deliver(data: command.data, to: centralID, label: label) {
             pendingCommands.append((command.data, centralID, label))
+            GameLogger.bluetooth("Command queued (BLE busy): \(label)")
             continuation.yield(.log("Command queued (BLE busy): \(label)"))
         }
     }
@@ -271,6 +299,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         label: String
     ) -> Bool {
         guard let peripheralManager, let commandCharacteristic else {
+            GameLogger.bluetooth("Command dropped (BLE not ready): \(label)")
             continuation.yield(.log("Command dropped (BLE not ready): \(label)"))
             return true
         }
@@ -280,6 +309,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         if let centralID {
             guard let central = subscribedCentrals[centralID] else {
                 // 대상 Watch가 이미 구독 해제됨 — 폐기
+                GameLogger.bluetooth("Command dropped (watch gone): \(label)")
                 continuation.yield(
                     .log("Command dropped (watch gone): \(label) → \(centralID.uuidString.prefix(8))")
                 )
@@ -295,6 +325,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         )
 
         if success {
+            GameLogger.bluetooth("Command sent: \(label)\(centralID.map { " → \($0.uuidString.prefix(8))" } ?? "")")
             continuation.yield(.log("Command sent: \(label)"))
         }
 
@@ -333,19 +364,15 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         let id = central.identifier
         subscribedCentrals[id] = central
 
+        GameLogger.bluetooth("Subscribed: \(id.uuidString.prefix(8)) (총 \(subscribedCentrals.count)대)")
         continuation.yield(
-            .log("Subscribed: \(id.uuidString.prefix(8)) (\(subscribedCentrals.count)/\(maxSubscribers))")
+            .log("Subscribed: \(id.uuidString.prefix(8)) (\(subscribedCentrals.count))")
         )
 
         continuation.yield(.watchConnected(id: id))
-
-        if subscribedCentrals.count >= maxSubscribers {
-            continuation.yield(.log("Slot full — stop advertising"))
-            stopAdvertising()
-        }
     }
 
-    /// Watch가 구독 해제 → 슬롯 회수 + 상위 레이어에 알림
+    /// Watch가 구독 해제 → 상위 레이어에 알림
     func peripheralManager(
         _ peripheral: CBPeripheralManager,
         central: CBCentral,
@@ -356,15 +383,12 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         let id = central.identifier
         subscribedCentrals.removeValue(forKey: id)
 
+        GameLogger.bluetooth("Unsubscribed: \(id.uuidString.prefix(8)) (총 \(subscribedCentrals.count)대)")
         continuation.yield(
-            .log("Unsubscribed: \(id.uuidString.prefix(8)) (\(subscribedCentrals.count)/\(maxSubscribers))")
+            .log("Unsubscribed: \(id.uuidString.prefix(8)) (\(subscribedCentrals.count))")
         )
 
         continuation.yield(.watchDisconnected(id: id))
-
-        if subscribedCentrals.count < maxSubscribers {
-            startAdvertising()
-        }
     }
 
     // MARK: - Receive Answer
@@ -407,6 +431,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
                   let answer = BLEAnswer(data: data)
             else { continue }
 
+            GameLogger.bluetooth("Answer 수신: \(answer.kind) ← \(centralID.uuidString.prefix(8))")
             continuation.yield(
                 .answerReceived(
                     id: centralID,
