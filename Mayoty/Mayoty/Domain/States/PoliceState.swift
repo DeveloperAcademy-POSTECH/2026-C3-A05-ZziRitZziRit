@@ -8,17 +8,17 @@
 struct PoliceState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("👮‍♂️ 경찰 수사 시작")
-        GameAudioManager.shared.playNarration(named: "policeSelected")
-        
+        game.soundManager.playPoliceStartSound()
+
         game.timerManager.startTimer(
             seconds: GameTime.police,
             onTimeout: {
                 GameLogger.timer("경찰 수사 시간 종료")
-                game.changeState(to: DoctorState())
+                transitionToDoctor(game: game)
             }
         )
     }
-    
+
     func handleAction(game: MafiaGame, action: GameAction) {
         guard case .policeSelected(let target) = action else { return }
 
@@ -35,12 +35,20 @@ struct PoliceState: GameState {
             to: game.players
         )
 
-        game.changeState(to: DoctorState())
+        transitionToDoctor(game: game)
     }
-    
+
     func exit(game: MafiaGame) {
         GameLogger.event("👮‍♂️ 경찰 수사 종료")
-        GameAudioManager.shared.stopAll()
         game.timerManager.stopTimer()
+    }
+
+    private func transitionToDoctor(game: MafiaGame) {
+        game.timerManager.stopTimer()
+
+        Task { @MainActor in
+            await game.soundManager.playPoliceEndSoundAndWait()
+            game.changeState(to: DoctorState())
+        }
     }
 }
