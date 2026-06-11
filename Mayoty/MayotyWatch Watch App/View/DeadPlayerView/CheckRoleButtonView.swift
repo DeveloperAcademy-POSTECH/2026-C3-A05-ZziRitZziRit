@@ -23,6 +23,7 @@ struct CheckRoleButtonView: View {
                     Text("확인하기")
                         .foregroundStyle(.white)
                         .font(Font.system(size: 25).bold())
+                        .fontWeight(.bold)
                 }
                 .tint(.btMain)
                 .buttonStyle(.glass)
