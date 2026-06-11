@@ -20,8 +20,9 @@ struct SubButtonView: View {
                 .foregroundStyle(player.color?.uiColor ?? .gray)
             
             VStack(alignment: .leading){
-                Text("\(player.color?.displayName ?? "") 플레이어")                    .font(Font.system(size: 20))
-                    .fontWeight(.semibold)
+                Text("\(player.color?.displayName ?? "") 플레이어")
+                    .font(Font.system(size: 20))
+                    .fontWeight(.bold)
             }
             .padding(.leading, 10)
         }

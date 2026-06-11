@@ -21,7 +21,7 @@ struct MainButtonView: View {
             VStack(alignment: .leading){
                 Text("\(player.color?.displayName ?? "") 플레이어")
                     .font(Font.system(size: 23))
-                    .fontWeight(.semibold)
+                    .fontWeight(.bold)
                 if !isConfirmed {
                     Text("꾹 눌러 확정하기")
                         .font(Font.system(size: 15))

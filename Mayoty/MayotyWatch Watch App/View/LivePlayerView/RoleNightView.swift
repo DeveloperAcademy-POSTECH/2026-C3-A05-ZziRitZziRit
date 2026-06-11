@@ -2,7 +2,7 @@
     //  RoleNightView.swift
     //  MayotyWatch Watch App
     //
-    //  Created by NamChoong
+    //  Created by Namkoong
     //  fix by 이경민 on 6/11/26.
     //
 
@@ -83,17 +83,18 @@ struct RoleNightView: View {
     var body: some View {
         MafiaLogoView {
             VStack{
-                Text(role.selectingText)
-                    .font(Font.system(size: 22))
-                    .fontWeight(.bold)
+                    Text(role.selectingText)
+                        .font(Font.system(size: 20))
+                        .fontWeight(.bold)
                 
                 VStack {
-                    ProgressView(value: downloadAmount, total: 100)
-                        .frame(width: 200)
-                        .padding(1)
-                        .progressViewStyle(
-                            LinearProgressViewStyle(tint: progressColor)
-                        )
+                        ProgressView(value: downloadAmount, total: 100)
+                            .frame(width: 160)
+                            .padding(.horizontal, 10)
+                            .progressViewStyle(
+                                LinearProgressViewStyle(tint: progressColor)
+                            )
+                    
                     ScrollView{
                         VStack{
                             ForEach(
@@ -103,7 +104,7 @@ struct RoleNightView: View {
 
                                 let playerNumber = UInt8(index + 1)
                                 if player.id == selectedPlayerID {
-                                    let longPress = LongPressGesture(minimumDuration: 3)
+                                    let longPress = LongPressGesture(minimumDuration: 1.5)
                                         .updating($isPressing) { current, state, _ in
                                             state = current
                                         }
@@ -146,7 +147,7 @@ struct RoleNightView: View {
                                     }
                                     .onChange(of: isPressing) { _, newValue in
                                         if newValue {
-                                            withAnimation(.linear(duration: 3)) {
+                                            withAnimation(.linear(duration: 1.5)) {
                                                 pressProgress = 1
                                             }
                                         } else {
@@ -183,5 +184,16 @@ struct RoleNightView: View {
         .task {
             await runCountdown()
         }
+    }
+}
+
+
+#Preview {
+    let sampleViewModel = WatchViewModel()
+    return NavigationStack {
+        RoleNightView(
+            role: .mafia,
+            viewModel: sampleViewModel
+        )
     }
 }
