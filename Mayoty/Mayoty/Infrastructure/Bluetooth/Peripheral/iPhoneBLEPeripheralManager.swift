@@ -36,7 +36,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
 
     /// updateValue 내부 큐가 가득 찼을 때 재전송 대기 중인 명령
     /// peripheralManagerIsReady 콜백에서 순서대로 재전송
-    private var pendingCommands: [(data: Data, centralID: UUID?, label: String)] = []
+    private let commandQueue = BLECommandQueue()
 
     let events: AsyncStream<BLEPeripheralEvent>
     private let continuation: AsyncStream<BLEPeripheralEvent>.Continuation
@@ -147,7 +147,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
     /// 다시 poweredOn이 됐을 때 서비스를 재등록할 수 있도록 상태를 초기화
     private func resetSessionState() {
         isServiceAdded = false
-        pendingCommands.removeAll()
+        commandQueue.removeAll()
 
         for id in subscribedCentrals.keys {
             continuation.yield(.watchDisconnected(id: id))
@@ -277,41 +277,36 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
     /// iPhone → Watch 명령 전송
     /// - Parameter centralID: 특정 Watch에만 보낼 때 해당 central id, nil이면 전체 브로드캐스트
     func sendCommand(_ command: BLECommand, to centralID: UUID? = nil) {
-        let label = "\(command.kind)"
+        let entry = BLECommandQueue.Entry(
+            data: command.data,
+            centralID: centralID,
+            label: "\(command.kind)"
+        )
 
-        // 대기 중인 명령이 있으면 순서 보장을 위해 뒤에 줄 세움
-        guard pendingCommands.isEmpty else {
-            pendingCommands.append((command.data, centralID, label))
-            return
-        }
+        let sentNow = commandQueue.send(entry) { deliver($0) }
 
-        if !deliver(data: command.data, to: centralID, label: label) {
-            pendingCommands.append((command.data, centralID, label))
-            GameLogger.bluetooth("Command queued (BLE busy): \(label)")
-            continuation.yield(.log("Command queued (BLE busy): \(label)"))
+        if !sentNow {
+            GameLogger.bluetooth("Command queued (BLE busy): \(entry.label)")
+            continuation.yield(.log("Command queued (BLE busy): \(entry.label)"))
         }
     }
 
     /// 실제 notify 전송. 큐가 가득 차면 false 반환
-    private func deliver(
-        data: Data,
-        to centralID: UUID?,
-        label: String
-    ) -> Bool {
+    private func deliver(_ entry: BLECommandQueue.Entry) -> Bool {
         guard let peripheralManager, let commandCharacteristic else {
-            GameLogger.bluetooth("Command dropped (BLE not ready): \(label)")
-            continuation.yield(.log("Command dropped (BLE not ready): \(label)"))
+            GameLogger.bluetooth("Command dropped (BLE not ready): \(entry.label)")
+            continuation.yield(.log("Command dropped (BLE not ready): \(entry.label)"))
             return true
         }
 
         var targets: [CBCentral]?
 
-        if let centralID {
+        if let centralID = entry.centralID {
             guard let central = subscribedCentrals[centralID] else {
                 // 대상 Watch가 이미 구독 해제됨 — 폐기
-                GameLogger.bluetooth("Command dropped (watch gone): \(label)")
+                GameLogger.bluetooth("Command dropped (watch gone): \(entry.label)")
                 continuation.yield(
-                    .log("Command dropped (watch gone): \(label) → \(centralID.uuidString.prefix(8))")
+                    .log("Command dropped (watch gone): \(entry.label) → \(centralID.uuidString.prefix(8))")
                 )
                 return true
             }
@@ -319,14 +314,14 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         }
 
         let success = peripheralManager.updateValue(
-            data,
+            entry.data,
             for: commandCharacteristic,
             onSubscribedCentrals: targets
         )
 
         if success {
-            GameLogger.bluetooth("Command sent: \(label)\(centralID.map { " → \($0.uuidString.prefix(8))" } ?? "")")
-            continuation.yield(.log("Command sent: \(label)"))
+            GameLogger.bluetooth("Command sent: \(entry.label)\(entry.centralID.map { " → \($0.uuidString.prefix(8))" } ?? "")")
+            continuation.yield(.log("Command sent: \(entry.label)"))
         }
 
         return success
@@ -336,19 +331,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
     func peripheralManagerIsReady(
         toUpdateSubscribers peripheral: CBPeripheralManager
     ) {
-        flushPendingCommands()
-    }
-
-    private func flushPendingCommands() {
-        while let next = pendingCommands.first {
-            guard deliver(
-                data: next.data,
-                to: next.centralID,
-                label: next.label
-            ) else { return }
-
-            pendingCommands.removeFirst()
-        }
+        commandQueue.flush { deliver($0) }
     }
 
     // MARK: - Subscription Tracking
