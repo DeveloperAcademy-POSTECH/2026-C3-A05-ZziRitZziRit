@@ -70,7 +70,7 @@ final class World {
     let bleViewModel: BLEViewModel
     let agents: [WatchAgent]
 
-    init() {
+    init(agentCount: Int = 5) {
         transport = iPhoneBLEPeripheralManager()
         watchCommandManager = WatchCommandManager(peripheralManager: transport)
 
@@ -87,7 +87,7 @@ final class World {
             watchCommandManager: watchCommandManager
         )
 
-        agents = (1...5).map { WatchAgent(name: "W\($0)") }
+        agents = (1...agentCount).map { WatchAgent(name: "W\($0)") }
 
         let agents = self.agents
         transport.onCommand = { command, centralID in
@@ -155,6 +155,7 @@ enum FlowSim {
         await scenario2_threeRounds(checker)
         await scenario3_timeoutsAndRace(checker)
         scenario4_commandQueue(checker)
+        await scenario5_sixthWatch(checker)
 
         print("\n==========================================================")
         print("  통과 \(checker.passed) / 실패 \(checker.failed)")
@@ -449,6 +450,12 @@ func scenario2_threeRounds(_ checker: Checker) async {
     let policeTurnBefore = world.agent(for: police).count(of: .policeTurn)
     let doctorTurnBefore = world.agent(for: doctor).count(of: .doctorTurn)
 
+    // G2 검증: 이미 죽은 대상(경찰)을 지목하면 거부돼야 함
+    world.answer(mafia, .mafiaSelected(playerID: num(police)))
+    await settle(0.3)
+    check(game.mafiaTarget == nil, "죽은 대상 지목은 거부됨 (target.isAlive 검증)")
+    check(game.currentState is MafiaState, "거부 후에도 MafiaState 유지")
+
     world.answer(mafia, .mafiaSelected(playerID: num(c1)))
     await settle(0.4) // → PoliceState (1초 타임아웃 대기)
     await settle(1.4) // → DoctorState
@@ -528,6 +535,52 @@ func scenario3_timeoutsAndRace(_ checker: Checker) async {
           "이중 전이 차단 — 경찰 페이즈는 한 번만 시작됨")
 
     game2.timerManager.stopTimer()
+}
+
+// MARK: - 시나리오 5: 6번째 워치 난입 (정원 초과 거절)
+
+@MainActor
+func scenario5_sixthWatch(_ checker: Checker) async {
+    print("\n========== 시나리오 5: 6번째 워치 난입 — 정원 초과 거절 ==========")
+    GameTime.useActionDrivenTimes()
+    GameAudioManager.shared.reset()
+    func check(_ c: Bool, _ m: String) { checker.check(c, m) }
+
+    let world = World(agentCount: 6)
+
+    // 앞 5대만 조인
+    for agent in world.agents.prefix(5) {
+        world.transport.inject(.watchConnected(id: agent.id))
+        await settle(0.1)
+    }
+    await settle(2.3)
+    check(world.bleViewModel.connectedPlayers.count == 5, "정원 5대 등록")
+
+    // 6번째 조인 시도 → 거절
+    let sixth = world.agents[5]
+    world.transport.inject(.watchConnected(id: sixth.id))
+    await settle(0.4)
+
+    check(world.bleViewModel.connectedPlayers.count == 5, "6번째는 등록되지 않음 — 로비 정지 없음")
+    check(sixth.count(of: .connectionFailed) == 1, "6번째 워치에 connectionFailed 통지")
+    check(sixth.store.currentScreen == .connectionFailed, "6번째 워치 연결 실패 화면 표시")
+
+    // 재시도해도 거절
+    world.transport.inject(.watchDisconnected(id: sixth.id))
+    await settle(0.2)
+    world.transport.inject(.watchConnected(id: sixth.id))
+    await settle(0.4)
+    check(world.bleViewModel.connectedPlayers.count == 5, "재시도 후에도 정원 유지")
+    check(sixth.count(of: .connectionFailed) == 2, "재시도에도 다시 거절 통지")
+
+    // 게임은 5명으로 정상 시작, 거절된 워치는 게임 화면 미수신
+    let game = await world.startGame()
+    check(game.currentState is RoleAssigningState, "5명으로 게임 정상 시작")
+    check(sixth.count(of: .roleAssigning) == 0, "거절된 워치에 게임 화면 미전송")
+    check(world.agents.prefix(5).allSatisfy { $0.count(of: .roleAssigning) == 1 },
+          "참가자 5명만 역할 배정 수신")
+
+    game.timerManager.stopTimer()
 }
 
 // MARK: - 시나리오 4: BLE 재전송 큐 (실제 BLECommandQueue)
