@@ -33,10 +33,11 @@ struct RoleCardView: View {
                 VStack(alignment: .leading){
                     Text("\(player.color?.displayName ?? "") 플레이어")
                         .font(Font.system(size: 15))
-                        .fontWeight(.semibold)
+                        .fontWeight(.bold)
                     Text("\(player.role?.displayName ?? "")")
                         .font(Font.system(size: 23))
                         .foregroundStyle(roleTint)
+                        .fontWeight(.bold)
                 }
                 .padding(.leading, 10)
             }
@@ -59,7 +60,7 @@ struct RoleCardView: View {
     let sample = Player(
         id: UUID(),
         color: .pink,
-        role: .citizen
+        role: .mafia
     )
     return RoleCardView(player: sample)
 }

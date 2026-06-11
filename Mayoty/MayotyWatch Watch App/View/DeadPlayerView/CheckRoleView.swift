@@ -26,6 +26,12 @@ struct CheckRoleView: View {
         MafiaLogoView {
             VStack{
                 
+                Text("진실을 확인합니다")
+                    .font(Font.system(size: 27))
+                    .fontWeight(.bold)
+                    .padding(.top, -15)
+                    .padding(.bottom, -2)
+                
                 ScrollView{
                     VStack(spacing:50) {
                         ForEach(players) { player in
@@ -37,9 +43,9 @@ struct CheckRoleView: View {
                     Color.clear
                         .frame(height: 40)
                 }
-                .padding(.top, 50)
                 .ignoresSafeArea()
             }
+            .padding(.top, 1)
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
                     dismiss()
