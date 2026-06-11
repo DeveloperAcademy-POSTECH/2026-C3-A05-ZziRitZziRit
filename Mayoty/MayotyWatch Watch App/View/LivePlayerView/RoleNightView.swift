@@ -9,8 +9,9 @@
 import SwiftUI
 
 struct RoleNightView: View {
+    let role: Role
+    let viewModel: WatchViewModel
     
-    let role:Role
     @State private var selectedPlayerID: UUID? = nil
     @GestureState private var isPressing = false
     @State private var pressProgress: Double = 0
@@ -52,6 +53,33 @@ struct RoleNightView: View {
         }
     }
     
+    private func sendAnswer(
+        playerID: UInt8
+    ) {
+        switch role {
+
+        case .mafia:
+            viewModel.selectMafiaTarget(
+                playerID: playerID
+            )
+
+        case .police:
+            viewModel.selectPoliceTarget(
+                playerID: playerID
+            )
+
+        case .doctor:
+            viewModel.selectDoctorTarget(
+                playerID: playerID
+            )
+
+        case .citizen:
+            viewModel.submitVote(
+                targetID: playerID
+            )
+        }
+    }
+    
     var body: some View {
         MafiaLogoView {
             VStack{
@@ -68,7 +96,12 @@ struct RoleNightView: View {
                         )
                     ScrollView{
                         VStack{
-                            ForEach(players) { player in
+                            ForEach(
+                                Array(players.enumerated()),
+                                id: \.element.id
+                            ) { index, player in
+
+                                let playerNumber = UInt8(index + 1)
                                 if player.id == selectedPlayerID {
                                     let longPress = LongPressGesture(minimumDuration: 3)
                                         .updating($isPressing) { current, state, _ in
@@ -77,6 +110,10 @@ struct RoleNightView: View {
                                         .onEnded { success in
                                             if success {
                                                 confirmedPlayerID = player.id
+
+                                                sendAnswer(
+                                                    playerID: playerNumber
+                                                )
                                             }
                                         }
                                     
@@ -147,9 +184,4 @@ struct RoleNightView: View {
             await runCountdown()
         }
     }
-}
-
-
-#Preview {
-    RoleNightView(role: .mafia)
 }
