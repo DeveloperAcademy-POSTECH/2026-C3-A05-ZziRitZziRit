@@ -36,6 +36,8 @@ struct DoctorState: GameState {
 
     func exit(game: MafiaGame) {
         GameLogger.event("👨‍⚕️ 의사 치료 종료")
+        
+        game.soundManager.playDoctorEndSound()
         GameAudioManager.shared.stopAll()
         game.timerManager.stopTimer()
     }

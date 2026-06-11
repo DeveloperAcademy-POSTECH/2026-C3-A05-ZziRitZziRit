@@ -49,17 +49,31 @@ final class SoundManager {
         
 //        GameAudioManager.shared.playBGM(named: "nightBgm")
     }
+    
+    func playMafiaEndSound() {
+        GameAudioManager.shared.playNarration(named: "closeEyes-mafia")
+        
+//        GameAudioManager.shared.playBGM(named: "nightBgm")
+    }
 
     // MARK: - Police
 
     func playPoliceStartSound() {
         GameAudioManager.shared.playNarration(named: "policeSelected")
     }
+    
+    func playPoliceEndSound() {
+        GameAudioManager.shared.playNarration(named: "closeEyes-police")
+    }
 
     // MARK: - Doctor
 
     func playDoctorStartSound() {
         GameAudioManager.shared.playNarration(named: "doctorSelected")
+    }
+    
+    func playDoctorEndSound() {
+        GameAudioManager.shared.playNarration(named: "closeEyes-doctor")
     }
 
     // MARK: - Discussion

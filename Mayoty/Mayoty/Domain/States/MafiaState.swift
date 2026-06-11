@@ -38,6 +38,7 @@ struct MafiaState: GameState {
     func exit(game: MafiaGame) {
         GameLogger.event("🦹‍♂️ 마피아 선택 종료")
 
+        game.soundManager.playMafiaEndSound()
         game.soundManager.stopAll()
         game.timerManager.stopTimer()
     }
