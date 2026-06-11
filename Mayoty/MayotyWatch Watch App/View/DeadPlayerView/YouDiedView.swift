@@ -29,8 +29,8 @@ struct YouDiedView: View {
                         .fontWeight(.bold)
                         .padding(.bottom, 1)
                     Text("⚠️ 게임이 끝날때까지\n발언이 금지됩니다")
-                        .font(Font.system(size: 13))
-                        .fontWeight(.semibold)
+                        .font(Font.system(size: 14))
+                        .fontWeight(.bold)
                         .foregroundStyle(.yellow)
                         .multilineTextAlignment(.center)
                     
