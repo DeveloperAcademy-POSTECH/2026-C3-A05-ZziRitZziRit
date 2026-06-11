@@ -12,7 +12,7 @@ struct VoteState: GameState {
         game.watchCommandManager.sendVote()
 
         game.soundManager.playVoteStartSound()
-        game.lightManager.setNightScene()
+        game.lightManager.setNightScene(players: game.players)
 
         game.timerManager.startTimer(
             seconds: GameTime.vote,
