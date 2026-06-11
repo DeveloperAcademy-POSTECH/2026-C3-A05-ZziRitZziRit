@@ -6,7 +6,9 @@
 //
 
 import Foundation
+import Observation
 
+@Observable
 final class Player: Identifiable {
     let id: UUID
 
@@ -15,7 +17,10 @@ final class Player: Identifiable {
     var isAlive: Bool
 
     let watchId: String?
-    let lightId: String?
+
+    /// 게임 시작 시 배정되는 HomeKit 조명 식별자 — 순서가 아닌 ID로 매핑해
+    /// 조명 재발견/순서 변화에도 플레이어-조명 대응이 유지됨
+    var lightId: String?
 
     init(
         id: UUID = UUID(),

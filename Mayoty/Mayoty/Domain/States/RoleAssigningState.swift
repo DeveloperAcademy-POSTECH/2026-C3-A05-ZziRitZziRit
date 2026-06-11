@@ -18,7 +18,9 @@ struct RoleAssigningState: GameState {
 
         game.colorManager.assignColors(to: game.players)
         GameLogger.event("✅ 색상 배정 성공")
-        
+
+        game.lightManager.assignLights(to: game.players)
+
         game.watchCommandManager.sendPlayerColors(
             to: game.players
         )

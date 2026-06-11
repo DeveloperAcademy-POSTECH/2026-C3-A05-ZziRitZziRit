@@ -12,21 +12,25 @@ final class GameRuleManager {
     func applyNightResult(game: MafiaGame) {
         guard let mafiaTarget = game.mafiaTarget else {
             GameLogger.event("🦹‍♂️ 마피아 타겟 없음")
+            game.setLastNightVictim(nil)
             return
         }
-        
+
         if mafiaTarget.id != game.doctorTarget?.id {
             mafiaTarget.isAlive = false
-            
+            game.setLastNightVictim(mafiaTarget)
+
             GameLogger.event(
                 "❌ \(mafiaTarget.color?.rawValue ?? "알 수 없음") 사망"
             )
         } else {
+            game.setLastNightVictim(nil)
+
             GameLogger.event(
                 "⭕️ \(mafiaTarget.color?.rawValue ?? "알 수 없음") 치료 성공"
             )
         }
-        
+
         game.resetNightTargets()
     }
     

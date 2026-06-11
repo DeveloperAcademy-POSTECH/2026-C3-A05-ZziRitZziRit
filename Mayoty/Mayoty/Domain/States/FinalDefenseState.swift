@@ -10,10 +10,15 @@ struct FinalDefenseState: GameState {
         GameLogger.event("🎤 최후 변론 시작")
 
         guard let finalDefensePlayer = game.finalDefensePlayer else {
+            GameLogger.event("⚠️ 최후 변론자 없음 — 토론으로 복귀")
+            game.changeState(to: DiscussionState())
             return
         }
 
-        game.watchCommandManager.sendFinalDefense()
+        game.watchCommandManager.sendFinalDefense(to: game.players)
+
+        // VoteState exit의 stopAll 이후에 시작해야 BGM이 살아남음
+        game.soundManager.playFinalDefenseBgm()
 
         game.lightManager.setFinalDefenseScene(
             player: finalDefensePlayer,

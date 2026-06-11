@@ -42,8 +42,9 @@ struct DoctorState: GameState {
     private func transitionAfterNight(game: MafiaGame) {
         game.timerManager.stopTimer()
 
-        Task { @MainActor in
+        game.runAfterNarration({
             await game.soundManager.playDoctorEndSoundAndWait()
+        }) {
             game.proceedAfterNight()
         }
     }

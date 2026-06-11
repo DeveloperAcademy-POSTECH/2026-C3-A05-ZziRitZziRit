@@ -33,7 +33,9 @@ struct ResultState: GameState {
         switch action {
         case .gameEnded:
             GameLogger.event("🔴🟢 게임 종료")
-            game.endGame()
+            game.timerManager.stopTimer()
+            game.soundManager.stopAll()
+            game.lightManager.turnOffAllLights()
 
         default:
             break

@@ -12,10 +12,17 @@ struct WaitingState: GameState {
 
     func handleAction(game: MafiaGame, action: GameAction) {
         guard case .startGame = action else { return }
-        guard game.players.count == 5 else { return }
 
-        Task {
-            await GameAudioManager.shared.playNarrationAndWait(named: "startGame")
+        guard game.players.count == GameRule.requiredPlayerCount else {
+            GameLogger.event(
+                "⚠️ 인원 부족: \(game.players.count)/\(GameRule.requiredPlayerCount) — startGame 무시"
+            )
+            return
+        }
+
+        game.runAfterNarration({
+            await game.soundManager.playGameStartSoundAndWait()
+        }) {
             game.changeState(to: RoleAssigningState())
         }
     }

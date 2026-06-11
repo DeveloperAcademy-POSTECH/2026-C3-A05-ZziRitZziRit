@@ -11,8 +11,8 @@ final class SoundManager {
 
     // MARK: - Waiting
 
-    func playGameStartSound() {
-        GameAudioManager.shared.playNarration(named: "startGame")
+    func playGameStartSoundAndWait() async {
+        await GameAudioManager.shared.playNarrationAndWait(named: "startGame")
     }
 
     // MARK: - Role Assigning
@@ -42,12 +42,16 @@ final class SoundManager {
         GameAudioManager.shared.playBGM(named: "discussionBgm")
     }
 
+    // MARK: - Night
+
+    func playNightBgm() {
+        GameAudioManager.shared.playBGM(named: "nightBgm")
+    }
+
     // MARK: - Mafia
 
     func playMafiaStartSound() {
         GameAudioManager.shared.playNarration(named: "mafiaSelected")
-        
-//        GameAudioManager.shared.playBGM(named: "nightBgm")
     }
     
     func playMafiaEndSoundAndWait() async {
@@ -77,18 +81,20 @@ final class SoundManager {
     // MARK: - Discussion
 
     func playDiscussionStartSound(game: MafiaGame) {
+        // 직전 밤 희생자만 발표 — 이전 라운드 사망자를 다시 읽으면 안 됨
         guard
-            let deadPlayer = game.players.first(where: { !$0.isAlive }),
+            let deadPlayer = game.lastNightVictim,
             let color = deadPlayer.color
         else {
             GameAudioManager.shared.playNarration(named: "discussionEnded-NobodyDead")
+            GameAudioManager.shared.playBGM(named: "discussionBgm")
             return
         }
 
         GameAudioManager.shared.playNarration(
             named: "discussionEnded-\(color.rawValue)Dead"
         )
-        
+
         GameAudioManager.shared.playBGM(named: "discussionBgm")
     }
 

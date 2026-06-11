@@ -14,6 +14,32 @@ final class LightManager {
         self.homeKitLightManager = homeKitLightManager
     }
 
+    /// 게임 시작 시 플레이어마다 조명을 고정 배정
+    /// 이름순 정렬로 결정적 순서를 보장 — 이후 모든 장면은 lightId로 조회
+    func assignLights(to players: [Player]) {
+        let sortedLights = homeKitLightManager.lights.sorted {
+            $0.name < $1.name
+        }
+
+        GameLogger.light("조명 배정 — 조명 \(sortedLights.count)개 / 플레이어 \(players.count)명")
+
+        for (player, light) in zip(players, sortedLights) {
+            player.lightId = light.uniqueIdentifier.uuidString
+
+            GameLogger.light(
+                "\(player.color?.rawValue ?? "unknown") ↔ \(light.name)"
+            )
+        }
+    }
+
+    private func light(for player: Player) -> HMAccessory? {
+        guard let lightId = player.lightId else { return nil }
+
+        return homeKitLightManager.lights.first {
+            $0.uniqueIdentifier.uuidString == lightId
+        }
+    }
+
     private func applyColor(
         _ color: HomeKitLightColor,
         to light: HMAccessory
@@ -43,8 +69,10 @@ final class LightManager {
         GameLogger.light("플레이어 색상 조명 적용")
         GameLogger.light("현재 등록된 조명 수: \(homeKitLightManager.lights.count)")
 
-        for (player, light) in zip(players, homeKitLightManager.lights) {
-            guard let color = player.color else { continue }
+        for player in players {
+            guard let color = player.color,
+                  let light = light(for: player)
+            else { continue }
 
             GameLogger.light("\(color.rawValue) 색상 적용")
             applyColor(color.homeKitColor, to: light)
@@ -80,7 +108,9 @@ final class LightManager {
     ) {
         GameLogger.light("최후 변론 조명 적용")
 
-        for (currentPlayer, light) in zip(players, homeKitLightManager.lights) {
+        for currentPlayer in players {
+            guard let light = light(for: currentPlayer) else { continue }
+
             guard currentPlayer.id == player.id else {
                 HomeKitLightService.setPower(light, isOn: false)
                 continue

@@ -46,8 +46,9 @@ struct PoliceState: GameState {
     private func transitionToDoctor(game: MafiaGame) {
         game.timerManager.stopTimer()
 
-        Task { @MainActor in
+        game.runAfterNarration({
             await game.soundManager.playPoliceEndSoundAndWait()
+        }) {
             game.changeState(to: DoctorState())
         }
     }

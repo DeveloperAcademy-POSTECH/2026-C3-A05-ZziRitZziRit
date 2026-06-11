@@ -35,7 +35,8 @@ extension GameState {
             game.setWinner(winner)
             game.changeState(to: ResultState())
         } else {
-            game.changeState(to: MafiaState())
+            // 처형 후의 밤도 NightState를 거쳐야 밤 조명/BGM이 적용됨
+            game.changeState(to: NightState())
         }
     }
 }

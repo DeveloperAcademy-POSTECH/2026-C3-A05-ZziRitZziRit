@@ -9,7 +9,7 @@ struct VoteState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("🗳️ 투표 시작")
 
-        game.watchCommandManager.sendVote()
+        game.watchCommandManager.sendVote(to: game.players)
 
         game.soundManager.playVoteStartSound()
         game.lightManager.setNightScene()
@@ -35,6 +35,11 @@ struct VoteState: GameState {
                 target: target
             )
 
+            if game.voteManager.hasAllVotes(from: game.players) {
+                GameLogger.event("🗳️ 전원 투표 완료 — 조기 종료")
+                finishVote(game: game)
+            }
+
         case .voteCompleted:
             GameLogger.event("🗳️ 모든 플레이어 투표 완료")
             finishVote(game: game)
@@ -55,46 +60,48 @@ struct VoteState: GameState {
 
         let result = game.voteManager.getVoteResult(from: game.players)
 
-        Task {
-            switch result {
-            case .noVotes:
-                GameLogger.event("🗳️ 무투표 - 밤으로 이동")
+        switch result {
+        case .noVotes:
+            GameLogger.event("🗳️ 무투표 - 밤으로 이동")
 
-                game.voteManager.resetTargetVotes()
+            game.voteManager.resetTargetVotes()
 
+            game.runAfterNarration({
                 await game.soundManager.playVoteCompletedSoundAndWait(
                     fileName: "voteCompleted-noVotes"
                 )
-
+            }) {
                 game.changeState(to: NightState())
+            }
 
-            case .tie:
-                GameLogger.event("🗳️ 동점 - 밤으로 이동")
+        case .tie:
+            GameLogger.event("🗳️ 동점 - 밤으로 이동")
 
-                game.voteManager.resetTargetVotes()
+            game.voteManager.resetTargetVotes()
 
+            game.runAfterNarration({
                 await game.soundManager.playVoteCompletedSoundAndWait(
                     fileName: "voteCompleted-tie"
                 )
-
+            }) {
                 game.changeState(to: NightState())
+            }
 
-            case .singleTop(let finalDefensePlayer):
-                GameLogger.event(
-                    "🗳️ 최다 득표자 선정: \(finalDefensePlayer.color?.rawValue ?? "Unknown")"
-                )
+        case .singleTop(let finalDefensePlayer):
+            GameLogger.event(
+                "🗳️ 최다 득표자 선정: \(finalDefensePlayer.color?.rawValue ?? "Unknown")"
+            )
 
-                game.selectFinalDefensePlayer(finalDefensePlayer)
-                game.voteManager.resetTargetVotes()
+            game.selectFinalDefensePlayer(finalDefensePlayer)
+            game.voteManager.resetTargetVotes()
 
-                let colorName = finalDefensePlayer.color?.rawValue ?? "unknown"
+            let colorName = finalDefensePlayer.color?.rawValue ?? "unknown"
 
+            game.runAfterNarration({
                 await game.soundManager.playVoteCompletedSoundAndWait(
                     fileName: "voteCompleted-\(colorName)"
                 )
-
-                game.soundManager.playFinalDefenseBgm()
-
+            }) {
                 game.changeState(to: FinalDefenseState())
             }
         }

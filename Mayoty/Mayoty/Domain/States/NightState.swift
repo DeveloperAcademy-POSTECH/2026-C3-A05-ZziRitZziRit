@@ -9,11 +9,9 @@ struct NightState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("🌙 밤 시작")
         game.lightManager.setNightScene()
-        // TODO: BLE payload/configuration 처리 완료 이벤트 이후 MafiaState로
-        
+        game.soundManager.playNightBgm()
+
         game.changeState(to: MafiaState())
-        
-        GameAudioManager.shared.playBGM(named: "nightBgm")
     }
     
     func handleAction(game: MafiaGame, action: GameAction) {

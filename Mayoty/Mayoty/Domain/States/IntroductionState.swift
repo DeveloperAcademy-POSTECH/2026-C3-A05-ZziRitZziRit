@@ -9,7 +9,7 @@ struct IntroductionState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("👋 자기소개 시작")
         
-        game.watchCommandManager.sendDayTime()
+        game.watchCommandManager.sendDayTime(to: game.players)
 
         game.lightManager.setPlayerColorScene(
             players: game.players
@@ -34,7 +34,7 @@ struct IntroductionState: GameState {
         guard case .introductionEnded = action else { return }
 
         GameLogger.event("👋 자기소개 종료")
-        game.changeState(to: VoteState())
+        game.changeState(to: NightState())
     }
 
     func exit(game: MafiaGame) {

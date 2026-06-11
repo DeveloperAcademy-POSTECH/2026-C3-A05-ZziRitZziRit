@@ -20,8 +20,15 @@ final class VoteManager {
     // MARK: - 일반 투표
 
     func submitVote(voter: Player, target: Player) {
+        guard voter.isAlive, target.isAlive else { return }
         guard voter.id != target.id else { return }
         targetVotes[voter.id] = target.id
+    }
+
+    /// 생존자 전원이 투표를 마쳤는지 — 조기 종료 판정용
+    func hasAllVotes(from players: [Player]) -> Bool {
+        let aliveCount = players.filter(\.isAlive).count
+        return aliveCount > 0 && targetVotes.count >= aliveCount
     }
 
     // MARK: - 일반 투표 결과
@@ -62,21 +69,21 @@ final class VoteManager {
         finalDefensePlayer: Player,
         isAgree: Bool
     ) {
+        guard voter.isAlive else { return }
         guard voter.id != finalDefensePlayer.id else { return }
         executionVotes[voter.id] = isAgree
     }
 
-    // MARK: - 시간 초과 처리
+    /// 변론자를 제외한 생존자 전원이 찬반 투표를 마쳤는지 — 조기 종료 판정용
+    func hasAllExecutionVotes(
+        from players: [Player],
+        excluding finalDefensePlayer: Player
+    ) -> Bool {
+        let voterCount = players
+            .filter { $0.isAlive && $0.id != finalDefensePlayer.id }
+            .count
 
-    func submitDefaultExecutionVote(
-        voter: Player,
-        finalDefensePlayer: Player
-    ) {
-        submitExecutionVote(
-            voter: voter,
-            finalDefensePlayer: finalDefensePlayer,
-            isAgree: false
-        )
+        return voterCount > 0 && executionVotes.count >= voterCount
     }
 
     // MARK: - 찬반 투표 결과
