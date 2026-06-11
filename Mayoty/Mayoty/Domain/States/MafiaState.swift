@@ -9,6 +9,10 @@ struct MafiaState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("🦹‍♂️ 마피아 선택 시작")
 
+        game.watchCommandManager.sendMafiaTurn(
+            to: game.players
+        )
+
         game.soundManager.playMafiaStartSound()
 
         game.timerManager.startTimer(

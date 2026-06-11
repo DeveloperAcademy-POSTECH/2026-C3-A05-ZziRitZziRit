@@ -9,6 +9,8 @@ struct VoteState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("🗳️ 투표 시작")
 
+        game.watchCommandManager.sendVote()
+
         game.soundManager.playVoteStartSound()
         game.lightManager.setNightScene()
 
@@ -90,6 +92,8 @@ struct VoteState: GameState {
                 await game.soundManager.playVoteCompletedSoundAndWait(
                     fileName: "voteCompleted-\(colorName)"
                 )
+
+                game.soundManager.playFinalDefenseBgm()
 
                 game.changeState(to: FinalDefenseState())
             }

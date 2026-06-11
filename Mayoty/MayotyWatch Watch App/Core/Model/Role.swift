@@ -42,3 +42,20 @@ extension Role {
         }
     }
 }
+
+extension Role {
+    init?(bleValue: UInt8) {
+        switch bleValue {
+        case 1:
+            self = .mafia
+        case 2:
+            self = .police
+        case 3:
+            self = .doctor
+        case 4:
+            self = .citizen
+        default:
+            return nil
+        }
+    }
+}

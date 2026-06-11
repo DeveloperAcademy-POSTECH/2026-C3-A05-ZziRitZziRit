@@ -19,7 +19,12 @@ enum BLEPeripheralEvent {
 final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
 
     private var peripheralManager: CBPeripheralManager?
+
+    /// Watch → iPhone
     private var answerCharacteristic: CBMutableCharacteristic?
+
+    /// iPhone → Watch
+    private var commandCharacteristic: CBMutableCharacteristic?
 
     let events: AsyncStream<BLEPeripheralEvent>
     private let continuation: AsyncStream<BLEPeripheralEvent>.Continuation
@@ -38,7 +43,11 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         )
     }
 
-    func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+    // MARK: - Bluetooth State
+
+    func peripheralManagerDidUpdateState(
+        _ peripheral: CBPeripheralManager
+    ) {
         switch peripheral.state {
         case .poweredOn:
             continuation.yield(
@@ -47,6 +56,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
                     log: "블루투스가 활성화"
                 )
             )
+
             setupService()
             startAdvertising()
 
@@ -76,46 +86,74 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
 
         case .resetting:
             continuation.yield(
-                .bluetoothStateChanged("Resetting", log: nil)
+                .bluetoothStateChanged(
+                    "Resetting",
+                    log: nil
+                )
             )
 
         case .unknown:
             continuation.yield(
-                .bluetoothStateChanged("Unknown", log: nil)
+                .bluetoothStateChanged(
+                    "Unknown",
+                    log: nil
+                )
             )
 
         @unknown default:
             continuation.yield(
-                .bluetoothStateChanged("Unknown Default", log: nil)
+                .bluetoothStateChanged(
+                    "Unknown Default",
+                    log: nil
+                )
             )
         }
     }
 
+    // MARK: - Service
+
+    /// BLE Service와 Characteristic을 등록
     private func setupService() {
         guard let peripheralManager else { return }
 
-        let characteristic = CBMutableCharacteristic(
+        let answerCharacteristic = CBMutableCharacteristic(
             type: BLEUUID.answer,
             properties: [.write, .writeWithoutResponse],
             value: nil,
             permissions: [.writeable]
         )
 
-        self.answerCharacteristic = characteristic
+        let commandCharacteristic = CBMutableCharacteristic(
+            type: BLEUUID.command,
+            properties: [.notify, .read],
+            value: nil,
+            permissions: [.readable]
+        )
+
+        self.answerCharacteristic = answerCharacteristic
+        self.commandCharacteristic = commandCharacteristic
 
         let service = CBMutableService(
             type: BLEUUID.service,
             primary: true
         )
 
-        service.characteristics = [characteristic]
+        service.characteristics = [
+            answerCharacteristic,
+            commandCharacteristic
+        ]
 
         peripheralManager.removeAllServices()
         peripheralManager.add(service)
 
-        continuation.yield(.log("Service added"))
+        continuation.yield(
+            .log("Service added")
+        )
     }
 
+    // MARK: - Advertising
+
+    /// Watch가 검색할 수 있도록 Advertising 시작
     func startAdvertising() {
         guard let peripheralManager else { return }
 
@@ -132,6 +170,7 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         )
     }
 
+    /// Advertising 중지
     func stopAdvertising() {
         peripheralManager?.stopAdvertising()
 
@@ -149,31 +188,69 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
     ) {
         if let error {
             continuation.yield(
-                .log("Advertising error: \(error.localizedDescription)")
+                .log(
+                    "Advertising error: \(error.localizedDescription)"
+                )
             )
         } else {
-            continuation.yield(.log("Advertising success"))
+            continuation.yield(
+                .log("Advertising success")
+            )
         }
     }
 
+    // MARK: - Command
+
+    /// iPhone → Watch 명령 전송
+    func sendCommand(_ command: BLECommand) {
+        guard let peripheralManager else { return }
+        guard let commandCharacteristic else { return }
+
+        let success = peripheralManager.updateValue(
+            command.data,
+            for: commandCharacteristic,
+            onSubscribedCentrals: nil
+        )
+
+        continuation.yield(
+            .log(
+                success
+                ? "Command sent: \(command.kind)"
+                : "Command send failed"
+            )
+        )
+    }
+
+    // MARK: - Receive Answer
+
+    /// Watch가 보낸 응답을 수신
     func peripheralManager(
         _ peripheral: CBPeripheralManager,
         didReceiveWrite requests: [CBATTRequest]
     ) {
         for request in requests {
+
             guard request.characteristic.uuid == BLEUUID.answer else {
-                peripheral.respond(to: request, withResult: .requestNotSupported)
+                peripheral.respond(
+                    to: request,
+                    withResult: .requestNotSupported
+                )
                 continue
             }
 
             let centralID = request.central.identifier
 
-            continuation.yield(.watchConnected(id: centralID))
+            continuation.yield(
+                .watchConnected(id: centralID)
+            )
 
             guard let data = request.value,
                   let answer = BLEAnswer(data: data)
             else {
-                peripheral.respond(to: request, withResult: .invalidAttributeValueLength)
+                peripheral.respond(
+                    to: request,
+                    withResult: .invalidAttributeValueLength
+                )
                 continue
             }
 
@@ -184,7 +261,10 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
                 )
             )
 
-            peripheral.respond(to: request, withResult: .success)
+            peripheral.respond(
+                to: request,
+                withResult: .success
+            )
         }
     }
 }

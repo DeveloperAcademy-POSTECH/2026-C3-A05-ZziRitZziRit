@@ -8,48 +8,47 @@
 import SwiftUI
 
 struct ExecutionVoteView: View {
-    @State private var model: WatchViewModel?
-    @State private var kill: Bool = false
-    
+    let viewModel: WatchViewModel
+
+    @State private var kill: Bool? = nil
+
     var body: some View {
-        MafiaLogoView{
+        MafiaLogoView {
             VStack(spacing: 25) {
                 Image(systemName: "person.fill")
                     .resizable()
                     .frame(width: 80, height: 80)
-//                    .foregroundStyle(.white) //최다 지목된 플레이어 색깔
+
                 HStack {
                     Button {
                         kill = false
+                        viewModel.submitExecutionVote(isAgree: false)
+
+                        Task {
+                            try? await HapticPattern.choosePlayer.play()
+                        }
                     } label: {
                         Text("살리기")
                             .foregroundStyle(.white)
                             .font(.title3)
                     }
-                    .foregroundStyle(kill ? .gray : .btGreen)
-                    .task {
-                        try? await HapticPattern.choosePlayer.play()
-                        print("살리기")
-                    }
-                    
+                    .foregroundStyle(kill == false ? .btGreen : .gray)
+
                     Button {
                         kill = true
+                        viewModel.submitExecutionVote(isAgree: true)
+
+                        Task {
+                            try? await HapticPattern.choosePlayer.play()
+                        }
                     } label: {
                         Text("죽이기")
                             .foregroundStyle(.white)
                             .font(.title3)
                     }
-                    .foregroundStyle(kill ? .btRed : .gray)
-                    .task {
-                        try? await HapticPattern.choosePlayer.play()
-                        print("죽이기")
-                    }
+                    .foregroundStyle(kill == true ? .btRed : .gray)
                 }
             }
         }
     }
-}
-
-#Preview {
-    ExecutionVoteView()
 }

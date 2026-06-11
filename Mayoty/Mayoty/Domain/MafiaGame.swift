@@ -36,17 +36,20 @@ final class MafiaGame {
     let colorManager = ColorManager()
     let lightManager: LightManager
     let soundManager = SoundManager()
+    let watchCommandManager: WatchCommandManager
 
     init(
         players: [Player],
         initialState: any GameState,
-        homeKitLightManager: HomeKitLightManager
+        homeKitLightManager: HomeKitLightManager,
+        watchCommandManager: WatchCommandManager
     ) {
         self.players = players
         self.currentState = initialState
         self.lightManager = LightManager(
             homeKitLightManager: homeKitLightManager
         )
+        self.watchCommandManager = watchCommandManager
 
         self.currentState.enter(game: self)
     }

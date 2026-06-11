@@ -8,6 +8,11 @@
 struct DoctorState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("👨‍⚕️ 의사 치료 시작")
+
+        game.watchCommandManager.sendDoctorTurn(
+            to: game.players
+        )
+
         GameAudioManager.shared.playNarration(named: "doctorSelected")
 
         game.timerManager.startTimer(

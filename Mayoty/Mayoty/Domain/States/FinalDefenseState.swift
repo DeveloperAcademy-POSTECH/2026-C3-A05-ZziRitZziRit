@@ -13,6 +13,8 @@ struct FinalDefenseState: GameState {
             return
         }
 
+        game.watchCommandManager.sendFinalDefense()
+
         game.lightManager.setFinalDefenseScene(
             player: finalDefensePlayer,
             players: game.players

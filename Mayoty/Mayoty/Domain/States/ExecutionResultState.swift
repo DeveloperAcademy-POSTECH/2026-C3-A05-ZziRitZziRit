@@ -13,7 +13,13 @@ struct ExecutionResultState: GameState {
             return
         }
 
+        game.watchCommandManager.sendExecutionResult()
+
         game.soundManager.playExecutionResultSound(game: game)
+
+        if game.voteManager.shouldBeExecuted {
+            game.soundManager.playGunSoundEffect()
+        }
 
         game.lightManager.setFinalDefenseScene(
             player: finalDefensePlayer,

@@ -90,6 +90,10 @@ final class SoundManager {
         await GameAudioManager.shared.playNarrationAndWait(named: fileName)
     }
     
+    func playFinalDefenseBgm() {
+        GameAudioManager.shared.playBGM(named: "finalDefenseBgm")
+    }
+    
     // MARK: - FinalDefense
     
     func playFinalDefenseEndingSound(after seconds: TimeInterval) {
@@ -131,6 +135,10 @@ final class SoundManager {
         GameAudioManager.shared.playNarration(
             named: "executionVoteCompleted-\(color.rawValue)\(result)"
         )
+    }
+    
+    func playGunSoundEffect() {
+        GameAudioManager.shared.playSoundEffect(named: "gunSoundEffect")
     }
     
     // MARK: - Result

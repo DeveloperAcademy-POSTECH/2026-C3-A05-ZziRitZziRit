@@ -8,18 +8,83 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var model: WatchViewModel?
-    @State private var manager: WatchCentralManager?
+    @Bindable var viewModel: WatchViewModel
     
     var body: some View {
-        VStack{
-            Button("Reconnect"){
-                manager?.scan()
-            }
+        switch viewModel.commandStore.currentScreen {
+        case .join:
+            JoinGameView(viewModel: viewModel)
+            
+        case .connectionSucceeded:
+            ConnectionSucceedView()
+
+        case .waiting:
+            WaitingPlayersView()
+            
+        case .roleAssigning:
+            RoleAssigningView()
+            
+        case .roleResult:
+            RoleResultView(
+                role: viewModel.commandStore.role
+            )
+            
+        case .dayTime:
+            DayTimeView()
+            
+        case .mafiaTurn:
+            RoleNightView(
+                role: .mafia,
+                viewModel: viewModel
+            )
+
+        case .policeTurn:
+            RoleNightView(
+                role: .police,
+                viewModel: viewModel
+            )
+
+        case .doctorTurn:
+            RoleNightView(
+                role: .doctor,
+                viewModel: viewModel
+            )
+
+        case .vote:
+            RoleNightView(
+                role: .citizen,
+                viewModel: viewModel
+            )
+            
+        case .nightTime:
+            RoleSelectingView(role: viewModel.commandStore.role)
+            
+        case .policeResult:
+            PoliceArrestResultView(
+                result: viewModel.commandStore.policeResultIsMafia
+                ? .success
+                : .fail
+            )
+            
+        case .finalDefense:
+            FinalDefenseView()
+            
+        case .executionVote:
+            ExecutionVoteView(
+                viewModel: viewModel
+            )
+            
+        case .executionResult:
+            ExecutionResultView(
+                excutionResult: .survive
+            )
+            
+        case .gameEnded:
+            VictoryView(
+                victory: viewModel.commandStore.winner == .mafia
+                    ? .mafia
+                    : .citizen
+            )
         }
     }
 }
-
-//#Preview {
-//    ContentView()
-//}
