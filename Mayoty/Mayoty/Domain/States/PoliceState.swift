@@ -40,7 +40,7 @@ struct PoliceState: GameState {
     
     func exit(game: MafiaGame) {
         GameLogger.event("👮‍♂️ 경찰 수사 종료")
-        GameAudioManager.shared.stopAll()
+
         game.timerManager.stopTimer()
     }
 }
