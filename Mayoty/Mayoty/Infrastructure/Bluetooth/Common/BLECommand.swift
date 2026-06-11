@@ -32,6 +32,12 @@ enum BLECommandKind: UInt8 {
 
     case gameEnded = 17
     case playerColor = 18
+
+    /// 대상 플레이어 사망 통지 — 사망자 전용 플로우 진입 (타깃 전송 전용)
+    case youDied = 19
+
+    /// 특정 플레이어의 직업 공개 — 사망자의 진실 확인 화면용 (타깃 전송 전용)
+    case playerRole = 20
 }
 
 struct BLECommand {
@@ -164,6 +170,21 @@ extension BLECommand {
         BLECommand(
             kind: .gameEnded,
             value: winner.bleValue
+        )
+    }
+
+    static func youDied() -> BLECommand {
+        BLECommand(kind: .youDied)
+    }
+
+    static func playerRole(
+        targetID: UInt8,
+        role: Role
+    ) -> BLECommand {
+        BLECommand(
+            kind: .playerRole,
+            targetID: targetID,
+            value: role.bleValue
         )
     }
 }

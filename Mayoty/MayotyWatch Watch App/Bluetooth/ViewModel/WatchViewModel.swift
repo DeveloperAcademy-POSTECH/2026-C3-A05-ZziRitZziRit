@@ -73,8 +73,11 @@ final class WatchViewModel {
     // MARK: - 이벤트 관찰
 
     private func observeEvents() {
-        eventTask = Task {
-            for await state in centralManager.events {
+        // AsyncStream은 종료되지 않으므로 강한 캡처 시 영구 retain cycle이 됨
+        eventTask = Task { [weak self] in
+            guard let self else { return }
+
+            for await state in self.centralManager.events {
                 await MainActor.run {
                     self.connectionState = state
                 }

@@ -13,21 +13,28 @@ final class BLEViewModel {
 
     var isAdvertising: Bool = false
     var bluetoothStateText: String = "Unknown"
-    var connectedWatchIDs: Set<UUID> = []
+    var connectedWatchIDs: [UUID] = []
+
+    /// 연결 순서 기준의 플레이어 목록 — Watch 연결/해제 시에만 갱신
+    var connectedPlayers: [Player] = []
+
     var answers: [UUID: BLEAnswer] = [:]
     var logs: [String] = []
 
     var game: MafiaGame
 
     private let peripheralManager: iPhoneBLEPeripheralManager
+    private let watchCommandManager: WatchCommandManager
     private var eventTask: Task<Void, Never>?
 
     init(
         game: MafiaGame,
-        peripheralManager: iPhoneBLEPeripheralManager
+        peripheralManager: iPhoneBLEPeripheralManager,
+        watchCommandManager: WatchCommandManager
     ) {
         self.game = game
         self.peripheralManager = peripheralManager
+        self.watchCommandManager = watchCommandManager
 
         observePeripheralEvents()
     }
@@ -49,8 +56,10 @@ final class BLEViewModel {
     // MARK: - 이벤트 관찰
 
     private func observePeripheralEvents() {
-        eventTask = Task {
-            for await event in peripheralManager.events {
+        eventTask = Task { [weak self] in
+            guard let self else { return }
+
+            for await event in self.peripheralManager.events {
                 await MainActor.run {
                     self.handle(event)
                 }
@@ -74,8 +83,10 @@ final class BLEViewModel {
             addLog(log)
 
         case let .watchConnected(id):
-            connectedWatchIDs.insert(id)
-            addLog("Watch connected: \(id.uuidString.prefix(8))")
+            watchConnected(id)
+
+        case let .watchDisconnected(id):
+            watchDisconnected(id)
 
         case let .answerReceived(id, answer):
             receiveAnswer(from: id, answer: answer)
@@ -85,10 +96,149 @@ final class BLEViewModel {
         }
     }
 
+    // MARK: - Watch 연결/해제
+
+    private func watchConnected(_ id: UUID) {
+        let isNew = !connectedWatchIDs.contains(id)
+
+        insertWatch(id)
+
+        guard isNew else { return }
+
+        addLog("Watch connected: \(id.uuidString.prefix(8))")
+
+        watchCommandManager.sendConnectionSucceeded(to: id)
+
+        if game.currentState is WaitingState {
+            watchCommandManager.sendWaitingPlayers(
+                count: connectedWatchIDs.count
+            )
+        } else {
+            // 게임 진행 중 재연결 — 현재 페이즈 화면을 복원
+            resyncWatch(id)
+        }
+    }
+
+    private func watchDisconnected(_ id: UUID) {
+        connectedWatchIDs.removeAll { $0 == id }
+        connectedPlayers.removeAll { $0.watchUUID == id }
+
+        addLog("Watch disconnected: \(id.uuidString.prefix(8))")
+
+        if game.currentState is WaitingState {
+            watchCommandManager.sendWaitingPlayers(
+                count: connectedWatchIDs.count
+            )
+        }
+    }
+
+    /// 게임 진행 중 재연결된 Watch에 현재 페이즈 명령을 재전송
+    private func resyncWatch(_ id: UUID) {
+        guard
+            let player = player(for: id),
+            let index = game.players.firstIndex(where: { $0.id == player.id })
+        else { return }
+
+        let playerNumber = UInt8(index + 1)
+        let state = game.currentState
+
+        // 사망자는 어느 페이즈든 사망자 플로우로 복원 (결과 화면 제외)
+        if !player.isAlive {
+            if state is ResultState, let winner = game.winner {
+                watchCommandManager.send(.gameEnded(winner: winner), to: player)
+            } else {
+                watchCommandManager.sendDeadFlow(to: player, players: game.players)
+            }
+
+            addLog("Watch resynced (dead): \(id.uuidString.prefix(8))")
+            return
+        }
+
+        // 밤 선택 화면은 전체 색상 명단이 있어야 그릴 수 있음
+        watchCommandManager.sendPlayerColors(
+            to: game.players,
+            watch: player
+        )
+
+        switch state {
+        case is RoleAssigningState:
+            watchCommandManager.send(.roleAssigning(), to: player)
+
+            if let role = player.role {
+                watchCommandManager.send(
+                    .roleResult(targetID: playerNumber, role: role),
+                    to: player
+                )
+            }
+
+        case is IntroductionState, is DiscussionState:
+            watchCommandManager.send(.dayTime(), to: player)
+
+        case is MafiaState:
+            sendNightTurn(.mafia, kind: .mafiaTurn, player: player, number: playerNumber)
+
+        case is PoliceState:
+            sendNightTurn(.police, kind: .policeTurn, player: player, number: playerNumber)
+
+        case is DoctorState:
+            sendNightTurn(.doctor, kind: .doctorTurn, player: player, number: playerNumber)
+
+        case is NightState:
+            watchCommandManager.send(.nightWaiting(targetID: playerNumber), to: player)
+
+        case is VoteState:
+            watchCommandManager.send(.vote(), to: player)
+
+        case is FinalDefenseState:
+            watchCommandManager.send(.finalDefense(), to: player)
+
+        case is ExecutionVoteState:
+            watchCommandManager.send(.executionVote(), to: player)
+
+        case is ExecutionResultState:
+            watchCommandManager.send(
+                BLECommand(
+                    kind: .executionResult,
+                    value: game.voteManager.shouldBeExecuted ? 1 : 0
+                ),
+                to: player
+            )
+
+        case is ResultState:
+            if let winner = game.winner {
+                watchCommandManager.send(.gameEnded(winner: winner), to: player)
+            }
+
+        default:
+            break
+        }
+
+        addLog("Watch resynced: \(id.uuidString.prefix(8))")
+    }
+
+    private func sendNightTurn(
+        _ activeRole: Role,
+        kind: BLECommandKind,
+        player: Player,
+        number: UInt8
+    ) {
+        if player.role == activeRole {
+            watchCommandManager.send(
+                BLECommand(kind: kind, targetID: number),
+                to: player
+            )
+        } else {
+            watchCommandManager.send(
+                .nightWaiting(targetID: number),
+                to: player
+            )
+        }
+    }
+
     // MARK: - 응답 수신
 
     func receiveAnswer(from id: UUID, answer: BLEAnswer) {
-        connectedWatchIDs.insert(id)
+        watchConnected(id)
         answers[id] = answer
 
         addLog(
@@ -106,20 +256,46 @@ final class BLEViewModel {
             break
 
         case .mafiaSelected:
-            guard let target = player(for: answer.value) else { return }
+            guard let sender = player(for: id),
+                  sender.role == .mafia,
+                  sender.isAlive,
+                  let target = player(for: answer.value)
+            else {
+                addLog("mafiaSelected rejected: \(id.uuidString.prefix(8))")
+                return
+            }
+
             game.handleAction(.mafiaSelected(target: target))
 
         case .policeSelected:
-            guard let target = player(for: answer.value) else { return }
+            guard let sender = player(for: id),
+                  sender.role == .police,
+                  sender.isAlive,
+                  let target = player(for: answer.value)
+            else {
+                addLog("policeSelected rejected: \(id.uuidString.prefix(8))")
+                return
+            }
+
             game.handleAction(.policeSelected(target: target))
 
         case .doctorSelected:
-            guard let target = player(for: answer.value) else { return }
+            guard let sender = player(for: id),
+                  sender.role == .doctor,
+                  sender.isAlive,
+                  let target = player(for: answer.value)
+            else {
+                addLog("doctorSelected rejected: \(id.uuidString.prefix(8))")
+                return
+            }
+
             game.handleAction(.doctorSelected(target: target))
 
         case .voteSubmitted:
-            guard let voter = player(for: id) else { return }
-            guard let target = player(for: answer.value) else { return }
+            guard let voter = player(for: id),
+                  voter.isAlive,
+                  let target = player(for: answer.value)
+            else { return }
 
             game.handleAction(
                 .voteSubmitted(
@@ -129,7 +305,9 @@ final class BLEViewModel {
             )
 
         case .executionVoteSubmitted:
-            guard let voter = player(for: id) else { return }
+            guard let voter = player(for: id),
+                  voter.isAlive
+            else { return }
 
             game.handleAction(
                 .executionVoteSubmitted(
@@ -163,5 +341,19 @@ final class BLEViewModel {
 
     private func addLog(_ text: String) {
         logs.insert(text, at: 0)
+    }
+
+    // MARK: - Watch 등록
+
+    private func insertWatch(_ id: UUID) {
+        guard !connectedWatchIDs.contains(id) else { return }
+
+        connectedWatchIDs.append(id)
+        connectedPlayers.append(
+            Player(
+                id: id,
+                watchId: id.uuidString
+            )
+        )
     }
 }
