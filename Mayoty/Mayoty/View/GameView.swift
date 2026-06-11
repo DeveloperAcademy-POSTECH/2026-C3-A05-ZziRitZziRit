@@ -42,24 +42,24 @@ struct GameView: View {
         )
     }
     
-        private var connectedPlayers: [Player] {
-            bleViewModel.connectedWatchIDs.map { id in
-                Player(
-                    id: id,
-                    watchId: id.uuidString
-                )
-            }
-        }
+//        private var connectedPlayers: [Player] {
+//            bleViewModel.connectedWatchIDs.map { id in
+//                Player(
+//                    id: id,
+//                    watchId: id.uuidString
+//                )
+//            }
+//        }
     
-//    private var connectedPlayers: [Player] {
-//        [
-//            Player(id: UUID(), watchId: "mock-watch-1"),
-//            Player(id: UUID(), watchId: "mock-watch-2"),
-//            Player(id: UUID(), watchId: "mock-watch-3"),
-//            Player(id: UUID(), watchId: "mock-watch-4")
-//            Player(id: UUID(), watchId: "mock-watch-5")
-//        ]
-//    }
+    private var connectedPlayers: [Player] {
+        [
+            Player(id: UUID(), watchId: "mock-watch-1"),
+            Player(id: UUID(), watchId: "mock-watch-2"),
+            Player(id: UUID(), watchId: "mock-watch-3"),
+            Player(id: UUID(), watchId: "mock-watch-4"),
+            Player(id: UUID(), watchId: "mock-watch-5")
+        ]
+    }
     
     private var canStartGame: Bool {
         connectedPlayers.count >= 3
