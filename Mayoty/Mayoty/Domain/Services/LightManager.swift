@@ -41,34 +41,33 @@ final class LightManager {
     /// 낮 조명
     func setPlayerColorScene(players: [Player]) {
         GameLogger.light("플레이어 색상 조명 적용")
-        GameLogger.light("현재 등록된 조명 수: \(homeKitLightManager.lights.count)")
 
         for (player, light) in zip(players, homeKitLightManager.lights) {
+            guard player.isAlive else {
+                HomeKitLightService.setPower(light, isOn: false)
+                continue
+            }
+
             guard let color = player.color else { continue }
 
-            GameLogger.light("\(color.rawValue) 색상 적용")
             applyColor(color.homeKitColor, to: light)
         }
     }
 
     /// 밤 조명
-    func setNightScene() {
-        GameLogger.light("밤 조명 적용 - 플레이어 색상 유지, 밝기 30%")
+    func setNightScene(players: [Player]) {
+        GameLogger.light("밤 조명 적용 - 생존자만 밝기 20%")
 
-        homeKitLightManager.lights.forEach { light in
+        for (player, light) in zip(players, homeKitLightManager.lights) {
+            guard player.isAlive else {
+                HomeKitLightService.setPower(light, isOn: false)
+                continue
+            }
+
             HomeKitLightService.setPower(light, isOn: true) { powerError in
-                if let powerError {
-                    GameLogger.light("\(light.name) ON 실패: \(powerError.localizedDescription)")
-                    return
-                }
+                if let powerError { return }
 
-                HomeKitLightService.setBrightness(20, accessory: light) { brightnessError in
-                    if let brightnessError {
-                        GameLogger.light("\(light.name) 밝기 20% 실패: \(brightnessError.localizedDescription)")
-                    } else {
-                        GameLogger.light("\(light.name) 밝기 20% 적용 성공")
-                    }
-                }
+                HomeKitLightService.setBrightness(20, accessory: light)
             }
         }
     }
@@ -81,12 +80,15 @@ final class LightManager {
         GameLogger.light("최후 변론 조명 적용")
 
         for (currentPlayer, light) in zip(players, homeKitLightManager.lights) {
-            guard currentPlayer.id == player.id else {
+            guard currentPlayer.isAlive else {
                 HomeKitLightService.setPower(light, isOn: false)
                 continue
             }
 
-            GameLogger.light("최후 변론 대상자 조명 ON")
+            guard currentPlayer.id == player.id else {
+                HomeKitLightService.setPower(light, isOn: false)
+                continue
+            }
 
             applyColor(
                 player.color?.homeKitColor ?? .finalDefenseFallback,
