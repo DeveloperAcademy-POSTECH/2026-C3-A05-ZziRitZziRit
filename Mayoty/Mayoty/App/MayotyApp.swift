@@ -11,7 +11,7 @@ import SwiftUI
 struct MayotyApp: App {
     var body: some Scene {
         WindowGroup {
-            GameView()
+            BoothManualGameView()
         }
     }
 }

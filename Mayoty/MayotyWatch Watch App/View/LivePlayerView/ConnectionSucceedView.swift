@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ConnectionSucceedView: View {
+    let viewModel: WatchViewModel
+    
     var body: some View {
         MafiaLogoView {
             VStack(spacing: 5) {
@@ -19,10 +21,7 @@ struct ConnectionSucceedView: View {
         }
         .task {
             try? await HapticPattern.connectionSucceed.play()
+            viewModel.autoNext(after: 1.2)
         }
     }
-}
-
-#Preview {
-    ConnectionSucceedView()
 }

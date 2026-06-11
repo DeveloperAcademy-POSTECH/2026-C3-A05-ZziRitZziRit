@@ -11,6 +11,7 @@ enum WatchScreen {
     case waiting
     case roleAssigning
     case roleResult
+    case introductino
     case dayTime
     case nightTime
     case mafiaTurn

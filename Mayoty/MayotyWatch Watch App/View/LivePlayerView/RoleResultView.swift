@@ -9,26 +9,31 @@ import SwiftUI
 
 
 struct RoleResultView: View {
-    let role: Role
+    let viewModel: WatchViewModel
+
     var body: some View {
+        let role = viewModel.commandStore.role
+
         MafiaLogoView {
             VStack(spacing: 5) {
                 Text("당신의 직업은")
-                    .font(.system(size:30))
+                    .font(.system(size: 20))
+
                 Image(role.iconName)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 120, height: 120)
+                    .frame(width: 80, height: 80)
+
                 Text(role.displayName)
-                    .font(.system(size:30))
+                    .font(.system(size: 20))
             }
         }
-        .task {
-            try? await HapticPattern.revealRole.play()
+        .onAppear {
+            Task {
+                try? await HapticPattern.revealRole.play()
+            }
+
+            viewModel.autoNext(after: 2.0)
         }
     }
-}
-
-#Preview {
-    RoleResultView(role: .police)
 }

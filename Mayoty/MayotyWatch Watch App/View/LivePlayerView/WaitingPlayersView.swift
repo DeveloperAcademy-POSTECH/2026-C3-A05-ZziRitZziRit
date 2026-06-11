@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct WaitingPlayersView: View {
+    let viewModel: WatchViewModel
+    
     var body: some View {
         MafiaLogoView {
             VStack(spacing: 20) {
@@ -19,12 +21,12 @@ struct WaitingPlayersView: View {
                     .font(.system(size:25))
             }
         }
-        .task {
-            try? await HapticPattern.circularProgress.play()
+        .onAppear {
+            Task {
+                try? await HapticPattern.connectionSucceed.play()
+            }
+
+            viewModel.autoNext(after: 1.2)
         }
     }
-}
-
-#Preview {
-    WaitingPlayersView()
 }
