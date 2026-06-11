@@ -8,6 +8,11 @@
 struct PoliceState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("👮‍♂️ 경찰 수사 시작")
+
+        game.watchCommandManager.sendPoliceTurn(
+            to: game.players
+        )
+
         game.soundManager.playPoliceStartSound()
 
         game.timerManager.startTimer(
