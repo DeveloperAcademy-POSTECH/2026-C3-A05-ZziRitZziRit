@@ -19,6 +19,11 @@ struct MayotyWatch_Watch_AppApp: App {
                     viewModel: viewModel
                 )
             }
+            .task {
+#if DEBUG
+                DemoAutoPlay.startIfNeeded(viewModel: viewModel)
+#endif
+            }
         }
     }
 }
