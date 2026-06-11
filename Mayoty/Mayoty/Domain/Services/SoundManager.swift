@@ -49,17 +49,29 @@ final class SoundManager {
         
 //        GameAudioManager.shared.playBGM(named: "nightBgm")
     }
+    
+    func playMafiaEndSoundAndWait() async {
+        await GameAudioManager.shared.playNarrationAndWait(named: "closeEyes-mafia")
+    }
 
     // MARK: - Police
 
     func playPoliceStartSound() {
         GameAudioManager.shared.playNarration(named: "policeSelected")
     }
+    
+    func playPoliceEndSoundAndWait() async {
+        await GameAudioManager.shared.playNarrationAndWait(named: "closeEyes-police")
+    }
 
     // MARK: - Doctor
 
     func playDoctorStartSound() {
         GameAudioManager.shared.playNarration(named: "doctorSelected")
+    }
+    
+    func playDoctorEndSoundAndWait() async {
+        await GameAudioManager.shared.playNarrationAndWait(named: "closeEyes-doctor")
     }
 
     // MARK: - Discussion
