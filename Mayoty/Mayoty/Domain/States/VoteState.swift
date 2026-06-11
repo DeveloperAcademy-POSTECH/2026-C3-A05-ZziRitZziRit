@@ -93,6 +93,8 @@ struct VoteState: GameState {
                     fileName: "voteCompleted-\(colorName)"
                 )
 
+                game.soundManager.playFinalDefenseBgm()
+
                 game.changeState(to: FinalDefenseState())
             }
         }

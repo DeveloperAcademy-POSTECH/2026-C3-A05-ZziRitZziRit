@@ -17,6 +17,10 @@ struct ExecutionResultState: GameState {
 
         game.soundManager.playExecutionResultSound(game: game)
 
+        if game.voteManager.shouldBeExecuted {
+            game.soundManager.playGunSoundEffect()
+        }
+
         game.lightManager.setFinalDefenseScene(
             player: finalDefensePlayer,
             players: game.players
