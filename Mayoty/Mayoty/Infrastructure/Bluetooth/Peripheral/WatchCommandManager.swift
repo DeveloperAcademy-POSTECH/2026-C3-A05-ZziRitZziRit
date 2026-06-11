@@ -36,6 +36,13 @@ final class WatchCommandManager {
         peripheralManager.sendCommand(command, to: centralID)
     }
 
+    func number(of player: Player, in players: [Player]) -> UInt8 {
+        guard let index = players.firstIndex(where: { $0.id == player.id }) else {
+            return 0
+        }
+        return UInt8(index + 1)
+    }
+
     func sendConnectionSucceeded(to centralID: UUID) {
         send(.connectionSucceeded(), to: centralID)
     }
@@ -67,11 +74,28 @@ final class WatchCommandManager {
 
     /// 낮 화면 — 생존자에게만. 사망자는 사망자 플로우 유지
     func sendDayTime(to players: [Player]) {
+        sendDeadList(to: players)
+
         forEachPlayer(players) { player, _ in
             if player.isAlive {
                 send(.dayTime(), to: player)
             } else {
                 sendDeadFlow(to: player, players: players)
+            }
+        }
+    }
+
+    /// 사망 상태 동기화 — 생존자 워치 명단에서 사망자를 표시/비활성하기 위함
+    func sendDeadList(to players: [Player]) {
+        let deadNumbers = players.enumerated()
+            .filter { !$0.element.isAlive }
+            .map { UInt8($0.offset + 1) }
+
+        guard !deadNumbers.isEmpty else { return }
+
+        forEachAlivePlayer(players) { player in
+            for number in deadNumbers {
+                send(.playerDied(targetID: number), to: player)
             }
         }
     }
@@ -94,73 +118,110 @@ final class WatchCommandManager {
         }
     }
 
-    func sendMafiaTurn(to players: [Player]) {
+    func sendMafiaTurn(to players: [Player], seconds: Int = GameTime.mafia) {
         sendRoleTurn(
             to: players,
             activeRole: .mafia,
-            activeKind: .mafiaTurn
+            activeKind: .mafiaTurn,
+            seconds: seconds
         )
     }
 
-    func sendPoliceTurn(to players: [Player]) {
+    func sendPoliceTurn(to players: [Player], seconds: Int = GameTime.police) {
         sendRoleTurn(
             to: players,
             activeRole: .police,
-            activeKind: .policeTurn
+            activeKind: .policeTurn,
+            seconds: seconds
         )
     }
 
-    func sendDoctorTurn(to players: [Player]) {
+    func sendDoctorTurn(to players: [Player], seconds: Int = GameTime.doctor) {
         sendRoleTurn(
             to: players,
             activeRole: .doctor,
-            activeKind: .doctorTurn
+            activeKind: .doctorTurn,
+            seconds: seconds
         )
     }
 
+    /// 수사 결과 — targetID에 수사 대상 번호를 실어 워치가 대상 색상을 표시
     func sendPoliceResult(
+        target: Player,
         isMafia: Bool,
-        to players: [Player]
+        in players: [Player]
     ) {
-        guard let (police, targetID) = playerWithID(
+        guard let (police, _) = playerWithID(
             for: .police,
             in: players
         ) else { return }
 
         send(
             .policeResult(
-                targetID: targetID,
+                targetID: number(of: target, in: players),
                 isMafia: isMafia
             ),
             to: police
         )
     }
 
-    func sendVote(to players: [Player]) {
+    func sendVote(to players: [Player], seconds: Int = GameTime.vote) {
+        sendDeadList(to: players)
+
         forEachAlivePlayer(players) { player in
-            send(.vote(), to: player)
+            send(.vote(seconds: UInt8(clamping: seconds)), to: player)
         }
     }
 
-    func sendFinalDefense(to players: [Player]) {
+    func sendFinalDefense(
+        defendant: Player,
+        to players: [Player],
+        seconds: Int = GameTime.finalDefense
+    ) {
+        let defendantID = number(of: defendant, in: players)
+
         forEachAlivePlayer(players) { player in
-            send(.finalDefense(), to: player)
+            send(
+                .finalDefense(
+                    defendantID: defendantID,
+                    seconds: UInt8(clamping: seconds)
+                ),
+                to: player
+            )
         }
     }
 
-    func sendExecutionVote(to players: [Player]) {
+    func sendExecutionVote(
+        defendant: Player,
+        to players: [Player],
+        seconds: Int = GameTime.executionVote
+    ) {
+        let defendantID = number(of: defendant, in: players)
+
         forEachAlivePlayer(players) { player in
-            send(.executionVote(), to: player)
+            send(
+                .executionVote(
+                    defendantID: defendantID,
+                    seconds: UInt8(clamping: seconds)
+                ),
+                to: player
+            )
         }
     }
 
     /// 처형 결과는 이 시점 생존자(변론자 포함)에게만 — 사망자는 사망자 플로우 유지
-    func sendExecutionResult(didExecute: Bool, to players: [Player]) {
+    func sendExecutionResult(
+        defendant: Player,
+        didExecute: Bool,
+        to players: [Player]
+    ) {
+        let defendantID = number(of: defendant, in: players)
+
         forEachAlivePlayer(players) { player in
             send(
-                BLECommand(
-                    kind: .executionResult,
-                    value: didExecute ? 1 : 0
+                .executionResult(
+                    defendantID: defendantID,
+                    didExecute: didExecute
                 ),
                 to: player
             )
@@ -212,8 +273,11 @@ private extension WatchCommandManager {
     func sendRoleTurn(
         to players: [Player],
         activeRole: Role,
-        activeKind: BLECommandKind
+        activeKind: BLECommandKind,
+        seconds: Int
     ) {
+        sendDeadList(to: players)
+
         forEachPlayer(players) { player, targetID in
             // 사망한 직업자는 턴을 받으면 안 됨 — 사망 판정이 우선
             guard player.isAlive else {
@@ -225,13 +289,17 @@ private extension WatchCommandManager {
                 send(
                     BLECommand(
                         kind: activeKind,
-                        targetID: targetID
+                        targetID: targetID,
+                        value: UInt8(clamping: seconds)
                     ),
                     to: player
                 )
             } else {
                 send(
-                    .nightWaiting(targetID: targetID),
+                    .nightWaiting(
+                        targetID: targetID,
+                        activeRole: activeRole
+                    ),
                     to: player
                 )
             }

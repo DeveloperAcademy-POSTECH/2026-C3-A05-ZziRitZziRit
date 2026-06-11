@@ -164,11 +164,31 @@ final class BLEViewModel {
             return
         }
 
-        // 밤 선택 화면은 전체 색상 명단이 있어야 그릴 수 있음
+        // 밤 선택 화면은 전체 색상 명단과 사망 상태가 있어야 그릴 수 있음
         watchCommandManager.sendPlayerColors(
             to: game.players,
             watch: player
         )
+
+        if let role = player.role {
+            // 자기 번호/역할 복원 (워치 자기 식별용)
+            watchCommandManager.send(
+                .roleResult(targetID: playerNumber, role: role),
+                to: player
+            )
+        }
+
+        for (index, rosterPlayer) in game.players.enumerated() where !rosterPlayer.isAlive {
+            watchCommandManager.send(
+                .playerDied(targetID: UInt8(index + 1)),
+                to: player
+            )
+        }
+
+        let remaining = game.timerManager.remainingTime
+        let defendantID = game.finalDefensePlayer.map {
+            watchCommandManager.number(of: $0, in: game.players)
+        } ?? 0
 
         switch state {
         case is RoleAssigningState:
@@ -185,31 +205,49 @@ final class BLEViewModel {
             watchCommandManager.send(.dayTime(), to: player)
 
         case is MafiaState:
-            sendNightTurn(.mafia, kind: .mafiaTurn, player: player, number: playerNumber)
+            sendNightTurn(.mafia, kind: .mafiaTurn, player: player, number: playerNumber, seconds: remaining)
 
         case is PoliceState:
-            sendNightTurn(.police, kind: .policeTurn, player: player, number: playerNumber)
+            sendNightTurn(.police, kind: .policeTurn, player: player, number: playerNumber, seconds: remaining)
 
         case is DoctorState:
-            sendNightTurn(.doctor, kind: .doctorTurn, player: player, number: playerNumber)
+            sendNightTurn(.doctor, kind: .doctorTurn, player: player, number: playerNumber, seconds: remaining)
 
         case is NightState:
-            watchCommandManager.send(.nightWaiting(targetID: playerNumber), to: player)
+            watchCommandManager.send(
+                .nightWaiting(targetID: playerNumber, activeRole: .mafia),
+                to: player
+            )
 
         case is VoteState:
-            watchCommandManager.send(.vote(), to: player)
+            watchCommandManager.send(
+                .vote(seconds: UInt8(clamping: remaining)),
+                to: player
+            )
 
         case is FinalDefenseState:
-            watchCommandManager.send(.finalDefense(), to: player)
+            watchCommandManager.send(
+                .finalDefense(
+                    defendantID: defendantID,
+                    seconds: UInt8(clamping: remaining)
+                ),
+                to: player
+            )
 
         case is ExecutionVoteState:
-            watchCommandManager.send(.executionVote(), to: player)
+            watchCommandManager.send(
+                .executionVote(
+                    defendantID: defendantID,
+                    seconds: UInt8(clamping: remaining)
+                ),
+                to: player
+            )
 
         case is ExecutionResultState:
             watchCommandManager.send(
-                BLECommand(
-                    kind: .executionResult,
-                    value: game.voteManager.shouldBeExecuted ? 1 : 0
+                .executionResult(
+                    defendantID: defendantID,
+                    didExecute: game.voteManager.shouldBeExecuted
                 ),
                 to: player
             )
@@ -230,16 +268,21 @@ final class BLEViewModel {
         _ activeRole: Role,
         kind: BLECommandKind,
         player: Player,
-        number: UInt8
+        number: UInt8,
+        seconds: Int
     ) {
         if player.role == activeRole {
             watchCommandManager.send(
-                BLECommand(kind: kind, targetID: number),
+                BLECommand(
+                    kind: kind,
+                    targetID: number,
+                    value: UInt8(clamping: seconds)
+                ),
                 to: player
             )
         } else {
             watchCommandManager.send(
-                .nightWaiting(targetID: number),
+                .nightWaiting(targetID: number, activeRole: activeRole),
                 to: player
             )
         }

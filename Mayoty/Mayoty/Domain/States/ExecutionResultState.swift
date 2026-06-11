@@ -16,6 +16,7 @@ struct ExecutionResultState: GameState {
         }
 
         game.watchCommandManager.sendExecutionResult(
+            defendant: finalDefensePlayer,
             didExecute: game.voteManager.shouldBeExecuted,
             to: game.players
         )

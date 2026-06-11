@@ -15,7 +15,10 @@ struct FinalDefenseState: GameState {
             return
         }
 
-        game.watchCommandManager.sendFinalDefense(to: game.players)
+        game.watchCommandManager.sendFinalDefense(
+            defendant: finalDefensePlayer,
+            to: game.players
+        )
 
         // VoteState exit의 stopAll 이후에 시작해야 BGM이 살아남음
         game.soundManager.playFinalDefenseBgm()

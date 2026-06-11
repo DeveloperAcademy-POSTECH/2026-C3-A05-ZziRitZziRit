@@ -31,6 +31,32 @@ final class WatchCommandStore {
     /// 대기 화면의 접속 인원 표시에 사용
     var waitingCount: Int = 0
 
+    /// 자기 자신의 플레이어 번호 (roleResult의 targetID) — 자기 표시/차단용
+    var myPlayerNumber: Int = 0
+
+    /// 밤 대기 화면에 표시할 "지금 진행 중인 직업"
+    var activeNightRole: Role = .mafia
+
+    /// 현재 페이즈 제한 시간(초) — 선택 화면 진행 바 동기화용
+    var phaseSeconds: Int = 0
+
+    /// 최후 변론/찬반 투표/처형 결과의 대상 플레이어 번호
+    var defendantNumber: Int = 0
+
+    /// 경찰 수사 결과의 대상 플레이어 번호
+    var investigatedNumber: Int = 0
+
+    func player(number: Int) -> Player? {
+        guard number >= 1, number <= players.count else { return nil }
+        return players[number - 1]
+    }
+
+    var defendant: Player? { player(number: defendantNumber) }
+
+    var isMeDefendant: Bool {
+        defendantNumber != 0 && defendantNumber == myPlayerNumber
+    }
+
     func handle(_ command: BLECommand) {
         switch command.kind {
         case .connectionSucceeded:
@@ -66,39 +92,53 @@ final class WatchCommandStore {
 
         case .roleResult:
             role = Role(bleValue: command.value) ?? .citizen
+            myPlayerNumber = Int(command.targetID)
             currentScreen = .roleResult
 
         case .dayTime:
             currentScreen = .dayTime
 
         case .mafiaTurn:
+            phaseSeconds = Int(command.value)
             currentScreen = .mafiaTurn
 
         case .policeTurn:
+            phaseSeconds = Int(command.value)
             currentScreen = .policeTurn
 
         case .doctorTurn:
+            phaseSeconds = Int(command.value)
             currentScreen = .doctorTurn
 
         case .nightWaiting:
+            activeNightRole = Role(bleValue: command.value) ?? .mafia
             currentScreen = .nightTime
 
         case .policeResult:
             policeResultIsMafia = command.value == 1
+            investigatedNumber = Int(command.targetID)
             currentScreen = .policeResult
 
         case .vote:
+            phaseSeconds = Int(command.value)
             currentScreen = .vote
 
         case .finalDefense:
+            defendantNumber = Int(command.targetID)
             currentScreen = .finalDefense
 
         case .executionVote:
+            defendantNumber = Int(command.targetID)
+            phaseSeconds = Int(command.value)
             currentScreen = .executionVote
 
         case .executionResult:
+            defendantNumber = Int(command.targetID)
             executionResult = command.value == 1 ? .dead : .survive
             currentScreen = .executionResult
+
+        case .playerDied:
+            markPlayerDead(targetID: command.targetID)
 
         case .gameEnded:
             winner = Team(bleValue: command.value) ?? .citizens
@@ -127,6 +167,11 @@ final class WatchCommandStore {
         role = .citizen
         policeResultIsMafia = false
         executionResult = .survive
+        myPlayerNumber = 0
+        activeNightRole = .mafia
+        phaseSeconds = 0
+        defendantNumber = 0
+        investigatedNumber = 0
         currentScreen = .waiting
     }
 
@@ -162,6 +207,20 @@ final class WatchCommandStore {
         players[index] = Player(
             color: players[index].color,
             role: role
+        )
+    }
+
+    private func markPlayerDead(targetID: UInt8) {
+        let index = Int(targetID) - 1
+        guard index >= 0 else { return }
+
+        ensurePlayerCapacity(through: index)
+
+        // 새 인스턴스로 교체해야 @Observable 배열 변경이 감지됨
+        players[index] = Player(
+            color: players[index].color,
+            role: players[index].role,
+            isAlive: false
         )
     }
 

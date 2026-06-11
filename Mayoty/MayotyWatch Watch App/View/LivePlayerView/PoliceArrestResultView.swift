@@ -9,14 +9,25 @@ import SwiftUI
 
 struct PoliceArrestResultView: View {
     let result: PoliceArrest
-    
+
+    /// 수사 대상 — 누구를 수사한 결과인지 표시
+    var target: Player?
+
     var body: some View {
         MafiaLogoView{
-            VStack {
+            VStack(spacing: 8) {
                 Image(systemName: "person.fill")
                     .resizable()
-                    .frame(width:56,height:56)
+                    .frame(width: 56, height: 56)
+                    .foregroundStyle(target?.color?.uiColor ?? .white)
                     .accessibilityHidden(true)
+
+                if let color = target?.color {
+                    Text("\(color.displayName) 플레이어")
+                        .font(.headline)
+                        .foregroundStyle(color.uiColor)
+                }
+
                 Text("검거 \(result.resultText)")
                     .foregroundStyle(result.resultColor)
                     .font(.title2.bold())
@@ -29,5 +40,8 @@ struct PoliceArrestResultView: View {
 }
 
 #Preview {
-    PoliceArrestResultView(result: .success)
+    PoliceArrestResultView(
+        result: .success,
+        target: Player(color: .pink)
+    )
 }

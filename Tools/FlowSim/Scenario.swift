@@ -217,6 +217,15 @@ func scenario1_happyPath(_ checker: Checker) async {
     check(game.players.filter { $0.id != mafia.id }
         .allSatisfy { world.agent(for: $0).store.currentScreen == .nightTime },
           "나머지 워치는 밤 대기 화면")
+    check(game.players.filter { $0.id != mafia.id }
+        .allSatisfy { world.agent(for: $0).store.activeNightRole == .mafia },
+          "대기 워치는 '마피아 지목중' 표시 (자기 직업 아님)")
+    check(world.agent(for: mafia).store.phaseSeconds == GameTime.mafia,
+          "마피아 워치 진행 바가 실제 페이즈 시간과 동기화")
+    check(game.players.allSatisfy { player in
+        world.agent(for: player).store.myPlayerNumber
+            == Int(world.number(of: player, in: game))
+    }, "각 워치가 자기 플레이어 번호를 인지")
 
     world.answer(police, .mafiaSelected(playerID: world.number(of: victim, in: game)))
     await settle(0.2)
@@ -237,6 +246,9 @@ func scenario1_happyPath(_ checker: Checker) async {
     check(world.agents.filter { $0.count(of: .policeResult) > 0 }.count == 1,
           "수사 결과가 다른 워치에 비노출")
     check(world.agent(for: police).store.policeResultIsMafia, "수사 결과: 마피아 맞음")
+    check(world.agent(for: police).store.investigatedNumber
+          == Int(world.number(of: mafia, in: game)),
+          "수사 결과 화면에 대상(누구를 수사했는지) 표시")
 
     print("── 1-5. 의사의 밤 → 토론(사망 발표) ──")
     check(game.currentState is DoctorState, "DoctorState 진입")
@@ -288,6 +300,15 @@ func scenario1_happyPath(_ checker: Checker) async {
     check(game.currentState is FinalDefenseState, "전원 투표 → 타임아웃 없이 조기 종료")
     check(game.finalDefensePlayer?.id == mafia.id, "최다 득표자 = 마피아")
     check(world.agent(for: victim).store.currentScreen == .dead, "투표/변론 화면이 사망자에게 비전달")
+    check(game.players.filter { $0.isAlive }.allSatisfy {
+        world.agent(for: $0).store.defendantNumber == Int(world.number(of: mafia, in: game))
+    }, "변론 화면에 변론자(누구인지) 표시")
+    check(game.players.filter { $0.isAlive && $0.id != victim.id }.allSatisfy { player in
+        let store = world.agent(for: player).store
+        let victimIndex = Int(world.number(of: victim, in: game)) - 1
+        return store.players.indices.contains(victimIndex)
+            && store.players[victimIndex].isAlive == false
+    }, "생존자 워치 명단에 사망자 표시 동기화")
 
     print("── 1-7. 최후 변론 → 처형 ──")
     await settle(1.4)

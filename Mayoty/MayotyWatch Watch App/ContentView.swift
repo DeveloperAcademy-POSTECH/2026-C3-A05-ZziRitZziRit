@@ -67,30 +67,39 @@ struct ContentView: View {
         case .vote:
             RoleNightView(
                 role: .citizen,
-                viewModel: viewModel
+                viewModel: viewModel,
+                isVote: true
             )
-            
+
         case .nightTime:
-            RoleSelectingView(role: viewModel.commandStore.role)
+            // 자기 직업이 아니라 "지금 진행 중인 직업"을 표시
+            RoleSelectingView(role: viewModel.commandStore.activeNightRole)
             
         case .policeResult:
             PoliceArrestResultView(
                 result: viewModel.commandStore.policeResultIsMafia
                 ? .success
-                : .fail
+                : .fail,
+                target: viewModel.commandStore.player(
+                    number: viewModel.commandStore.investigatedNumber
+                )
             )
-            
+
         case .finalDefense:
-            FinalDefenseView()
-            
+            FinalDefenseView(
+                defendant: viewModel.commandStore.defendant,
+                isMe: viewModel.commandStore.isMeDefendant
+            )
+
         case .executionVote:
             ExecutionVoteView(
                 viewModel: viewModel
             )
-            
+
         case .executionResult:
             ExecutionResultView(
-                excutionResult: viewModel.commandStore.executionResult
+                excutionResult: viewModel.commandStore.executionResult,
+                defendant: viewModel.commandStore.defendant
             )
             
         case .gameEnded:

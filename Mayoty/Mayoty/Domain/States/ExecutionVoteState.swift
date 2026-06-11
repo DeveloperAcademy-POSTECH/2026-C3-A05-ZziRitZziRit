@@ -9,7 +9,16 @@ struct ExecutionVoteState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("👍 처형 찬반 투표 시작")
 
-        game.watchCommandManager.sendExecutionVote(to: game.players)
+        guard let finalDefensePlayer = game.finalDefensePlayer else {
+            GameLogger.event("⚠️ 최후 변론자 없음 — 토론으로 복귀")
+            game.changeState(to: DiscussionState())
+            return
+        }
+
+        game.watchCommandManager.sendExecutionVote(
+            defendant: finalDefensePlayer,
+            to: game.players
+        )
 
         game.soundManager.playExecutionVoteStartSound(game: game)
 

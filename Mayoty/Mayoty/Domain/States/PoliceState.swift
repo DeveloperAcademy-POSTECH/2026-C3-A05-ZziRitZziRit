@@ -36,8 +36,9 @@ struct PoliceState: GameState {
         )
 
         game.watchCommandManager.sendPoliceResult(
+            target: target,
             isMafia: isMafia,
-            to: game.players
+            in: game.players
         )
 
         transitionToDoctor(game: game)

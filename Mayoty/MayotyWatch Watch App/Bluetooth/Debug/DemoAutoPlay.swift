@@ -60,8 +60,28 @@ enum DemoAutoPlay {
         }
     }
 
+    /// 생존자 중에서 대상 선택 (투표는 자기 자신 제외 — iPhone이 거부함)
+    private static func pickTarget(
+        viewModel: WatchViewModel,
+        excludeSelf: Bool
+    ) -> UInt8 {
+        let store = viewModel.commandStore
+        var candidates: [UInt8] = []
+
+        for (index, player) in store.players.enumerated() where player.isAlive {
+            let number = UInt8(index + 1)
+            if excludeSelf, Int(number) == store.myPlayerNumber { continue }
+            candidates.append(number)
+        }
+
+        return candidates.randomElement() ?? UInt8.random(in: 1...5)
+    }
+
     private static func act(on screen: WatchScreen, viewModel: WatchViewModel) {
-        let target = UInt8.random(in: 1...5)
+        let target = pickTarget(
+            viewModel: viewModel,
+            excludeSelf: screen == .vote
+        )
 
         switch screen {
         case .mafiaTurn:

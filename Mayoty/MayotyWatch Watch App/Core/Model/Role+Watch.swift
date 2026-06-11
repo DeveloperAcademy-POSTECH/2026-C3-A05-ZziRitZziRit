@@ -23,6 +23,16 @@ extension Role {
             case .citizen: "죽일 사람을 지목하세요"
         }
     }
+
+    /// 밤 대기 화면 — "지금 누구의 턴이 진행 중인지" 표시용
+    var nightActionLabel: String {
+        switch self {
+            case .mafia: "마피아 지목중"
+            case .police: "경찰 수사중"
+            case .doctor: "의사 치료중"
+            case .citizen: "진행중"
+        }
+    }
 }
 
 extension Role {

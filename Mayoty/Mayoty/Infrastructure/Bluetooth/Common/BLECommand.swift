@@ -38,7 +38,20 @@ enum BLECommandKind: UInt8 {
 
     /// 특정 플레이어의 직업 공개 — 사망자의 진실 확인 화면용 (타깃 전송 전용)
     case playerRole = 20
+
+    /// 특정 플레이어 사망 상태 동기화 — 생존자 워치의 명단 표시용
+    /// (targetID = 사망한 플레이어 번호)
+    case playerDied = 21
 }
+
+// 페이로드 규약 (3바이트: kind, targetID, value)
+// - mafiaTurn/policeTurn/doctorTurn : value = 남은 시간(초)
+// - nightWaiting                    : value = 진행 중인 직업(bleValue)
+// - vote                            : value = 남은 시간(초)
+// - finalDefense / executionVote    : targetID = 변론자 번호, value = 남은 시간(초)
+// - executionResult                 : targetID = 변론자 번호, value = 처형 여부(1/0)
+// - policeResult                    : targetID = 수사 대상 번호, value = 마피아 여부(1/0)
+// - roleResult                      : targetID = 수신자 자신의 플레이어 번호
 
 struct BLECommand {
     let kind: BLECommandKind
@@ -115,20 +128,22 @@ extension BLECommand {
         BLECommand(kind: .dayTime)
     }
 
-    static func mafiaTurn(targetID: UInt8) -> BLECommand {
+    static func mafiaTurn(targetID: UInt8, seconds: UInt8) -> BLECommand {
         BLECommand(
             kind: .mafiaTurn,
-            targetID: targetID
+            targetID: targetID,
+            value: seconds
         )
     }
 
-    static func policeTurn(targetID: UInt8) -> BLECommand {
+    static func policeTurn(targetID: UInt8, seconds: UInt8) -> BLECommand {
         BLECommand(
             kind: .policeTurn,
-            targetID: targetID
+            targetID: targetID,
+            value: seconds
         )
     }
-    
+
     static func policeResult(
         targetID: UInt8,
         isMafia: Bool
@@ -140,30 +155,67 @@ extension BLECommand {
         )
     }
 
-    static func doctorTurn(targetID: UInt8) -> BLECommand {
+    static func doctorTurn(targetID: UInt8, seconds: UInt8) -> BLECommand {
         BLECommand(
             kind: .doctorTurn,
-            targetID: targetID
+            targetID: targetID,
+            value: seconds
         )
     }
 
-    static func nightWaiting(targetID: UInt8) -> BLECommand {
+    static func nightWaiting(
+        targetID: UInt8,
+        activeRole: Role
+    ) -> BLECommand {
         BLECommand(
             kind: .nightWaiting,
-            targetID: targetID
+            targetID: targetID,
+            value: activeRole.bleValue
         )
     }
 
-    static func vote() -> BLECommand {
-        BLECommand(kind: .vote)
+    static func vote(seconds: UInt8) -> BLECommand {
+        BLECommand(kind: .vote, value: seconds)
     }
 
-    static func finalDefense() -> BLECommand {
-        BLECommand(kind: .finalDefense)
+    static func finalDefense(
+        defendantID: UInt8,
+        seconds: UInt8
+    ) -> BLECommand {
+        BLECommand(
+            kind: .finalDefense,
+            targetID: defendantID,
+            value: seconds
+        )
     }
 
-    static func executionVote() -> BLECommand {
-        BLECommand(kind: .executionVote)
+    static func executionVote(
+        defendantID: UInt8,
+        seconds: UInt8
+    ) -> BLECommand {
+        BLECommand(
+            kind: .executionVote,
+            targetID: defendantID,
+            value: seconds
+        )
+    }
+
+    static func executionResult(
+        defendantID: UInt8,
+        didExecute: Bool
+    ) -> BLECommand {
+        BLECommand(
+            kind: .executionResult,
+            targetID: defendantID,
+            value: didExecute ? 1 : 0
+        )
+    }
+
+    static func playerDied(targetID: UInt8) -> BLECommand {
+        BLECommand(
+            kind: .playerDied,
+            targetID: targetID
+        )
     }
 
     static func gameEnded(winner: Team) -> BLECommand {

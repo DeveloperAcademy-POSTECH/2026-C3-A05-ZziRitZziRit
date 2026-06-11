@@ -11,7 +11,10 @@ import SwiftUI
 struct RoleNightView: View {
     let role: Role
     let viewModel: WatchViewModel
-    
+
+    /// 낮 투표 화면 여부 (문구·자기 투표 차단이 달라짐)
+    var isVote: Bool = false
+
     @State private var selectedPlayerID: UUID? = nil
     @GestureState private var isPressing = false
     @State private var pressProgress: Double = 0
@@ -23,17 +26,40 @@ struct RoleNightView: View {
         viewModel.commandStore.players
     }
 
+    private var promptText: String {
+        isVote ? "처형할 사람에게 투표하세요" : role.selectingText
+    }
+
+    /// 죽은 플레이어와 (투표에서는) 자기 자신은 선택 불가 — iPhone도 거부함
+    private func isSelectable(index: Int, player: Player) -> Bool {
+        guard player.isAlive else { return false }
+
+        if isVote, index + 1 == viewModel.commandStore.myPlayerNumber {
+            return false
+        }
+
+        return true
+    }
+
+    private func disabledLabel(index: Int) -> String {
+        index + 1 == viewModel.commandStore.myPlayerNumber ? "나" : "사망"
+    }
+
     @State private var downloadAmount : Double = 100
-    
+
     private func runCountdown() async {
+        // iPhone이 보내준 페이즈 제한 시간에 진행 바를 동기화
+        let totalSeconds = max(5, viewModel.commandStore.phaseSeconds)
+        let tick = Double(totalSeconds) / 100.0
+
         while downloadAmount > 0 {
-            try? await Task.sleep(for: .milliseconds(100))
+            try? await Task.sleep(for: .seconds(tick))
             if Task.isCancelled { return }
-            
-            withAnimation(.linear(duration: 0.1)) {
+
+            withAnimation(.linear(duration: tick)) {
                 downloadAmount -= 1
             }
-            
+
             let value = Int(downloadAmount)
             if value <= 50, value > 0, value % 10 == 0 {
                 try? await HapticPattern.timeRemaining.play()
@@ -81,7 +107,7 @@ struct RoleNightView: View {
     var body: some View {
         MafiaLogoView {
             VStack{
-                    Text(role.selectingText)
+                    Text(promptText)
                         .font(.headline.bold())
                 
                 VStack {
@@ -158,7 +184,7 @@ struct RoleNightView: View {
                                             pressProgress = 0
                                         }
                                     }
-                                } else {
+                                } else if isSelectable(index: index, player: player) {
                                     SubButtonView(player: player)
                                         .onTapGesture {
                                             withAnimation(.easeInOut(duration:0.15)) {
@@ -166,6 +192,20 @@ struct RoleNightView: View {
                                                 confirmedPlayerID = nil
                                                 pressProgress = 0
                                             }
+                                        }
+                                } else {
+                                    // 죽은 플레이어/자기 자신 — 선택 불가 표시
+                                    SubButtonView(player: player)
+                                        .opacity(0.35)
+                                        .overlay(alignment: .trailing) {
+                                            Text(disabledLabel(index: index))
+                                                .font(.footnote.bold())
+                                                .foregroundStyle(
+                                                    disabledLabel(index: index) == "사망"
+                                                        ? .red
+                                                        : .secondary
+                                                )
+                                                .padding(.trailing, 12)
                                         }
                                 }
                             }

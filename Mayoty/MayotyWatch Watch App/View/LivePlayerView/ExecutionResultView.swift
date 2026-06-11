@@ -9,14 +9,25 @@ import SwiftUI
 
 struct ExecutionResultView: View {
     let excutionResult: ExecutionResult
-    
+
+    /// 처형 대상 — 누구의 결과인지 표시
+    var defendant: Player?
+
     var body: some View {
         MafiaLogoView {
-            VStack {
+            VStack(spacing: 8) {
                 Image(systemName: "person.fill")
                     .resizable()
-                    .frame(width: 80, height: 80)
-//                    .foregroundStyle(.white) //최다 지목된 플레이어 색깔
+                    .frame(width: 70, height: 70)
+                    .foregroundStyle(defendant?.color?.uiColor ?? .white)
+                    .accessibilityHidden(true)
+
+                if let color = defendant?.color {
+                    Text("\(color.displayName) 플레이어")
+                        .font(.headline)
+                        .foregroundStyle(color.uiColor)
+                }
+
                 Text(excutionResult.textResult)
                     .foregroundStyle(excutionResult.textColor)
                     .font(.title)
@@ -26,5 +37,8 @@ struct ExecutionResultView: View {
 }
 
 #Preview {
-    ExecutionResultView(excutionResult: .survive)
+    ExecutionResultView(
+        excutionResult: .survive,
+        defendant: Player(color: .pink)
+    )
 }
