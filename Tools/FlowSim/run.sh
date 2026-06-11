@@ -41,6 +41,7 @@ xcrun swiftc -swift-version 5 -o "$OUT" \
   "$APP/Infrastructure/Bluetooth/Common/BLECommand.swift" \
   "$APP/Infrastructure/Bluetooth/Common/BLEAnswer.swift" \
   "$APP/Infrastructure/Bluetooth/Peripheral/WatchCommandManager.swift" \
+  "$APP/Infrastructure/Bluetooth/Peripheral/BLECommandQueue.swift" \
   "$APP/Infrastructure/Bluetooth/Peripheral/BLEViewModel.swift" \
   "$WATCH/Core/WatchCommandStore.swift" \
   "$WATCH/Core/Model/WatchScreen.swift" \

@@ -18,19 +18,32 @@ import Foundation
 
 enum GameTime {
     // 타이머로만 진행되는 페이즈: 1초로 단축
-    static let roleAssigning = 1
-    static let introduction = 1
-    static let discussion = 1
-    static let finalDefense = 1
-    static let executionResult = 1
+    static var roleAssigning = 1
+    static var introduction = 1
+    static var discussion = 1
+    static var finalDefense = 1
+    static var executionResult = 1
 
     // 워치 답변으로 진행되는 페이즈: 시나리오의 답변이 타임아웃보다
     // 먼저 처리되도록 충분히 길게 (조기 종료 검증이 진짜가 되도록)
-    static let mafia = 30
-    static let police = 30
-    static let doctor = 30
-    static let vote = 30
-    static let executionVote = 30
+    // 시나리오에 따라 가변 (타임아웃 시나리오는 1초로 전환)
+    static var mafia = 30
+    static var police = 30
+    static var doctor = 30
+    static var vote = 30
+    static var executionVote = 30
+
+    static func useActionDrivenTimes() {
+        roleAssigning = 1; introduction = 1; discussion = 1
+        finalDefense = 1; executionResult = 1
+        mafia = 30; police = 30; doctor = 30; vote = 30; executionVote = 30
+    }
+
+    static func useAllShortTimes() {
+        roleAssigning = 1; introduction = 1; discussion = 1
+        finalDefense = 1; executionResult = 1
+        mafia = 1; police = 1; doctor = 1; vote = 1; executionVote = 1
+    }
 }
 
 // MARK: - GameAudioManager (즉시 반환)
@@ -43,6 +56,19 @@ final class GameAudioManager {
     private(set) var playedBgms: [String] = []
 
     private init() {}
+
+    func reset() {
+        playedNarrations = []
+        playedBgms = []
+    }
+
+    func count(ofNarration name: String) -> Int {
+        playedNarrations.filter { $0 == name }.count
+    }
+
+    func count(ofBgm name: String) -> Int {
+        playedBgms.filter { $0 == name }.count
+    }
 
     func setupAudioSession() {}
 
