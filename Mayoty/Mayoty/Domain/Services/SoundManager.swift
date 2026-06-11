@@ -74,7 +74,7 @@ final class SoundManager {
         }
 
         GameAudioManager.shared.playNarration(
-            named: "discussion-\(color.rawValue)Dead"
+            named: "discussionEnded-\(color.rawValue)Dead"
         )
         
         GameAudioManager.shared.playBGM(named: "discussionBgm")
