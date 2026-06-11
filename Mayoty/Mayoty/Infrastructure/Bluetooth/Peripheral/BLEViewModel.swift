@@ -101,6 +101,16 @@ final class BLEViewModel {
     private func watchConnected(_ id: UUID) {
         let isNew = !connectedWatchIDs.contains(id)
 
+        // 정원(5명) 초과 신규 워치는 거절 — 광고가 항시 유지되므로 6번째도
+        // 구독은 가능하지만, 등록하면 로비 시작 조건(정확히 5명)이 영구히 깨짐
+        if isNew,
+           player(for: id) == nil,
+           connectedWatchIDs.count >= GameRule.requiredPlayerCount {
+            addLog("Watch rejected (slot full): \(id.uuidString.prefix(8))")
+            watchCommandManager.send(.connectionFailed(), to: id)
+            return
+        }
+
         insertWatch(id)
 
         guard isNew else { return }
@@ -259,7 +269,8 @@ final class BLEViewModel {
             guard let sender = player(for: id),
                   sender.role == .mafia,
                   sender.isAlive,
-                  let target = player(for: answer.value)
+                  let target = player(for: answer.value),
+                  target.isAlive
             else {
                 addLog("mafiaSelected rejected: \(id.uuidString.prefix(8))")
                 return
@@ -271,7 +282,8 @@ final class BLEViewModel {
             guard let sender = player(for: id),
                   sender.role == .police,
                   sender.isAlive,
-                  let target = player(for: answer.value)
+                  let target = player(for: answer.value),
+                  target.isAlive
             else {
                 addLog("policeSelected rejected: \(id.uuidString.prefix(8))")
                 return
@@ -283,7 +295,8 @@ final class BLEViewModel {
             guard let sender = player(for: id),
                   sender.role == .doctor,
                   sender.isAlive,
-                  let target = player(for: answer.value)
+                  let target = player(for: answer.value),
+                  target.isAlive
             else {
                 addLog("doctorSelected rejected: \(id.uuidString.prefix(8))")
                 return

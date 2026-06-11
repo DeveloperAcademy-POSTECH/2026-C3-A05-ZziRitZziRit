@@ -44,8 +44,11 @@ final class WatchCommandManager {
         send(.waitingPlayers(count: UInt8(clamping: count)))
     }
 
-    func sendRoleAssigning() {
-        send(.roleAssigning())
+    /// 게임 참가자에게만 — 거절된(미등록) 구독 워치가 게임 화면으로 끌려가지 않도록
+    func sendRoleAssigning(to players: [Player]) {
+        for player in players {
+            send(.roleAssigning(), to: player)
+        }
     }
 
     func sendRoleResults(to players: [Player]) {
@@ -164,8 +167,11 @@ final class WatchCommandManager {
         }
     }
 
-    func sendGameEnded(winner: Team) {
-        send(.gameEnded(winner: winner))
+    /// 사망자 포함 전 참가자에게 — 단 거절된(미등록) 구독 워치는 제외
+    func sendGameEnded(winner: Team, to players: [Player]) {
+        for player in players {
+            send(.gameEnded(winner: winner), to: player)
+        }
     }
 
     /// 전체 색상 명단은 모든 Watch가 선택 화면에 사용하므로 브로드캐스트

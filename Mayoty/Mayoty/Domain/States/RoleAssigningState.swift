@@ -9,7 +9,7 @@ struct RoleAssigningState: GameState {
     func enter(game: MafiaGame) {
         GameLogger.event("✅ 역할 배정 시작")
 
-        game.watchCommandManager.sendRoleAssigning()
+        game.watchCommandManager.sendRoleAssigning(to: game.players)
 
         game.soundManager.playRoleAssigningSounds()
 

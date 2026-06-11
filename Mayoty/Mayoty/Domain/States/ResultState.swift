@@ -12,7 +12,10 @@ struct ResultState: GameState {
             return
         }
 
-        game.watchCommandManager.sendGameEnded(winner: winner)
+        game.watchCommandManager.sendGameEnded(
+            winner: winner,
+            to: game.players
+        )
 
         GameLogger.result(
             winner == .mafia
