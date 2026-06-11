@@ -69,7 +69,7 @@ final class SoundManager {
             let deadPlayer = game.players.first(where: { !$0.isAlive }),
             let color = deadPlayer.color
         else {
-            GameAudioManager.shared.playNarration(named: "discussion-noDead")
+            GameAudioManager.shared.playNarration(named: "discussionEnded-NobodyDead")
             return
         }
 
