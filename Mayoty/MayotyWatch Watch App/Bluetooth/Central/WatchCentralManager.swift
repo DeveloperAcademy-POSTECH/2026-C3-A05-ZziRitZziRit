@@ -35,6 +35,15 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
     let events: AsyncStream<WatchConnectionState>
     private let continuation: AsyncStream<WatchConnectionState>.Continuation
     
+#if DEBUG
+    /// 시뮬레이터 데모용 TCP 브리지 (-blebridge 런치 인자)
+    private var bridge: BLEBridgeClient?
+
+    private var isBridgeMode: Bool {
+        ProcessInfo.processInfo.arguments.contains("-blebridge")
+    }
+#endif
+
     init(commandStore: WatchCommandStore) {
         let stream = AsyncStream.makeStream(of: WatchConnectionState.self)
 
@@ -44,11 +53,37 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
 
         super.init()
 
+#if DEBUG
+        if isBridgeMode {
+            startBridge()
+            return
+        }
+#endif
+
         self.centralManager = CBCentralManager(
             delegate: self,
             queue: nil
         )
     }
+
+#if DEBUG
+    private func startBridge() {
+        guard bridge == nil else { return }
+
+        let bridge = BLEBridgeClient()
+
+        bridge.onCommand = { [weak self] command in
+            self?.commandStore.handle(command)
+        }
+
+        bridge.onStateChange = { [weak self] state in
+            self?.continuation.yield(state)
+        }
+
+        bridge.connect()
+        self.bridge = bridge
+    }
+#endif
 
     // MARK: - Bluetooth State
 
@@ -96,6 +131,13 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
 
     /// iPhone Peripheral 검색 시작
     func scan() {
+#if DEBUG
+        if isBridgeMode {
+            bridge?.connect()
+            return
+        }
+#endif
+
         guard centralManager?.state == .poweredOn else {
             GameLogger.bluetooth("블루투스 상태가 올바르지 않음")
             continuation.yield(.bluetoothUnavailable)
@@ -147,6 +189,13 @@ final class WatchCentralManager: NSObject, CBCentralManagerDelegate, CBPeriphera
 
     /// Watch에서 선택한 응답을 iPhone으로 전송
     func send(_ answer: BLEAnswer) {
+#if DEBUG
+        if let bridge {
+            bridge.send(answer)
+            return
+        }
+#endif
+
         guard let answerSender else {
             GameLogger.bluetooth("전송 준비 안 됨. 답변 보관 후 디바운스 재스캔 예약")
 

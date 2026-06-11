@@ -50,9 +50,25 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
         super.init()
     }
 
+#if DEBUG
+    /// 시뮬레이터 데모용 TCP 브리지 (-blebridge 런치 인자)
+    private var bridge: BLEBridgeServer?
+
+    private var isBridgeMode: Bool {
+        ProcessInfo.processInfo.arguments.contains("-blebridge")
+    }
+#endif
+
     /// CBPeripheralManager 생성 — 첫 화면 표시 시점에 호출
     /// (@main 부트스트랩 중 생성하면 시스템 데몬 연결 시점이 너무 일러질 수 있음)
     func activate() {
+#if DEBUG
+        if isBridgeMode {
+            startBridge()
+            return
+        }
+#endif
+
         guard peripheralManager == nil else { return }
 
         GameLogger.bluetooth("PeripheralManager 활성화")
@@ -62,6 +78,33 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
             queue: nil
         )
     }
+
+#if DEBUG
+    private func startBridge() {
+        guard bridge == nil else { return }
+
+        let bridge = BLEBridgeServer()
+
+        bridge.onWatchConnected = { [weak self] id in
+            self?.continuation.yield(.watchConnected(id: id))
+        }
+
+        bridge.onWatchDisconnected = { [weak self] id in
+            self?.continuation.yield(.watchDisconnected(id: id))
+        }
+
+        bridge.onAnswer = { [weak self] id, answer in
+            self?.continuation.yield(.answerReceived(id: id, answer: answer))
+        }
+
+        bridge.start()
+        self.bridge = bridge
+
+        continuation.yield(
+            .bluetoothStateChanged("Bridge", log: "시뮬레이터 TCP 브리지 모드")
+        )
+    }
+#endif
 
     // MARK: - Bluetooth State
 
@@ -277,6 +320,15 @@ final class iPhoneBLEPeripheralManager: NSObject, CBPeripheralManagerDelegate {
     /// iPhone → Watch 명령 전송
     /// - Parameter centralID: 특정 Watch에만 보낼 때 해당 central id, nil이면 전체 브로드캐스트
     func sendCommand(_ command: BLECommand, to centralID: UUID? = nil) {
+#if DEBUG
+        if let bridge {
+            bridge.send(command.data, to: centralID)
+            GameLogger.bluetooth("Command sent (bridge): \(command.kind)")
+            continuation.yield(.log("Command sent: \(command.kind)"))
+            return
+        }
+#endif
+
         let entry = BLECommandQueue.Entry(
             data: command.data,
             centralID: centralID,
