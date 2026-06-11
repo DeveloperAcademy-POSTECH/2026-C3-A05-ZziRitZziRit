@@ -75,19 +75,20 @@ final class GameAudioManager {
         named fileName: String,
         delay seconds: TimeInterval
     ) {
+        setupAudioSession()
+
         narrationTask?.cancel()
         narrationPlayer?.stop()
         narrationPlayer = nil
 
         narrationTask = Task { [weak self] in
             do {
-                try? await Task.sleep(for: .seconds(seconds))
-                guard !Task.isCancelled else { return }
-
-                await self?.playOneNarrationAndWait(named: fileName)
+                try await Task.sleep(for: .seconds(seconds))
             } catch {
                 return
             }
+
+            await self?.playOneNarrationAndWait(named: fileName)
         }
     }
 
@@ -161,12 +162,12 @@ final class GameAudioManager {
         await sleepUntilFinished(player)
     }
 
-    /// 오디오 길이만큼 대기
+    /// 오디오 길이만큼 대기 — Task 취소 시 재생도 함께 중단
     private func sleepUntilFinished(_ player: AVAudioPlayer) async {
         let duration = UInt64(player.duration * 1_000_000_000)
 
         do {
-            try? await Task.sleep(nanoseconds: duration)
+            try await Task.sleep(nanoseconds: duration)
         } catch {
             player.stop()
         }

@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct MayotyApp: App {
+    @State private var dependencies = AppDependencies()
+
     var body: some Scene {
         WindowGroup {
-            GameView()
+            GameView(dependencies: dependencies)
         }
     }
 }

@@ -49,7 +49,7 @@ enum HomeKitLightService {
               )
         else {
             GameLogger.light("\(accessory.name) 색상 characteristic 찾기 실패")
-            completion?(nil)
+            completion?(HomeKitLightError.colorNotSupported)
             return
         }
 
@@ -93,7 +93,7 @@ enum HomeKitLightService {
                 type: HMCharacteristicTypeBrightness
               )
         else {
-            completion?(nil)
+            completion?(HomeKitLightError.brightnessNotSupported)
             return
         }
 

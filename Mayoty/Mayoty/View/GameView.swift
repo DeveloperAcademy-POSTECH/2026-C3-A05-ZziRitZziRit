@@ -8,91 +8,77 @@
 import SwiftUI
 
 struct GameView: View {
-    
-    @State private var game: MafiaGame
-    @State private var bleViewModel: BLEViewModel
+
+    let dependencies: AppDependencies
+
     @State private var didAutoStartGame = false
 
-    private let peripheralManager: iPhoneBLEPeripheralManager
-    private let watchCommandManager: WatchCommandManager
-    
-    init() {
-        let peripheralManager = iPhoneBLEPeripheralManager()
-
-        let watchCommandManager = WatchCommandManager(
-            peripheralManager: peripheralManager
-        )
-
-        let initialGame = MafiaGame(
-            players: [],
-            initialState: WaitingState(),
-            homeKitLightManager: HomeKitLightManager(),
-            watchCommandManager: watchCommandManager
-        )
-        
-        self.peripheralManager = peripheralManager
-        self.watchCommandManager = watchCommandManager
-
-        _game = State(initialValue: initialGame)
-        _bleViewModel = State(
-            initialValue: BLEViewModel(
-                game: initialGame,
-                peripheralManager: peripheralManager
-            )
-        )
+    private var bleViewModel: BLEViewModel {
+        dependencies.bleViewModel
     }
-    
-//        private var connectedPlayers: [Player] {
-//            bleViewModel.connectedWatchIDs.map { id in
-//                Player(
-//                    id: id,
-//                    watchId: id.uuidString
-//                )
-//            }
-//        }
-    
+
+    private var game: MafiaGame {
+        dependencies.bleViewModel.game
+    }
+
     private var connectedPlayers: [Player] {
-        [
-            Player(id: UUID(), watchId: "mock-watch-1"),
-            Player(id: UUID(), watchId: "mock-watch-2"),
-            Player(id: UUID(), watchId: "mock-watch-3"),
-            Player(id: UUID(), watchId: "mock-watch-4"),
-            Player(id: UUID(), watchId: "mock-watch-5")
-        ]
+        bleViewModel.connectedPlayers
     }
-    
+
     private var canStartGame: Bool {
-        connectedPlayers.count >= 3
+        connectedPlayers.count == GameRule.requiredPlayerCount
     }
-    
+
     private func startGameIfNeeded() {
         guard canStartGame else { return }
         guard game.currentState is WaitingState else { return }
         guard !didAutoStartGame else { return }
-        
+
         didAutoStartGame = true
-        
-        game = MafiaGame(
+
+        let newGame = MafiaGame(
             players: connectedPlayers,
             initialState: WaitingState(),
-            homeKitLightManager: HomeKitLightManager(),
-            watchCommandManager: watchCommandManager
+            homeKitLightManager: dependencies.homeKitLightManager,
+            watchCommandManager: dependencies.watchCommandManager
         )
-        
-        game.handleAction(.startGame)
+
+        bleViewModel.game = newGame
+
+        newGame.handleAction(.startGame)
     }
-    
+
+    /// 게임 종료 후 새 로비로 복귀 — 연결된 워치가 그대로면 자동으로 다음 판 시작
+    private func restartGame() {
+        game.handleAction(.gameEnded)
+
+        let lobbyGame = MafiaGame(
+            players: [],
+            initialState: WaitingState(),
+            homeKitLightManager: dependencies.homeKitLightManager,
+            watchCommandManager: dependencies.watchCommandManager
+        )
+
+        bleViewModel.game = lobbyGame
+        didAutoStartGame = false
+
+        // 워치들을 대기 화면으로 복귀시킴 (gameEnded 화면에서 waitingPlayers 수신 시 복귀)
+        dependencies.watchCommandManager.sendWaitingPlayers(
+            count: connectedPlayers.count
+        )
+    }
+
     var body: some View {
         switch game.currentState {
-            
+
         case is WaitingState:
             VStack {
                 WaitingStateView(
                     players: connectedPlayers,
                     remainingTime: game.timerManager.remainingTime
                 )
-                
-                Text("플레이어를 기다리는 중...")
+
+                Text("플레이어를 기다리는 중... (\(connectedPlayers.count)/\(GameRule.requiredPlayerCount))")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -100,59 +86,65 @@ struct GameView: View {
                 startGameIfNeeded()
             }
             .onChange(of: connectedPlayers.count) {
+                // 시작 전 이탈 시 자동 시작 잠금 해제 — 재충원되면 다시 시작 가능
+                if connectedPlayers.count < GameRule.requiredPlayerCount,
+                   game.players.isEmpty {
+                    didAutoStartGame = false
+                }
+
                 startGameIfNeeded()
             }
-            
+
         case is RoleAssigningState:
             RoleAssignView(
                 players: game.players,
                 remainingTime: game.timerManager.remainingTime
             )
-            
+
         case is IntroductionState:
             DiscussionStateView(
                 players: game.players,
-                title: "IntroductionState",
+                title: "자기소개",
                 remainingTime: game.timerManager.remainingTime
             )
-            
+
         case is MafiaState:
             NightActionStateView(
                 players: game.players,
-                title: "MafiaState",
+                title: "마피아의 밤",
                 remainingTime: game.timerManager.remainingTime,
                 selectedPlayer: game.mafiaTarget
             ) { player in
                 game.handleAction(.mafiaSelected(target: player))
             }
-            
+
         case is PoliceState:
             NightActionStateView(
                 players: game.players,
-                title: "PoliceState",
+                title: "경찰의 밤",
                 remainingTime: game.timerManager.remainingTime,
                 selectedPlayer: game.policeTarget
             ) { player in
                 game.handleAction(.policeSelected(target: player))
             }
-            
+
         case is DoctorState:
             NightActionStateView(
                 players: game.players,
-                title: "DoctorState",
+                title: "의사의 밤",
                 remainingTime: game.timerManager.remainingTime,
                 selectedPlayer: game.doctorTarget
             ) { player in
                 game.handleAction(.doctorSelected(target: player))
             }
-            
+
         case is DiscussionState:
             DiscussionStateView(
                 players: game.players,
-                title: "DiscussionState",
+                title: "자유 토론",
                 remainingTime: game.timerManager.remainingTime
             )
-            
+
         case is VoteState:
             VoteStateView(
                 players: game.players,
@@ -165,15 +157,15 @@ struct GameView: View {
                     )
                 )
             }
-            
+
         case is FinalDefenseState:
             FinalDefenseView(
                 players: game.players,
                 finalDefender: game.finalDefensePlayer,
                 remainingTime: game.timerManager.remainingTime,
-                stateTitle: "FinalDefenseState"
+                stateTitle: "최후 변론"
             )
-            
+
         case is ExecutionVoteState:
             ExecutionVoteView(
                 players: game.players,
@@ -187,20 +179,27 @@ struct GameView: View {
                     )
                 )
             }
-            
+
         case is ExecutionResultState:
             FinalDefenseView(
                 players: game.players,
                 finalDefender: game.finalDefensePlayer,
                 remainingTime: game.timerManager.remainingTime,
-                stateTitle: "ExecutionResultState"
+                stateTitle: "처형 결과"
             )
-            
+
         case is ResultState:
             if let winner = game.winner {
-                GameResultView(winner: winner)
+                GameResultView(winner: winner) {
+                    restartGame()
+                }
+            } else {
+                ContentUnavailableView(
+                    "결과 집계 중",
+                    systemImage: "hourglass"
+                )
             }
-            
+
         default:
             Text("알 수 없는 상태")
         }

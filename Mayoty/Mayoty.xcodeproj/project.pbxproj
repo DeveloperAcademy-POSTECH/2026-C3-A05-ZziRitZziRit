@@ -58,7 +58,11 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Core/GameLogger.swift,
+				Domain/Entities/Player.swift,
+				Domain/Entities/PlayerColor.swift,
 				Domain/Entities/Team.swift,
+				Domain/GameRule.swift,
+				Domain/Roles/Role.swift,
 				Infrastructure/Bluetooth/Common/BLEAnswer.swift,
 				Infrastructure/Bluetooth/Common/BLECommand.swift,
 				Infrastructure/Bluetooth/Common/BLEUUID.swift,

@@ -1,19 +1,11 @@
 //
-//  PlayerColor.swift
-//  Mayoty
+//  PlayerColor+Watch.swift
+//  MayotyWatch Watch App
 //
-//  Created by sun on 6/8/26.
+//  Created by Claude on 6/11/26.
 //
 
 import SwiftUI
-
-enum PlayerColor: String, Codable, CaseIterable {
-    case pink
-    case purple
-    case yellow
-    case mint
-    case orange
-}
 
 extension PlayerColor {
     var uiColor: Color {
