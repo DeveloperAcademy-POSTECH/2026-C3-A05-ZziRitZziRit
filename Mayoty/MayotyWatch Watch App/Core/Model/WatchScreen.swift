@@ -7,6 +7,8 @@
 
 enum WatchScreen {
     case join
+    case connectionSucceeded
+    case waiting
     case roleAssigning
     case roleResult
     case dayTime

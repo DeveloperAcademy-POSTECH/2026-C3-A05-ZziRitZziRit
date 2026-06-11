@@ -27,6 +27,14 @@ final class WatchCommandStore {
 
     func handle(_ command: BLECommand) {
         switch command.kind {
+        case .connectionSucceeded:
+            currentScreen = .connectionSucceeded
+            
+            Task {
+                try? await Task.sleep(for: .seconds(2))
+                currentScreen = .waiting
+            }
+            
         case .playerColor:
             updatePlayerColor(
                 targetID: command.targetID,

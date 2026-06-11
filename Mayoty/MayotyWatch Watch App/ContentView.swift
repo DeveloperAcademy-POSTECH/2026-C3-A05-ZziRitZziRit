@@ -15,11 +15,17 @@ struct ContentView: View {
         case .join:
             JoinGameView(viewModel: viewModel)
             
+        case .connectionSucceeded:
+            ConnectionSucceedView()
+
+        case .waiting:
+            WaitingPlayersView()
+            
         case .roleAssigning:
             RoleAssigningView()
             
         case .roleResult:
-            RoleSelectingView(
+            RoleResultView(
                 role: viewModel.commandStore.role
             )
             
