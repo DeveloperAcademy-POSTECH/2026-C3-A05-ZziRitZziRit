@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import AVFoundation
+import AVKit
 
 struct GameView: View {
     
@@ -42,27 +44,27 @@ struct GameView: View {
         )
     }
     
-//        private var connectedPlayers: [Player] {
-//            bleViewModel.connectedWatchIDs.map { id in
-//                Player(
-//                    id: id,
-//                    watchId: id.uuidString
-//                )
-//            }
-//        }
+        private var connectedPlayers: [Player] {
+            bleViewModel.connectedWatchIDs.map { id in
+                Player(
+                    id: id,
+                    watchId: id.uuidString
+                )
+            }
+        }
     
-    private var connectedPlayers: [Player] {
-        [
-            Player(id: UUID(), watchId: "mock-watch-1"),
-            Player(id: UUID(), watchId: "mock-watch-2"),
-            Player(id: UUID(), watchId: "mock-watch-3"),
-            Player(id: UUID(), watchId: "mock-watch-4"),
-            Player(id: UUID(), watchId: "mock-watch-5")
-        ]
-    }
+//    private var connectedPlayers: [Player] {
+//        [
+//            Player(id: UUID(), watchId: "mock-watch-1"),
+//            Player(id: UUID(), watchId: "mock-watch-2"),
+//            Player(id: UUID(), watchId: "mock-watch-3"),
+//            Player(id: UUID(), watchId: "mock-watch-4"),
+//            Player(id: UUID(), watchId: "mock-watch-5")
+//        ]
+//    }
     
     private var canStartGame: Bool {
-        connectedPlayers.count >= 3
+        connectedPlayers.count >= 5
     }
     
     private func startGameIfNeeded() {
@@ -83,6 +85,10 @@ struct GameView: View {
     }
     
     var body: some View {
+        
+        AirPlayRoutePicker()
+            .frame(width: 60, height: 60)
+            .padding(.top, 10)
         switch game.currentState {
             
         case is WaitingState:
@@ -205,4 +211,14 @@ struct GameView: View {
             Text("알 수 없는 상태")
         }
     }
+}
+
+struct AirPlayRoutePicker: UIViewRepresentable {
+    func makeUIView(context: Context) -> AVRoutePickerView {
+        let view = AVRoutePickerView()
+        view.prioritizesVideoDevices = false
+        return view
+    }
+
+    func updateUIView(_ uiView: AVRoutePickerView, context: Context) {}
 }
