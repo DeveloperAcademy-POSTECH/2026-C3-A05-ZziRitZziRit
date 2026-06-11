@@ -9,31 +9,21 @@ import SwiftUI
 
 struct CheckRoleView: View {
     @Environment(\.dismiss) private var dismiss
-    
-    
-    // TODO: 게임 상태(Store/ViewModel)에서 플레이어 목록 주입받도록 변경
-    @State private var players: [Player] = [
-        Player(color: PlayerColor.pink, role: Role.mafia),
-        Player(color: PlayerColor.purple, role: Role.citizen),
-        Player(color: PlayerColor.yellow, role: Role.citizen),
-        Player(color: PlayerColor.orange, role: Role.doctor),
-        Player(color: PlayerColor.mint, role: Role.police)
-    ]
-    
-    
-    
+
+    /// BLE playerRole 명령으로 수신한 실제 직업 명단 (사망자에게만 공개됨)
+    let players: [Player]
+
     var body: some View {
         MafiaLogoView {
             VStack{
-                
+
                 Text("진실을 확인합니다")
-                    .font(Font.system(size: 27))
-                    .fontWeight(.bold)
+                    .font(.title3.bold())
                     .padding(.top, -15)
                     .padding(.bottom, -2)
                 
                 ScrollView{
-                    VStack(spacing:50) {
+                    VStack(spacing: 12) {
                         ForEach(players) { player in
                             RoleCardView(player: player)
                         }
@@ -46,10 +36,11 @@ struct CheckRoleView: View {
                 .ignoresSafeArea()
             }
             .padding(.top, 1)
-            .onAppear {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
-                    dismiss()
-                }
+            .task {
+                // 뷰가 먼저 사라지면 sleep이 취소되어 stale dismiss가 호출되지 않음
+                try? await Task.sleep(for: .seconds(4))
+                guard !Task.isCancelled else { return }
+                dismiss()
             }
         }
     }
@@ -57,6 +48,12 @@ struct CheckRoleView: View {
 
 #Preview {
     NavigationStack{
-        CheckRoleView()
+        CheckRoleView(players: [
+            Player(color: .pink, role: .mafia),
+            Player(color: .purple, role: .citizen),
+            Player(color: .yellow, role: .citizen),
+            Player(color: .orange, role: .doctor),
+            Player(color: .mint, role: .police)
+        ])
     }
 }

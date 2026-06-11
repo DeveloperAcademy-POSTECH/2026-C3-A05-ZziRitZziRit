@@ -24,13 +24,12 @@ struct YouDiedView: View {
                     
                     Image("skeleton")
                         .frame(width: 86, height: 111)
+                        .accessibilityHidden(true)
                     Text("사망하셨습니다")
-                        .font(Font.system(size: 22))
-                        .fontWeight(.bold)
+                        .font(.headline.bold())
                         .padding(.bottom, 1)
                     Text("⚠️ 게임이 끝날때까지\n발언이 금지됩니다")
-                        .font(Font.system(size: 14))
-                        .fontWeight(.bold)
+                        .font(.footnote.bold())
                         .foregroundStyle(.yellow)
                         .multilineTextAlignment(.center)
                     

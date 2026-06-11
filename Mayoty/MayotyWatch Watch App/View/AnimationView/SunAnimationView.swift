@@ -9,45 +9,42 @@ import SwiftUI
 
 struct SunAnimationView: View {
     private let totalFrames = 347
-    @State private var currentFrame = 1
-    @State private var cachedImages: [UIImage] = []
+
+    /// 347장 풀스크린 프레임을 UIImage 배열로 프리로드하면
+    /// watchOS 메모리 한도를 위협하므로 에셋 카탈로그 캐시에 맡김.
+    /// 33ms(~30fps)면 워치 디스플레이에 충분.
+    private let frameInterval = 1.0 / 30.0
+
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var startDate: Date?
 
     var body: some View {
         Group {
-            if cachedImages.isEmpty {
-                Color.clear
+            if reduceMotion {
+                frameImage(1)
             } else {
-                Image(uiImage: cachedImages[currentFrame - 1])
-                    .resizable()
-                    .scaledToFit()
+                TimelineView(.periodic(from: .now, by: frameInterval)) { context in
+                    frameImage(frame(at: context.date))
+                }
             }
         }
         .onAppear {
-            preloadImages()
+            startDate = Date()
         }
     }
 
-    private func preloadImages() {
-        DispatchQueue.global(qos: .userInitiated).async {
-            var images: [UIImage] = []
-            for i in 1...totalFrames {
-                let name = String(format: "sun_%03d", i)
-                if let img = UIImage(named: name) {
-                    images.append(img)
-                }
-            }
-            DispatchQueue.main.async {
-                cachedImages = images
-                startAnimation()
-            }
-        }
+    private func frame(at date: Date) -> Int {
+        guard let startDate else { return 1 }
+
+        let elapsed = max(0, date.timeIntervalSince(startDate))
+        return Int(elapsed / frameInterval) % totalFrames + 1
     }
 
-    private func startAnimation() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.015) {
-            currentFrame = (currentFrame % totalFrames) + 1
-            startAnimation()
-        }
+    private func frameImage(_ frame: Int) -> some View {
+        Image(String(format: "sun_%03d", frame))
+            .resizable()
+            .scaledToFit()
+            .accessibilityHidden(true)
     }
 }
 

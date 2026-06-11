@@ -13,8 +13,9 @@ struct ConnectionSucceedView: View {
             VStack(spacing: 5) {
                 Image(systemName: "checkmark.circle")
                     .font(.system(size:40))
+                    .accessibilityHidden(true)
                 Text("연결 완료")
-                    .font(.system(size:30))
+                    .font(.title2)
             }
         }
         .task {

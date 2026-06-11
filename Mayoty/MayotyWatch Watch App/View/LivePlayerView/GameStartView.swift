@@ -11,7 +11,7 @@ struct GameStartView: View {
     var body: some View {
         MafiaLogoView {
                 Text("마피아 게임을 시작합니다")
-                    .font(.system(size:30))
+                    .font(.title2)
                     .multilineTextAlignment(.center)
         }
         .task {

@@ -16,15 +16,13 @@ struct RoleNightView: View {
     @GestureState private var isPressing = false
     @State private var pressProgress: Double = 0
     @State private var confirmedPlayerID: UUID? = nil
-    
-    @State private var players: [Player] = [
-        Player(color: PlayerColor.pink),
-        Player(color: PlayerColor.purple),
-        Player(color: PlayerColor.yellow),
-        Player(color: PlayerColor.orange),
-        Player(color: PlayerColor.mint)
-    ]
-    
+
+    /// iPhone이 playerColor 명령으로 보내준 실제 명단 —
+    /// 전송하는 playerID(index+1)가 호스트의 배정 순서와 일치해야 함
+    private var players: [Player] {
+        viewModel.commandStore.players
+    }
+
     @State private var downloadAmount : Double = 100
     
     private func runCountdown() async {
@@ -84,16 +82,14 @@ struct RoleNightView: View {
         MafiaLogoView {
             VStack{
                     Text(role.selectingText)
-                        .font(Font.system(size: 20))
-                        .fontWeight(.bold)
+                        .font(.headline.bold())
                 
                 VStack {
                         ProgressView(value: downloadAmount, total: 100)
-                            .frame(width: 160)
+                            .frame(maxWidth: 160)
                             .padding(.horizontal, 10)
-                            .progressViewStyle(
-                                LinearProgressViewStyle(tint: progressColor)
-                            )
+                            .progressViewStyle(.linear)
+                            .tint(progressColor)
                     
                     ScrollView{
                         VStack{

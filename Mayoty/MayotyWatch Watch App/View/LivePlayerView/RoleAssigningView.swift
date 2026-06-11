@@ -14,7 +14,7 @@ struct RoleAssigningView: View {
                 ProgressView{}
                     .frame(width: 30, height: 30)
                 Text("직업 배정중")
-                    .font(.system(size:30))
+                    .font(.title2)
             }
         }
         .task {

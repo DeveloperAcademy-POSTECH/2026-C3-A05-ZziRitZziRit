@@ -8,16 +8,17 @@
 import SwiftUI
 
 struct ConnectionFailView: View {
+    let onRetry: () -> Void
+
     var body: some View {
         MafiaLogoView {
             VStack(spacing: 5) {
                 Image(systemName: "exclamationmark.triangle")
                     .font(.system(size:40))
+                    .accessibilityHidden(true)
                 Text("연결 실패")
-                    .font(.system(size:30))
-                Button(action:{
-                    print("")
-                }) {
+                    .font(.title2)
+                Button(action: onRetry) {
                     Text("다시 시도")
                         .foregroundStyle(.white)
                 }
@@ -31,5 +32,5 @@ struct ConnectionFailView: View {
 }
 
 #Preview {
-    ConnectionFailView()
+    ConnectionFailView {}
 }

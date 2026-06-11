@@ -20,17 +20,17 @@ struct MainButtonView: View {
             
             VStack(alignment: .leading){
                 Text("\(player.color?.displayName ?? "") 플레이어")
-                    .font(Font.system(size: 23))
-                    .fontWeight(.bold)
+                    .font(.headline.bold())
                 if !isConfirmed {
                     Text("꾹 눌러 확정하기")
-                        .font(Font.system(size: 15))
+                        .font(.footnote)
                         .foregroundStyle(Color.textPush)
                 }
             }
             .padding(.leading, 10)
         }
-        .frame(width: 180, height: 75)
+        // 고정 폭은 40-41mm 화면(162-176pt)에서 넘침 — 화면 상대 폭 사용
+        .frame(maxWidth: .infinity, minHeight: 75)
         .background(
             RoundedRectangle(cornerRadius: 16)
             .fill(Color.gray)

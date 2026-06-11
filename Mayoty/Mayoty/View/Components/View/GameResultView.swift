@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GameResultView: View {
     let winner: Team
+    let onRestart: () -> Void
 
     var body: some View {
         VStack(spacing: 24) {
@@ -18,6 +19,9 @@ struct GameResultView: View {
 
             Text(winner.displayName)
                 .font(.title)
+
+            Button("새 게임 시작", action: onRestart)
+                .buttonStyle(.borderedProminent)
         }
     }
 }

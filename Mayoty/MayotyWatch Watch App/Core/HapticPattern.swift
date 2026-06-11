@@ -99,9 +99,10 @@ enum HapticPattern {
                 }
                 
             case .circularProgress:
-                while true {
+                // .task에서 호출되면 뷰 소멸 시 sleep이 throw하며 종료됨
+                // 비구조화 Task에서 호출할 경우를 대비해 취소도 직접 확인
+                while !Task.isCancelled {
                     device.play(.directionUp)
-                    device.play(.start) // 연결완료시까지 무한반복
                     try await Task.sleep(for: .milliseconds(500))
                 }
             case .connectionSucceed:

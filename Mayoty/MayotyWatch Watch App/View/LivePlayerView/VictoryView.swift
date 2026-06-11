@@ -9,7 +9,8 @@ import SwiftUI
 
 struct VictoryView: View {
     let victory: Victory
-    
+    let onRestart: () -> Void
+
     var body: some View {
         MafiaLogoView(baseColor: victory.backGroundColor) {
             victory.animation {
@@ -17,9 +18,7 @@ struct VictoryView: View {
                     Text(victory.text)
                         .foregroundStyle(victory.textColor)
                         .font(.title)
-                    Button{
-                            // TODO: go to 1st step
-                    } label: {
+                    Button(action: onRestart) {
                         Text("처음으로")
                             .foregroundStyle(.white)
                     }
@@ -34,5 +33,5 @@ struct VictoryView: View {
 }
 
 #Preview {
-    VictoryView(victory: .mafia)
+    VictoryView(victory: .mafia) {}
 }

@@ -8,15 +8,17 @@
 import SwiftUI
 
 struct WaitingPlayersView: View {
+    let count: Int
+
     var body: some View {
         MafiaLogoView {
             VStack(spacing: 20) {
                 Text("플레이어 접속중")
-                    .font(.system(size:25))
+                    .font(.title3)
                 ProgressView()
                     .frame(width: 30, height: 30)
-                Text("n/5")
-                    .font(.system(size:25))
+                Text("\(count)/\(GameRule.requiredPlayerCount)")
+                    .font(.title3)
             }
         }
         .task {
@@ -26,5 +28,5 @@ struct WaitingPlayersView: View {
 }
 
 #Preview {
-    WaitingPlayersView()
+    WaitingPlayersView(count: 3)
 }

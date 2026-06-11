@@ -13,13 +13,27 @@ struct ContentView: View {
     var body: some View {
         switch viewModel.commandStore.currentScreen {
         case .join:
-            JoinGameView(viewModel: viewModel)
-            
+            // BLE 연결 실패 시 재시도 화면으로 안내
+            if viewModel.connectionState == .failed {
+                ConnectionFailView {
+                    viewModel.scan()
+                }
+            } else {
+                JoinGameView(viewModel: viewModel)
+            }
+
         case .connectionSucceeded:
             ConnectionSucceedView()
 
+        case .connectionFailed:
+            ConnectionFailView {
+                viewModel.scan()
+            }
+
         case .waiting:
-            WaitingPlayersView()
+            WaitingPlayersView(
+                count: viewModel.commandStore.waitingCount
+            )
             
         case .roleAssigning:
             RoleAssigningView()
@@ -76,7 +90,7 @@ struct ContentView: View {
             
         case .executionResult:
             ExecutionResultView(
-                excutionResult: .survive
+                excutionResult: viewModel.commandStore.executionResult
             )
             
         case .gameEnded:
@@ -84,6 +98,13 @@ struct ContentView: View {
                 victory: viewModel.commandStore.winner == .mafia
                     ? .mafia
                     : .citizen
+            ) {
+                viewModel.commandStore.returnToWaiting()
+            }
+
+        case .dead:
+            DeadPlayerFlowView(
+                players: viewModel.commandStore.players
             )
         }
     }

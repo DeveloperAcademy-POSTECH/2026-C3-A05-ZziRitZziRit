@@ -8,6 +8,7 @@
 enum WatchScreen {
     case join
     case connectionSucceeded
+    case connectionFailed
     case waiting
     case roleAssigning
     case roleResult
@@ -22,4 +23,5 @@ enum WatchScreen {
     case executionVote
     case executionResult
     case gameEnded
+    case dead
 }

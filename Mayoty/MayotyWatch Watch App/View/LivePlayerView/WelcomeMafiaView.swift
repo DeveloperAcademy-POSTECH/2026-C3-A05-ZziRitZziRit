@@ -12,7 +12,7 @@ struct WelcomeMafiaView: View {
         MafiaLogoView{
                 Text("마피아 세계에 \n오신걸 \n환영합니다.")
                     .multilineTextAlignment(.center)
-                    .font(.system(size: 30))
+                    .font(.title2)
         }
     }
 }

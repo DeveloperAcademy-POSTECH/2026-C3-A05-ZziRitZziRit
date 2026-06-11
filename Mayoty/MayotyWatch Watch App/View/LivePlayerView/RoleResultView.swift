@@ -14,13 +14,14 @@ struct RoleResultView: View {
         MafiaLogoView {
             VStack(spacing: 5) {
                 Text("당신의 직업은")
-                    .font(.system(size:30))
+                    .font(.title2)
                 Image(role.iconName)
                     .resizable()
                     .scaledToFit()
                     .frame(width: 120, height: 120)
+                    .accessibilityHidden(true)
                 Text(role.displayName)
-                    .font(.system(size:30))
+                    .font(.title2)
             }
         }
         .task {

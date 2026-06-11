@@ -10,7 +10,7 @@ struct WaitView: View {
         MafiaLogoView {
             Text("잠시후,\n다른 플레이어들의\n지목 화면이\n표시됩니다")
                 .multilineTextAlignment(.center)
-                .font(Font.system(size: 20).weight(.bold))
+                .font(.headline.bold())
                 .padding(.bottom, 20)
         }
     }
