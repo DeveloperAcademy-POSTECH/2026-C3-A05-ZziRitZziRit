@@ -101,7 +101,6 @@ enum HapticPattern {
             case .circularProgress:
                 while true {
                     device.play(.directionUp)
-                    device.play(.start) // 연결완료시까지 무한반복
                     try await Task.sleep(for: .milliseconds(500))
                 }
             case .connectionSucceed:
