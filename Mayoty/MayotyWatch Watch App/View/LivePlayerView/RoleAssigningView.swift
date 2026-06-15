@@ -21,9 +21,6 @@ struct RoleAssigningView: View {
             }
         }
         .onAppear {
-            Task {
-                try? await HapticPattern.circularProgress.play()
-            }
 
             viewModel.autoNext(after: 1.5)
         }
