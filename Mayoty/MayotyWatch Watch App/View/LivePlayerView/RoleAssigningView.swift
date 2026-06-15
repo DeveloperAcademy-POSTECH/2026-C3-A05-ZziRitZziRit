@@ -8,21 +8,21 @@
 import SwiftUI
 
 struct RoleAssigningView: View {
+    let viewModel: WatchViewModel
+
     var body: some View {
         MafiaLogoView {
             VStack(spacing: 5) {
-                ProgressView{}
+                ProgressView()
                     .frame(width: 30, height: 30)
+
                 Text("직업 배정중")
-                    .font(.system(size:30))
+                    .font(.system(size: 30))
             }
         }
-        .task {
-            try? await HapticPattern.circularProgress.play()
+        .onAppear {
+
+            viewModel.autoNext(after: 1.5)
         }
     }
-}
-
-#Preview {
-    RoleAssigningView()
 }

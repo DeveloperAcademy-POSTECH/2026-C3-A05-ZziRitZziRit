@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct ConnectionWaitingView: View {
+    let viewModel: WatchViewModel
+    
     var body: some View {
         MafiaLogoView{
             VStack {
@@ -22,8 +24,4 @@ struct ConnectionWaitingView: View {
             }
         }
     }
-}
-
-#Preview {
-    ConnectionWaitingView()
 }

@@ -9,25 +9,26 @@ import SwiftUI
 
 struct PoliceArrestResultView: View {
     let result: PoliceArrest
+    let viewModel: WatchViewModel
     
     var body: some View {
-        MafiaLogoView{
+        MafiaLogoView {
             VStack {
                 Image(systemName: "person.fill")
-//                    .foregroundStyle(.playerColor) //지목한 사람의 색깔 들어오기 -> 지목 CardView 완성 후
                     .resizable()
-                    .frame(width:56,height:56)
+                    .frame(width: 56, height: 56)
+
                 Text("검거 \(result.resultText)")
                     .foregroundStyle(result.resultColor)
-                    .font(.system(size:35))
+                    .font(.system(size: 35))
             }
         }
-        .task {
-            try? await result.resultHaptic.play()
+        .onAppear {
+            Task {
+                try? await result.resultHaptic.play()
+            }
+
+            viewModel.autoNext(after: 2.0)
         }
     }
-}
-
-#Preview {
-    PoliceArrestResultView(result: .success)
 }

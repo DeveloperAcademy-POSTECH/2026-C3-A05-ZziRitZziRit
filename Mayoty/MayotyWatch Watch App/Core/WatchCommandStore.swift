@@ -30,11 +30,6 @@ final class WatchCommandStore {
         case .connectionSucceeded:
             currentScreen = .connectionSucceeded
             
-            Task {
-                try? await Task.sleep(for: .seconds(2))
-                currentScreen = .waiting
-            }
-            
         case .playerColor:
             updatePlayerColor(
                 targetID: command.targetID,

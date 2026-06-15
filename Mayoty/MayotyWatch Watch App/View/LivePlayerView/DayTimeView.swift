@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct DayTimeView: View {
+    let viewModel: WatchViewModel
+
     var body: some View {
         MafiaLogoView {
             SunAnimationView()
         }
+        .onAppear {
+            viewModel.autoNext(after: 2.0)
+        }
     }
-}
-
-#Preview {
-    DayTimeView()
 }

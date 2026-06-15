@@ -18,6 +18,7 @@ struct MayotyWatch_Watch_AppApp: App {
                 ContentView(
                     viewModel: viewModel
                 )
+//                WatchBLETestView()
             }
         }
     }

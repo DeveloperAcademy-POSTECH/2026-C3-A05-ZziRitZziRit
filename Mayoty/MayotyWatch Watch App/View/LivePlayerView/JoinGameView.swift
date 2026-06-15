@@ -18,6 +18,7 @@ struct JoinGameView: View {
 
                 Button {
                     viewModel.scan()
+                    viewModel.goNext()
                     Task { try? await HapticPattern.choosePlayer.play() }
                 } label: {
                     Text("참가하기")

@@ -9,22 +9,20 @@ import SwiftUI
 
 struct RoleSelectingView: View {
     let role: Role
-    
+    let viewModel: WatchViewModel
+
     var body: some View {
-        MafiaLogoView{
+        MafiaLogoView {
             VStack {
-                ProgressView{}
+                ProgressView()
                     .frame(width: 30, height: 30)
+
                 Text("\(role.displayName) 지목중")
-                    .font(.system(size:25))
+                    .font(.system(size: 25))
             }
         }
-        .task {
-            try? await HapticPattern.circularProgress.play()
+        .onAppear {
+            viewModel.autoNext(after: 1.5)
         }
     }
-}
-
-#Preview {
-    RoleSelectingView(role: .doctor)
 }

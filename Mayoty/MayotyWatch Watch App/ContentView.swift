@@ -11,26 +11,24 @@ struct ContentView: View {
     @Bindable var viewModel: WatchViewModel
     
     var body: some View {
-        switch viewModel.commandStore.currentScreen {
+        switch viewModel.currentScreen {
         case .join:
             JoinGameView(viewModel: viewModel)
             
         case .connectionSucceeded:
-            ConnectionSucceedView()
+            ConnectionSucceedView(viewModel: viewModel)
 
         case .waiting:
-            WaitingPlayersView()
+            WaitingPlayersView(viewModel: viewModel)
             
         case .roleAssigning:
-            RoleAssigningView()
+            RoleAssigningView(viewModel: viewModel)
             
         case .roleResult:
-            RoleResultView(
-                role: viewModel.commandStore.role
-            )
+            RoleResultView(viewModel: viewModel)
             
-        case .dayTime:
-            DayTimeView()
+        case .introductino:
+            DayTimeView(viewModel: viewModel)
             
         case .mafiaTurn:
             RoleNightView(
@@ -49,6 +47,9 @@ struct ContentView: View {
                 role: .doctor,
                 viewModel: viewModel
             )
+            
+        case .dayTime:
+            DayTimeView(viewModel: viewModel)
 
         case .vote:
             RoleNightView(
@@ -57,17 +58,19 @@ struct ContentView: View {
             )
             
         case .nightTime:
-            RoleSelectingView(role: viewModel.commandStore.role)
+            RoleSelectingView(
+                role: .mafia,
+                viewModel: viewModel
+            )
             
         case .policeResult:
             PoliceArrestResultView(
-                result: viewModel.commandStore.policeResultIsMafia
-                ? .success
-                : .fail
+                result: viewModel.commandStore.policeResultIsMafia ? .success : .fail,
+                viewModel: viewModel
             )
             
         case .finalDefense:
-            FinalDefenseView()
+            FinalDefenseView(viewModel: viewModel)
             
         case .executionVote:
             ExecutionVoteView(
@@ -76,14 +79,16 @@ struct ContentView: View {
             
         case .executionResult:
             ExecutionResultView(
-                excutionResult: .survive
+                excutionResult: .survive,
+                viewModel: viewModel
             )
             
         case .gameEnded:
             VictoryView(
                 victory: viewModel.commandStore.winner == .mafia
                     ? .mafia
-                    : .citizen
+                    : .citizen,
+                viewModel: viewModel
             )
         }
     }

@@ -9,22 +9,22 @@ import SwiftUI
 
 struct ExecutionResultView: View {
     let excutionResult: ExecutionResult
-    
+    let viewModel: WatchViewModel
+
     var body: some View {
         MafiaLogoView {
             VStack {
                 Image(systemName: "person.fill")
                     .resizable()
                     .frame(width: 80, height: 80)
-//                    .foregroundStyle(.white) //최다 지목된 플레이어 색깔
+
                 Text(excutionResult.textResult)
                     .foregroundStyle(excutionResult.textColor)
                     .font(.title)
             }
         }
+        .onAppear {
+            viewModel.autoNext(after: 2.0)
+        }
     }
-}
-
-#Preview {
-    ExecutionResultView(excutionResult: .survive)
 }
